@@ -34,7 +34,14 @@ public class IntListTest {
      *  IntList empty = IntList.list().
      */
     
-    //TODO:  Create testSquareListRecursive()
+    @Test
+    public void testsquareListRecursive() {
+        IntList L = IntList.list(1,2,3);
+        IntList.squareListRecursive(L);
+        assertEquals(IntList.list(1, 2, 3), L);
+        assertEquals(IntList.list(1, 4, 9), IntList.squareListRecursive(L));
+
+    }
 
     /* Run the unit tests in this file. */
     public static void main(String... args) {
