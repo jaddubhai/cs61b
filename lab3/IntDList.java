@@ -46,7 +46,20 @@ public class IntDList {
      * @return The number of elements in this list.
      */
     public int size() {
-        return 0;   // Your code here
+        if (_back == null){
+            return 0;
+        }
+
+        DNode temp = _front;
+
+        int size = 0;
+        // IntDList.DNode x = _back;
+
+        while (temp != null){
+            temp = temp._next;
+            size += 1;
+        }
+        return size;
     }
 
     /**
@@ -60,21 +73,52 @@ public class IntDList {
      * @return The integer value at index i
      */
     public int get(int i) {
-        return 0;   // Your code here
+        if (i < 0){
+            i = size() + i;
+        }
+
+        DNode temp = _front;
+
+        while (i>0){
+            temp = temp._next;
+            i --;
+        }
+        return temp._val;
     }
 
     /**
      * @param d value to be inserted in the front
      */
     public void insertFront(int d) {
-        // Your code here
+        _front = new DNode(null, d, _front);
+        // DNode old_back = _back;
+
+        // new_back._next = old_back;
+
+        if (_back == null) {
+            _back = _front;
+        }
+        else {
+            _front._next._prev = _front;
+        }
     }
 
     /**
      * @param d value to be inserted in the back
      */
     public void insertBack(int d) {
-        // Your code here
+        _back = new DNode(_back, d, null);
+       // DNode old_back = _back;
+
+       // new_back._next = old_back;
+
+        if (_front == null) {
+            _front = _back;
+        }
+        else {
+            _back._prev._next = _back;
+        }
+
     }
 
     /**
@@ -83,7 +127,13 @@ public class IntDList {
      * @return the item that was deleted
      */
     public int deleteBack() {
-        return 0;   // Your code here
+        int result = _back._val;
+
+        _back = _back._prev;
+        if (_back != null) {
+            _back._next = null;
+        }
+        return result;   // Your code here
 
     }
 
@@ -96,7 +146,17 @@ public class IntDList {
      * System.out.println(a); //prints ab
      */
     public String toString() {
-        return null;   // Your code here
+        int length = size();
+        String lst_string = "[";
+
+        if (length == 0) {
+            return "[]";
+        }
+        for (int i = 0; i<length -1; i++){
+            lst_string += Integer.toString(get(i)) + ", ";
+        }
+        lst_string += Integer.toString(get(-1)) + ']';
+        return lst_string;
     }
 
     /**

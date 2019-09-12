@@ -18,7 +18,16 @@ public class BuggyIntDListSolution extends IntDList {
      */
     public void insertBack(int d) {
         _back = new DNode(_back, d, null);
-        _back._prev._next = _back;
+        // DNode old_back = _back;
+
+        // new_back._next = old_back;
+
+        if (_front == null) {
+            _front = _back;
+        }
+        else {
+            _back._prev._next = _back;
+        }
     }
 
     /**
@@ -28,7 +37,7 @@ public class BuggyIntDListSolution extends IntDList {
      * @return The name of the type of exception that is thrown.
      */
     public String getException() {
-        return "ERROR EXCEPTION HERE";
+        return "NullPointerException";
     }
 
     /**
@@ -38,7 +47,7 @@ public class BuggyIntDListSolution extends IntDList {
      * @return The name of the function in which the error occurs.
      */
     public String getErrorFunction() {
-        return "FUNCTION IN WHICH ERROR OCCURS HERE";
+        return "insertBack";
     }
 
     /**
@@ -48,6 +57,6 @@ public class BuggyIntDListSolution extends IntDList {
      * @return The line number at which the error occurs
      */
     public int getErrorLineNumber() {
-        return -1;
+        return 21;
     }
 }
