@@ -18,6 +18,24 @@ class Lists {
      *  original list pointed to by L. */
     static IntListList naturalRuns(IntList L) {
         /* *Replace this body with the solution. */
-        return null;
+        if (L == null) {
+            return null;
+        } else {
+            IntList start = Helper(L);
+            IntListList sub = naturalRuns(start.tail);
+            start.tail = null;
+            return new IntListList (L, sub);
+        }
     }
-}
+
+    private static IntList Helper(IntList L) {
+        while (L.tail != null) {
+            if (L.head < L.tail.head) {
+                L = L.tail;
+            }
+        }
+        return L;
+    }
+    }
+
+

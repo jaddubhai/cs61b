@@ -55,7 +55,22 @@ public class MatrixUtils {
      */
 
     public static double[][] accumulateVertical(double[][] m) {
-        return null; //your code here
+        double[][] copy = MatrixUtils.copy(m);
+        for (int row = 0; row < copy.length; row ++ ){
+            for (int col = 0; col < copy[0].length; col ++){
+                double least = Math.min(Math.min(get(m, row, col), get(m, row, col - 1)), get(m, row, col + 1));
+                copy[row][col] += least;
+            }
+        }
+        return copy; //your code here
+    }
+
+    private static double get(double[][] m, int row, int col){
+        if ((col >= 0) && (col < m[0].length) && (row< m.length) && (row >= 0)){
+            return m[row][col];
+        } else {
+            return Double.POSITIVE_INFINITY;
+        }
     }
 
     /** Non-destructively accumulates a matrix M along the specified
@@ -82,8 +97,25 @@ public class MatrixUtils {
      */
 
     public static double[][] accumulate(double[][] m, Orientation orientation) {
-        return null; //your code here
+        if (orientation == Orientation.HORIZONTAL) {
+            return accu_helper(accumulateVertical(m));
+        }
+        return accumulateVertical(m);
     }
+
+    private static double[][] accu_helper(double[][] m) {
+        int num_rows = m.length;
+        int num_cols = m[0].length;
+        double[][] flipped = new double[num_cols][num_rows];
+        for (int r = 0; r < num_rows; r++) {
+            for (int c = 0; c < num_cols; c++) {
+                flipped[c][r] = m[r][c];
+            }
+        }
+        return flipped;
+    }
+
+
 
     /** Finds the vertical seam VERTSEAM of the given matrix M.
      *

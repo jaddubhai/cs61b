@@ -26,7 +26,7 @@ import static signpost.Utils.*;
  *  of the next higher numbered square in the solution: d * 45 degrees clockwise
  *  from straight up (i.e., toward higher y coordinates).  The highest-numbered
  *  square has direction 0.  Certain squares can have their values fixed to
- *  those in the solution. Initially, the only two squares with fixed values
+ *  those in the solution. Initially, the only  two squares with fixed values
  *  are those with the lowest and highest sequence numbers in the solution.
  *
  *  At any given time after initialization, a square whose value is not fixed
