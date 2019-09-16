@@ -93,8 +93,29 @@ class Place {
     static PlaceList[][][] successorCells(int width, int height) {
         PlaceList[][][] M = new PlaceList[width][height][9];
         int lim = Math.max(width, height);
+        for (int x = 0; x < width; x++){
+            for (int y = 0; y < height; y++){
+                for (int dir = 8; dir > -1; dir--){
+
+                    for (int i = 0; i < width; i++){
+                        for (int j = 0; j < height; j++) {
+                            PlaceList p = new PlaceList();
+                            if (i != x && j != y) {
+                                if (dirOf(x, y, i, j) != 0 && dirOf(x, y, i, j) == dir) {
+                                    p.add(Place.pl(i, j));
+                                }
+                                M[x][y][dirOf(x, y, i, j)] = p;
+
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
         return M;
     }
+
 
     @Override
     public boolean equals(Object obj) {

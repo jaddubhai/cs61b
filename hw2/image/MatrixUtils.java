@@ -109,7 +109,8 @@ public class MatrixUtils {
 
     public static double[][] accumulate(double[][] m, Orientation orientation) {
         if (orientation == Orientation.HORIZONTAL) {
-            return accu_helper(accumulateVertical(m));
+
+            return accu_helper(accumulateVertical(accu_helper(m)));
         }
         return accumulateVertical(m);
     }

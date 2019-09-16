@@ -297,8 +297,20 @@ class Model implements Iterable<Model.Sq> {
             return 0;
         }
         else{
-            Place succ = solnNumToPlace(seq0+1);
-            return Place.dirOf(x, y, succ.x, succ.y);
+            int count_x = 0;
+            int count_y = 0;
+            for (int i = 0; i < _width; i++ ){
+                for (int j = 0; j < _height; j++){
+                    if (_solution[i][j] == seq0+1){
+                        break;
+                    }
+                    count_x +=1;
+                    count_y += 1;
+
+                }
+            }
+
+            return Place.dirOf(x, y, count_x, count_y);
         }
     }
 

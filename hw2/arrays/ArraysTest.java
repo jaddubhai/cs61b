@@ -32,9 +32,14 @@ public class ArraysTest {
     public void testnaturalRuns() {
         int[] A = {1, 2, 6, 5, 4};
         int[][] B = {{1, 2, 6}, {5}, {4}};
+        int [] A1 = null;
 
         assertArrayEquals(B, Arrays.naturalRuns(A));
-        assertArrayEquals(null, Arrays.naturalRuns(null));
+        assertArrayEquals(null, Arrays.naturalRuns(A1));
 
+    }
+
+    public static void main(String[] args) {
+        System.exit(ucb.junit.textui.runClasses(ArraysTest.class));
     }
 }

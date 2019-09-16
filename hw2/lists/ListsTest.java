@@ -34,4 +34,8 @@ public class ListsTest {
 
     }
 
+    public static void main(String[] args) {
+        System.exit(ucb.junit.textui.runClasses(ListsTest.class));
+    }
+
 }

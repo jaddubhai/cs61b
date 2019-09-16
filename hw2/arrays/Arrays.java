@@ -51,7 +51,8 @@ class Arrays {
      *  {{1, 3, 7}, {5}, {4, 6, 9, 10}}. */
     static int[][] naturalRuns(int[] A) {
         if (A == null) {
-            return null;
+            int [][] nul = null;
+            return nul;
         }
 
         int counter = 1;
