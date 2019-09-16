@@ -17,24 +17,35 @@ class Lists {
      *  Destructive: creates no new IntList items, and may modify the
      *  original list pointed to by L. */
     static IntListList naturalRuns(IntList L) {
-        /* *Replace this body with the solution. */
-        if (L == null) {
-            return null;
-        } else {
-            IntList start = Helper(L);
-            IntListList sub = naturalRuns(start.tail);
-            start.tail = null;
-            return new IntListList (L, sub);
-        }
-    }
 
-    private static IntList Helper(IntList L) {
-        while (L.tail != null) {
-            if (L.head < L.tail.head) {
-                L = L.tail;
+        if (L == null ) {
+            return null;
+        }
+
+        IntList curr = L;
+        IntList sub = L;
+
+
+        while (curr != null) {
+
+            if (curr.tail == null) {
+                curr = curr.tail;
+                sub.tail = null;
+                break;
+
+            } else if (curr.tail.head > curr.head) {
+                curr = curr.tail;
+                sub = sub.tail;
+
+            } else {
+                curr = curr.tail;
+                sub.tail = null;
+                break;
             }
         }
-        return L;
+
+        IntListList result = new IntListList(L, naturalRuns(curr));
+        return result;
     }
     }
 

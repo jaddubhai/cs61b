@@ -8,7 +8,8 @@ import static org.junit.Assert.*;
  */
 
 public class ArraysTest {
-    /** FIXME
+    /**
+     * FIXME
      */
 
     @Test
@@ -20,13 +21,20 @@ public class ArraysTest {
     }
 
     @Test
-    public void testRemove() {
-        int[] A = {1, 2, 3, 4, 5};
-        int[] B = {3,4};
-        assertEquals(true, Utils.equals(Arrays.remove(A, 2, 2), B));
+    public void testremove() {
+        int[] A = {1, 2, 3, 4, 5, 6, 7, 8};
+        int[] C = {1, 2, 6, 7, 8};
+        assertArrayEquals(C, Arrays.remove(A, 2, 3));
+
     }
 
-    public static void main(String[] args) {
-        System.exit(ucb.junit.textui.runClasses(ArraysTest.class));
+    @Test
+    public void testnaturalRuns() {
+        int[] A = {1, 2, 6, 5, 4};
+        int[][] B = {{1, 2, 6}, {5}, {4}};
+
+        assertArrayEquals(B, Arrays.naturalRuns(A));
+        assertArrayEquals(null, Arrays.naturalRuns(null));
+
     }
 }

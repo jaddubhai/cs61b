@@ -27,8 +27,8 @@ public class MatrixUtilsTest {
                         {2060005, 1089520, 1098278, 2133049},
                         {2089520, 1162923, 1124919, 2098278},
                         {2162923, 2124919, 2124919, 2124919}};
-        double[][] test = MatrixUtils.accumulateVertical(test);
-        assertArrayEquals(check, test);
+        double[][] yeet = MatrixUtils.accumulateVertical(test);
+        assertArrayEquals(check, yeet);
     }
 
     public static void main(String[] args) {

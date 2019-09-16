@@ -23,7 +23,7 @@ class Arrays {
         }
 
         int count2 = 0;
-        int index = A.length -1;
+        int index = A.length;
         while (count2 < B.length){
             catenated[index] = B[count2];
             count2++;
@@ -36,30 +36,11 @@ class Arrays {
     /** Returns the array formed by removing LEN items from A,
      *  beginning with item #START. */
     static int[] remove(int[] A, int start, int len) {
-        /* *Replace this body with the solution. */
-        int index = 0;
 
-        if (len <= 0 || A.length == 0){
-            return A;
-        }
-
-        while (index < A.length){
-            if (A[index] == start){
-                break;
-            }
-            index ++;
-        }
-        int[] result = new int[A.length - (index + len -1)];
-
-        for (int i = 0; i< index; i ++){
-            result[i] = A[i];
-        }
-
-        for (int i = index+len; i < A.length; i++){
-            result[i] = A[i];
-        }
-
-        return result;
+        int[] removed = new int[A.length-len];
+        System.arraycopy(A, 0, removed, 0, start );
+        System.arraycopy(A, start+len, removed, start, A.length-(start+len));
+        return removed;
     }
 
     /* E. */
@@ -69,27 +50,36 @@ class Arrays {
      *  returns the three-element array
      *  {{1, 3, 7}, {5}, {4, 6, 9, 10}}. */
     static int[][] naturalRuns(int[] A) {
-        /* *Replace this body with the solution. */
-        int tracker = 0;
-        int first = A[0];
+        if (A == null) {
+            return null;
+        }
+
+        int counter = 1;
+        for(int i = 0; i < A.length-1; i++){
+            if (A[i] > A[i + 1]){
+                counter += 1;
+            }
+        }
+
+        int[][] result = new int[counter][];
+
+        int row=0;
+        int start = 0;
 
         for (int i = 0; i < A.length; i++) {
-            if (first > A[i]) {
-                tracker++;
+            if (i < A.length -1 && A[i + 1] <= A[i]) {
+
+                result[row] = new int[i - start + 1];
+                System.arraycopy(A, start, result[row], 0, i - start + 1);
+                start = i + 1;
+                row = row + 1;
+
+            } else if (i == A.length - 1) {
+                result[row] = new int[i + 1 - start];
+                System.arraycopy(A, start, result[row], 0, i + 1 - start);
             }
         }
 
-        int[][] result = new int[tracker][];
-        int[] indexes = new int[tracker];
-
-        for (int i = 0; i < tracker; i++) {
-            //int h = A[0];
-            for (int j = 0; j < A.length; j++) {
-                if (first > A[j]) {
-                    indexes[i] = j;
-                }
-            }
-        }
         return result;
     }
 }

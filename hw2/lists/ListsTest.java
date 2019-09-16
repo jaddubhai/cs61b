@@ -20,16 +20,18 @@ public class ListsTest {
     // few lines of code! Make note of the IntListList.list method that
     // takes as input a 2D array.
     @Test
-    public void naturalRunstest() {
-        assertEquals(null, Lists.naturalRuns(IntList.list()));
+    public void testnaturalRuns() {
+        IntList null_check = IntList.list();
+        assertEquals(null, Lists.naturalRuns(null_check));
 
-        IntList one = IntList.list(1,2,5);
-        IntList two = IntList.list(2);
-        IntList test = new IntListList ( one, two);
-        assertEquals(test, Lists.naturalRuns(IntList.list(1,2,5,2)));
+        IntList A = IntList.list(1, 2, 6, 5, 4);
+        IntList B = IntList.list(1, 2, 6);
+        IntList C = IntList.list(5);
+        IntList D = IntList.list(4);
+        IntListList E = IntListList.list(B, C, D);
+        assertEquals(E, Lists.naturalRuns(A));
+
+
     }
 
-    public static void main(String[] args) {
-        System.exit(ucb.junit.textui.runClasses(ListsTest.class));
-    }
 }

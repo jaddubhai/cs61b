@@ -102,6 +102,7 @@ class Model implements Iterable<Model.Sq> {
         //        1 - last appear; else throw IllegalArgumentException (see
         //        badArgs utility).
 
+
         // FIXME: For each Sq object on the board, set its _successors and
         //        _predecessor lists to the lists of locations of all cells
         //        that it might connect to (i.e., all cells that are a queen
@@ -109,6 +110,35 @@ class Model implements Iterable<Model.Sq> {
         //        that might connect to it.
 
         _unconnected = last - 1;
+        _solnNumToPlace = new Place[last+1];
+        _board = new Sq[width()][height()];
+
+        for (int i =0; i<width(); i++){
+            for (int j =0; j<height(); j++){
+                if (_solution[i][j] ==1 || _solution[i][j] == last){
+                    _board[i][j] = new Sq(i, j, _solution[i][j], true, arrowDirection(i, j), 0);
+                }
+                else {
+                    _board[i][j] = new Sq(i, j, 0, false, arrowDirection(i, j), -1);
+                }
+                _allSquares.add(_board[i][j]);
+                _solnNumToPlace[_solution[i][j]] = Place.pl(i,j);
+            }
+        }
+
+        for (int i = 1; i<_solnNumToPlace.length; i++) {
+            if (_solnNumToPlace[i] == null){
+                throw new IllegalArgumentException("Solution must use all squares!");
+            }
+        }
+
+        for (int i = 0; i< width(); i++){
+            for (int j = 0; j < height(); j++){
+                // need to check for predecessors and add base cases
+                _board[i][j]._successors = Place.successorCells(width(), height())[i][j][arrowDirection(i,j)];
+
+            }
+        }
     }
 
     /** Initializes a copy of MODEL. */
@@ -185,7 +215,19 @@ class Model implements Iterable<Model.Sq> {
         //        move in direction DIR from (x, y) and _allSuccSquares[x][y][0]
         //        is a list of all Places that are one queen move from in
         //        direction from (x, y).
+
+        _board = new Sq[width()][height()];
+        for (int i = 0; i<_width; i++){
+            for (int j =0; j<_height; j++){
+                _board[i][j] = null;
+            }
+        }
+        _allSquares.clear();
+        PlaceList[][][] _allSuccSquares = Place.successorCells(_width, _height);
+
     }
+
+
 
     /** Remove all connections and non-fixed sequence numbers. */
     void restart() {
@@ -251,8 +293,13 @@ class Model implements Iterable<Model.Sq> {
      *  successor, or 0 if it has none. */
     private int arrowDirection(int x, int y) {
         int seq0 = _solution[x][y];
-        // FIXME
-        return 0;
+        if (seq0 == _width*_height){
+            return 0;
+        }
+        else{
+            Place succ = solnNumToPlace(seq0+1);
+            return Place.dirOf(x, y, succ.x, succ.y);
+        }
     }
 
     /** Return a new, currently unused group number > 0.  Selects the
@@ -491,11 +538,11 @@ class Model implements Iterable<Model.Sq> {
             return _successors;
         }
 
-        /** Return locations of my potential predecessors. */
+        /** Return locations of my
+potential predecessors. */
         PlaceList predecessors() {
             return _predecessors;
         }
-
         /** Returns true iff I may be connected to cell S1, that is:
          *  + S1 is in the correct direction from me.
          *  + S1 does not have a current predecessor, and I do not have a
@@ -506,7 +553,7 @@ class Model implements Iterable<Model.Sq> {
          *    of the same connected sequence.
          */
         boolean connectable(Sq s1) {
-            // FIXME
+
             return true;
         }
 

@@ -55,14 +55,25 @@ public class MatrixUtils {
      */
 
     public static double[][] accumulateVertical(double[][] m) {
-        double[][] copy = MatrixUtils.copy(m);
-        for (int row = 0; row < copy.length; row ++ ){
-            for (int col = 0; col < copy[0].length; col ++){
-                double least = Math.min(Math.min(get(m, row, col), get(m, row, col - 1)), get(m, row, col + 1));
-                copy[row][col] += least;
+        double[][] result = new double[m.length][m[0].length];
+
+        for (int row = 0; row < m.length; row++) {
+            for (int col = 0; col < m[0].length; col++) {
+
+                double curr = get(m, row, col);
+                if (row == 0) {
+                    result[row][col] = curr;}
+                else if (col == m[0].length-1) {
+                        result[row][col] = Math.min(result[row-1][col-1], result[row-1][col])+curr;
+                } else if (col == 0) {
+                    result[row][col] = Math.min(result[row-1][col], result[row-1][col+1])+curr;
+                }
+                else {
+                    result[row][col] = Math.min(Math.min(result[row-1][col-1], result[row-1][col+1]), result[row-1][col]) + curr;
+                }
             }
         }
-        return copy; //your code here
+        return result;
     }
 
     private static double get(double[][] m, int row, int col){

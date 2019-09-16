@@ -93,7 +93,6 @@ class Place {
     static PlaceList[][][] successorCells(int width, int height) {
         PlaceList[][][] M = new PlaceList[width][height][9];
         int lim = Math.max(width, height);
-        // FIXME
         return M;
     }
 
