@@ -148,6 +148,7 @@ public class ModelTests {
         assertTrue("Trivial puzzle should be solved at birth.", model.solved());
     }
 
+
     /* The following array data is written to look on the page like
      * the arrangement of data on the screen, with the first row
      * corresponding to the top row of the puzzle board, etc.  They are

@@ -95,22 +95,24 @@ class Place {
         int lim = Math.max(width, height);
         for (int x = 0; x < width; x++){
             for (int y = 0; y < height; y++){
-                for (int dir = 8; dir > -1; dir--){
 
                     for (int i = 0; i < width; i++){
                         for (int j = 0; j < height; j++) {
-                            PlaceList p = new PlaceList();
+
                             if (i != x && j != y) {
-                                if (dirOf(x, y, i, j) != 0 && dirOf(x, y, i, j) == dir) {
-                                    p.add(Place.pl(i, j));
+                                if (dirOf(x, y, i, j) != 0) {
+                                    if (M[x][y][dirOf(x,y,i,j)] == null){
+                                        M[x][y][dirOf(x, y, i, j)] = new PlaceList();
+                                    }
+                                    M[x][y][dirOf(x, y, i, j)].add(Place.pl(i, j));
+                                    if (M[x][y][0] == null) {
+                                        M[x][y][0] = new PlaceList();
+                                        M[x][y][0].add(Place.pl(i, j));
+                                    }
                                 }
-                                M[x][y][dirOf(x, y, i, j)] = p;
-
                             }
-
                         }
                     }
-                }
             }
         }
         return M;

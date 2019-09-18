@@ -23,8 +23,8 @@ class PuzzleGenerator implements PuzzleSource {
         Model model =
             new Model(makePuzzleSolution(width, height, allowFreeEnds));
         // FIXME: Remove the "//" on the following two lines.
-        // makeSolutionUnique(model);
-        // model.autoconnect();
+        makeSolutionUnique(model);
+        model.autoconnect();
         return model;
     }
 
@@ -54,15 +54,10 @@ class PuzzleGenerator implements PuzzleSource {
         _vals[x1][y1] = last;
         // FIXME: Remove the following return statement and uncomment the
         //        next three lines.
-        return new int[][] {
-            { 14, 9, 8, 1 },
-            { 15, 10, 7, 2 },
-            { 13, 11, 6, 3 },
-            { 16, 12, 5, 4 }
-        };
-        //boolean ok = findSolutionPathFrom(x0, y0);
-        //assert ok;
-        //return _vals;
+
+        boolean ok = findSolutionPathFrom(x0, y0);
+        assert ok;
+        return _vals;
     }
 
     /** Try to find a random path of queen moves through VALS from (X0, Y0)
@@ -127,10 +122,8 @@ class PuzzleGenerator implements PuzzleSource {
         int result;
         result = 1;
         for (Sq sq : model) {
-            Sq found;
-            found = null;
             int nFound;
-            nFound = 0;
+            nFound = model.allSuccessors(sq.x, sq.y, sq.direction()).size();
             if (sq.successor() == null && sq.direction() != 0) {
                 // FIXME: Set nFound to the number of squares in the
                 //        direction sq.direction() from sq that can
@@ -138,13 +131,29 @@ class PuzzleGenerator implements PuzzleSource {
                 //        squares.  If sq is numbered and can be connected to
                 //        a numbered square, then set nFound to 1 and found
                 //        to that numbered square.
+                for (int x = 0; x < model.width(); x++) {
+                    for (int y = 0; y < model.height(); y++) {
+                        if (sq.connectable(model.get(x, y))) {
+                            if (model.get(x, y).sequenceNum() != 0 && sq.sequenceNum() != 0) {
+                                nFound = 1;
+                                Sq found = model.get(x, y);
+                                sq.connect(found);
+                                result = 2;
+                                return result;
+                            }
+                            else {
+                                result = 1;
+                                return result;
+                            }
+                        }
+                    }
+                }
                 if (nFound == 0) {
                     return 0;
-                } else if (nFound == 1) {
-                    sq.connect(found);
-                    result = 2;
                 }
+
             }
+
         }
         return result;
     }
@@ -153,15 +162,12 @@ class PuzzleGenerator implements PuzzleSource {
      *  a single possible predecessor).  Return 2 if changes made, 1 if no
      *  changes made, 0 if a non-final square with no possible connections
      *  encountered. */
-    private int makeBackwardConnections(Model model) {
+    private int makeBackwardConnections(Model model){
         int w = model.width(), h = model.height();
         int result;
         result = 1;
         for (Sq sq : model) {
-            Sq found;
-            int nFound;
-            found = null;
-            nFound = 0;
+            int nFound = 0;
             if (sq.predecessor() == null && sq.sequenceNum() != 1) {
                 // FIXME: Set nFound to the number of squares that are
                 //        possible predecessors of sq and connectable to it,
@@ -169,11 +175,26 @@ class PuzzleGenerator implements PuzzleSource {
                 //        numbered and one of these connectable predecessors
                 //        is numbered, then set nFound to 1 and found
                 //        to that numbered predecessor.
+                for (int x = 0; x < model.width(); x++){
+                    for (int y = 0; y < model.height(); y++){
+                        if (model.get(x,y).connectable(sq)){
+                            nFound += 1;
+                            if (sq.sequenceNum() != 0 && model.get(x,y).sequenceNum() != 0){
+                                Sq found = model.get(x, y);
+                                nFound = 1;
+                                found.connect(sq);
+                                result = 2;
+                                return result;
+                            }
+                            else {
+                                result = 1;
+                                return result;
+                            }
+                        }
+                    }
+                }
                 if (nFound == 0) {
                     return 0;
-                } else if (nFound == 1) {
-                    found.connect(sq);
-                    result = 2;
                 }
             }
         }
