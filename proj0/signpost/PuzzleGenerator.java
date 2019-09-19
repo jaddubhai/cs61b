@@ -20,8 +20,7 @@ class PuzzleGenerator implements PuzzleSource {
 
     @Override
     public Model getPuzzle(int width, int height, boolean allowFreeEnds) {
-        Model model =
-            new Model(makePuzzleSolution(width, height, allowFreeEnds));
+        Model model = new Model(makePuzzleSolution(width, height, allowFreeEnds));
         // FIXME: Remove the "//" on the following two lines.
         makeSolutionUnique(model);
         model.autoconnect();
@@ -84,6 +83,7 @@ class PuzzleGenerator implements PuzzleSource {
                     return true;
                 }
                 _vals[p.x][p.y] = 0;
+
             } else if (v == start && start == w * h) {
                 return true;
             }
@@ -122,8 +122,8 @@ class PuzzleGenerator implements PuzzleSource {
         int result;
         result = 1;
         for (Sq sq : model) {
-            int nFound;
-            nFound = model.allSuccessors(sq.x, sq.y, sq.direction()).size();
+            int nFound = 0;
+            //nFound = model.allSuccessors(sq.x, sq.y, sq.direction()).size();
             if (sq.successor() == null && sq.direction() != 0) {
                 // FIXME: Set nFound to the number of squares in the
                 //        direction sq.direction() from sq that can
@@ -134,22 +134,23 @@ class PuzzleGenerator implements PuzzleSource {
                 for (int x = 0; x < model.width(); x++) {
                     for (int y = 0; y < model.height(); y++) {
                         if (sq.connectable(model.get(x, y))) {
+                            Sq found = model.get(x, y);
                             if (model.get(x, y).sequenceNum() != 0 && sq.sequenceNum() != 0) {
                                 nFound = 1;
-                                Sq found = model.get(x, y);
                                 sq.connect(found);
                                 result = 2;
-                                return result;
+                                break;
                             }
-                            else {
-                                result = 1;
-                                return result;
-                            }
+                            nFound += 1;
+
+                        }
+                        else {
+                            result = 1;
                         }
                     }
                 }
                 if (nFound == 0) {
-                    return 0;
+                    result = 0;
                 }
 
             }
@@ -178,23 +179,22 @@ class PuzzleGenerator implements PuzzleSource {
                 for (int x = 0; x < model.width(); x++){
                     for (int y = 0; y < model.height(); y++){
                         if (model.get(x,y).connectable(sq)){
-                            nFound += 1;
+                            Sq found = model.get(x, y);
                             if (sq.sequenceNum() != 0 && model.get(x,y).sequenceNum() != 0){
-                                Sq found = model.get(x, y);
                                 nFound = 1;
                                 found.connect(sq);
                                 result = 2;
-                                return result;
+                                break;
                             }
-                            else {
-                                result = 1;
-                                return result;
-                            }
+                            nFound += 1;
+                        }
+                        else {
+                            result = 1;
                         }
                     }
                 }
                 if (nFound == 0) {
-                    return 0;
+                    result = 0;
                 }
             }
         }

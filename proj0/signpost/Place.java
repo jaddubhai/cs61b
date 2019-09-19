@@ -107,8 +107,9 @@ class Place {
                                     M[x][y][dirOf(x, y, i, j)].add(Place.pl(i, j));
                                     if (M[x][y][0] == null) {
                                         M[x][y][0] = new PlaceList();
-                                        M[x][y][0].add(Place.pl(i, j));
                                     }
+                                        M[x][y][0].add(Place.pl(i, j));
+
                                 }
                             }
                         }

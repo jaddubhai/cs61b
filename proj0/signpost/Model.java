@@ -98,15 +98,8 @@ class Model implements Iterable<Model.Sq> {
         _solnNumToPlace = new Place[last+1];
         _board = new Sq[width()][height()];
 
-        for (int i =0; i<width(); i++){
-            for (int j =0; j<height(); j++){
-                if (_solution[i][j] ==1 || _solution[i][j] == last){
-                    _board[i][j] = new Sq(i, j, _solution[i][j], true, arrowDirection(i, j), 0);
-                }
-                else {
-                    _board[i][j] = new Sq(i, j, 0, false, arrowDirection(i, j), -1);
-                }
-                _allSquares.add(_board[i][j]);
+        for (int i =0; i<width(); i++) {
+            for (int j = 0; j < height(); j++) {
                 _solnNumToPlace[_solution[i][j]] = Place.pl(i,j);
             }
         }
@@ -116,6 +109,20 @@ class Model implements Iterable<Model.Sq> {
                 throw new IllegalArgumentException("Solution must use all squares!");
             }
         }
+
+        for (int i =0; i<width(); i++){
+            for (int j =0; j<height(); j++){
+                if (_solution[i][j] ==1 || _solution[i][j] == last){
+                    _board[i][j] = new Sq(i, j, _solution[i][j], true, arrowDirection(i, j), 0);
+                }
+                else {
+                    _board[i][j] = new Sq(i, j, 0, false, arrowDirection(i, j), -1);
+                }
+                _allSquares.add(_board[i][j]);
+            }
+        }
+
+
 
         for (int i = 0; i< width(); i++){
             for (int j = 0; j < height(); j++){
@@ -340,7 +347,7 @@ class Model implements Iterable<Model.Sq> {
         if (seq0 == size()){
             return 0;
         }
-        else{
+        /* else{
             int count_x = 0;
             int count_y = 0;
 
@@ -356,7 +363,8 @@ class Model implements Iterable<Model.Sq> {
             }
 
             return Place.dirOf(x, y, count_x, count_y);
-        }
+        } */
+        return Place.dirOf(x, y, solnNumToPlace(seq0 + 1).x, solnNumToPlace(seq0 + 1).y);
     }
 
     /** Return a new, currently unused group number > 0.  Selects the
@@ -610,16 +618,23 @@ potential predecessors. */
          *    of the same connected sequence.
          */
         boolean connectable(Sq s1) {
-            if (Place.dirOf(x, y, s1.x, s1.y) == _dir){
-                if (_successor == null && s1._predecessor == null){
-                    if (_sequenceNum != 0 && s1._sequenceNum != 0){
-                        if (sequenceNum() == s1.sequenceNum() -1){
+            if (Place.dirOf(x, y, s1.x, s1.y) == _dir) {
+                if (_successor == null && s1._predecessor == null) {
+                    if ((_sequenceNum == 0 && s1._sequenceNum != 0) || (_sequenceNum != 0 && s1._sequenceNum == 0)){
+                        return true;
+                    }
+                    if (_sequenceNum != 0 && s1._sequenceNum != 0) {
+                        if (sequenceNum() == s1.sequenceNum() - 1) {
                             return true;
                         }
                     }
-                }
-            }
+                    if (_sequenceNum == 0 && s1._sequenceNum == 0) {
+                        return false;
+                    }
 
+                }
+
+            }
             return false;
         }
 

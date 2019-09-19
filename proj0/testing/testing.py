@@ -477,3 +477,6 @@ class Tester:
         else:
             print("Passed {passed} out of {num} tests."
                   .format(passed=self.passed, num=self.count))
+
+    def _command_line(self, id): 
+        return "{command} {args}".format(command=self.tested_program, args = self.command_args(id))
