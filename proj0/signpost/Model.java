@@ -116,7 +116,7 @@ class Model implements Iterable<Model.Sq> {
                     _board[i][j] = new Sq(i, j, _solution[i][j], true, arrowDirection(i, j), 0);
                 }
                 else {
-                    _board[i][j] = new Sq(i, j, 0, false, arrowDirection(i, j), -1);
+                    _board[i][j] = new Sq(i, j,  0, false, arrowDirection(i, j), -1);
                 }
                 _allSquares.add(_board[i][j]);
             }
@@ -315,7 +315,9 @@ class Model implements Iterable<Model.Sq> {
                 for (int y = 0; y < height(); y++){
                     for (int i = 0; i < width(); i++){
                         for (int j = 0; j<height(); j++){
-                            get(x, y).connect(get(i, j));
+                            if (get(x,y).sequenceNum() != 0 && get(i,j).sequenceNum() != 0){
+                                get(x, y).connect(get(i, j));
+                            }
                         }
                     }
 
@@ -618,22 +620,17 @@ potential predecessors. */
          *    of the same connected sequence.
          */
         boolean connectable(Sq s1) {
-            if (Place.dirOf(x, y, s1.x, s1.y) == _dir) {
+            if (Place.dirOf(x, y, s1.x, s1.y) == direction()) {
                 if (_successor == null && s1._predecessor == null) {
-                    if ((_sequenceNum == 0 && s1._sequenceNum != 0) || (_sequenceNum != 0 && s1._sequenceNum == 0)){
-                        return true;
-                    }
-                    if (_sequenceNum != 0 && s1._sequenceNum != 0) {
-                        if (sequenceNum() == s1.sequenceNum() - 1) {
-                            return true;
-                        }
+                    if (sequenceNum() != 0 && s1.sequenceNum() != 0) {
+                            return sequenceNum() == s1.sequenceNum()-1;
                     }
                     if (_sequenceNum == 0 && s1._sequenceNum == 0) {
-                        return false;
+                        boolean check = (group() == -1 && s1.group() == -1);
+                        return check || (group() != s1.group());
                     }
-
+                    return true;
                 }
-
             }
             return false;
         }
@@ -666,6 +663,7 @@ potential predecessors. */
             s1._predecessor = this;
             int s1_num = s1._sequenceNum;
             int this_num = _sequenceNum;
+
             if (_sequenceNum != 0){
                 Sq succ = _successor;
                 int num = _sequenceNum;

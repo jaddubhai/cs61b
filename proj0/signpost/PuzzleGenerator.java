@@ -159,11 +159,13 @@ class PuzzleGenerator implements PuzzleSource {
         return result;
     }
 
+
+
     /** Make all unique backward connections in MODEL (those in which there is
      *  a single possible predecessor).  Return 2 if changes made, 1 if no
      *  changes made, 0 if a non-final square with no possible connections
      *  encountered. */
-    private int makeBackwardConnections(Model model){
+    private int makeBackwardConnections(Model model) {
         int w = model.width(), h = model.height();
         int result;
         result = 1;
@@ -176,6 +178,7 @@ class PuzzleGenerator implements PuzzleSource {
                 //        numbered and one of these connectable predecessors
                 //        is numbered, then set nFound to 1 and found
                 //        to that numbered predecessor.
+
                 for (int x = 0; x < model.width(); x++){
                     for (int y = 0; y < model.height(); y++){
                         if (model.get(x,y).connectable(sq)){

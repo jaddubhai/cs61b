@@ -99,7 +99,6 @@ class Place {
                     for (int i = 0; i < width; i++){
                         for (int j = 0; j < height; j++) {
 
-                            if (i != x && j != y) {
                                 if (dirOf(x, y, i, j) != 0) {
                                     if (M[x][y][dirOf(x,y,i,j)] == null){
                                         M[x][y][dirOf(x, y, i, j)] = new PlaceList();
@@ -108,10 +107,9 @@ class Place {
                                     if (M[x][y][0] == null) {
                                         M[x][y][0] = new PlaceList();
                                     }
-                                        M[x][y][0].add(Place.pl(i, j));
+                                    M[x][y][0].add(Place.pl(i, j));
 
                                 }
-                            }
                         }
                     }
             }

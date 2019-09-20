@@ -148,6 +148,18 @@ public class ModelTests {
         assertTrue("Trivial puzzle should be solved at birth.", model.solved());
     }
 
+    @Test
+    public void someConnectTests(){
+        Model model = new Model (tr(SOLN1));
+        assert (model.get(0,3).connectable(model.get(3,3)));
+        assert ((model.get(0,3).connect(model.get(3,3))));
+        assertEquals(false, model.get(0,3).connectable(model.get(1,3)));
+        model.autoconnect();
+        assert(model.get(0,3).successor() == model.get(3,3));
+        model.get(0,3).disconnect();
+        assertEquals(false, model.get(0,3).successor() == model.get(3,3));
+    }
+
 
     /* The following array data is written to look on the page like
      * the arrangement of data on the screen, with the first row
