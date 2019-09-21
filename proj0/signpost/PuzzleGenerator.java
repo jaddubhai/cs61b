@@ -51,8 +51,6 @@ class PuzzleGenerator implements PuzzleSource {
         }
         _vals[x0][y0] = 1;
         _vals[x1][y1] = last;
-        // FIXME: Remove the following return statement and uncomment the
-        //        next three lines.
 
         boolean ok = findSolutionPathFrom(x0, y0);
         assert ok;
@@ -117,7 +115,7 @@ class PuzzleGenerator implements PuzzleSource {
      *  a single possible successor).  Return 2 if changes made, 1 if no
      *  changes made, 0 if a non-final square with no possible connections
      *  encountered. */
-    private int makeForwardConnections(Model model) {
+    /* private int makeForwardConnections(Model model) {
         int w = model.width(), h = model.height();
         int result;
         result = 1;
@@ -160,12 +158,11 @@ class PuzzleGenerator implements PuzzleSource {
     }
 
 
-
     /** Make all unique backward connections in MODEL (those in which there is
      *  a single possible predecessor).  Return 2 if changes made, 1 if no
      *  changes made, 0 if a non-final square with no possible connections
      *  encountered. */
-    private int makeBackwardConnections(Model model) {
+    /* private int makeBackwardConnections(Model model) {
         int w = model.width(), h = model.height();
         int result;
         result = 1;
@@ -203,7 +200,103 @@ class PuzzleGenerator implements PuzzleSource {
         }
         return result;
     }
+    */
 
+    private int makeForwardConnections(Model model) {
+        int w = model.width(), h = model.height();
+        int result;
+        result = 1;
+        for (Sq sq : model) {
+            Sq found;
+            found = null;
+            int nFound;
+            nFound = 0;
+            if (sq.successor() == null && sq.direction() != 0) {
+
+                int[] solution = findHelp(sq, sq.successors(), model, true);
+                nFound = solution[0];
+
+                if (nFound == 0) {
+                    return 0;
+                } else if (nFound == 1) {
+                    found = model.get(solution[1], solution[2]);
+                    sq.connect(found);
+                    result = 2;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**Helper function that returns an array signifying the number of possible
+     * successors for SQ based on PL and MODEL, and if it is 1, then it returns
+     * the coordinates of the successor in the array. This can be used to find
+     * predecessors as well, if SUCC = false.
+     * */
+    private int[] findHelp(Sq sq, PlaceList pl, Model model, boolean succ) {
+        int[] connections = {0, -1, -1};
+        for (Place p: pl) {
+            if (connectableMod(sq, model.get(p), succ)) {
+                if (sq.sequenceNum() != 0 && model.get(p).sequenceNum() != 0) {
+                    connections[0] = 1;
+                    connections[1] = p.x;
+                    connections[2] = p.y;
+                    return connections;
+                }
+                connections[0]++;
+            }
+        }
+        if (connections[0] == 1) {
+            for (Place p: pl) {
+                if (connectableMod(sq, model.get(p), succ)) {
+                    connections[0] = 1;
+                    connections[1] = p.x;
+                    connections[2] = p.y;
+                }
+            }
+        }
+        return connections;
+    }
+
+    /**Helper function that returns whether SQ1 and SQ2 are connectable,
+     * based on ORDER.*/
+    private boolean connectableMod(Sq sq1, Sq sq2, boolean order) {
+        if (order) {
+            return sq1.connectable(sq2);
+        } else {
+            return sq2.connectable(sq1);
+        }
+    }
+
+
+    /** Make all unique backward connections in MODEL (those in which there is
+     *  a single possible predecessor).  Return 2 if changes made, 1 if no
+     *  changes made, 0 if a non-final square with no possible connections
+     *  encountered. */
+    private int makeBackwardConnections(Model model) {
+        int w = model.width(), h = model.height();
+        int result;
+        result = 1;
+        for (Sq sq : model) {
+            Sq found;
+            int nFound;
+            found = null;
+            nFound = 0;
+            if (sq.predecessor() == null && sq.sequenceNum() != 1) {
+                int[] solution = findHelp(sq, sq.predecessors(), model, false);
+                nFound = solution[0];
+
+                if (nFound == 0) {
+                    return 0;
+                } else if (nFound == 1) {
+                    found = model.get(solution[1], solution[2]);
+                    found.connect(sq);
+                    result = 2;
+                }
+            }
+        }
+        return result;
+    }
     /** Remove all links in MODEL and unfix numbers (other than the first and
      *  last) that do not affect solvability.  Not all such numbers are
      *  necessarily removed. */

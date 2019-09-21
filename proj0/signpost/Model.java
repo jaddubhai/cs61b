@@ -49,7 +49,7 @@ import static signpost.Utils.*;
  *  with fixed sequence numbers appear at the corresponding position
  *  in that sequence.
  *
- *  @author
+ *  @author 61b student
  */
 class Model implements Iterable<Model.Sq> {
 
@@ -75,10 +75,6 @@ class Model implements Iterable<Model.Sq> {
         _solution = new int[_width][_height];
         deepCopy(solution, _solution);
 
-        // DUMMY SETUP
-        // FIXME: Remove everything down "// END DUMMY SETUP".
-        // END DUMMY SETUP
-
         // FIXME: Initialize _board so that _board[x][y] contains the Sq object
         //        representing the contents at cell (x, y), _allSquares
         //        contains the list of all Sq objects on the board, and
@@ -94,9 +90,23 @@ class Model implements Iterable<Model.Sq> {
         //        move away in the direction of its arrow, and of all cells
         //        that might connect to it.
 
-        _unconnected = last - 1;
-        _solnNumToPlace = new Place[last+1];
         _board = new Sq[width()][height()];
+        _solnNumToPlace = new Place[last+1];
+
+        for (int i =0; i<width(); i++){
+            for (int j =0; j<height(); j++){
+                if (_solution[i][j] == 1 || _solution[i][j] == last){
+                    _board[i][j] = new Sq(i, j, _solution[i][j], true,
+                            arrowDirection(i, j), 0);
+                }
+                else {
+                    _board[i][j] = new Sq(i, j,  0, false,
+                            arrowDirection(i, j), -1);
+                }
+                _allSquares.add(_board[i][j]);
+            }
+
+        }
 
         for (int i =0; i<width(); i++) {
             for (int j = 0; j < height(); j++) {
@@ -104,49 +114,27 @@ class Model implements Iterable<Model.Sq> {
             }
         }
 
-        for (int i = 1; i<_solnNumToPlace.length; i++) {
+        for (int i = 1; i < _solnNumToPlace.length; i++) {
             if (_solnNumToPlace[i] == null){
-                throw new IllegalArgumentException("Solution must use all squares!");
+                throw new IllegalArgumentException("All Squares not used!");
             }
         }
 
-        for (int i =0; i<width(); i++){
-            for (int j =0; j<height(); j++){
-                if (_solution[i][j] ==1 || _solution[i][j] == last){
-                    _board[i][j] = new Sq(i, j, _solution[i][j], true, arrowDirection(i, j), 0);
-                }
-                else {
-                    _board[i][j] = new Sq(i, j,  0, false, arrowDirection(i, j), -1);
-                }
-                _allSquares.add(_board[i][j]);
-            }
-        }
-
-
-
-        for (int i = 0; i< width(); i++){
+        for (int i = 0; i < width(); i++){
             for (int j = 0; j < height(); j++){
-                // need to check for predecessors and add base cases
-                _board[i][j]._successors = Place.successorCells(width(), height())[i][j][arrowDirection(i,j)];
-                for (int x = 0; x <width(); x++){
-                    for (int y = 0; y<height(); y++){
-                        if (i!=x && y!=j){
-                            if (Place.dirOf(i,j,x,y) == 0){
-                                continue;
-                            }
-                            if (Place.dirOf(i,j,x,y) == (Place.dirOf(x,y,i,j) + 4)%8){
-                                if (_board[x][y]._predecessors == null){
-                                    _board[x][y]._predecessors = new PlaceList();
-                                }
-                                _board[x][y]._predecessors.add(Place.pl(i,j));
-                            }
-
+                if (_board[i][j].direction() != 0){
+                _board[i][j]._successors = _allSuccessors[i][j][_board[i][j].direction()];
+                    for (Place p : _board[i][j].successors()) {
+                        if (_board[p.x][p.y]._predecessors == null){
+                            _board[p.x][p.y]._predecessors = new PlaceList();
                         }
+                        _board[p.x][p.y]._predecessors.add(_board[i][j].pl);
                     }
                 }
 
             }
         }
+        _unconnected = last - 1;
     }
 
     /** Initializes a copy of MODEL. */
@@ -166,25 +154,33 @@ class Model implements Iterable<Model.Sq> {
         // FIXME: Fill in the _successor, _predecessor, and _head fields of the
         //        copied Sq objects.
         _board = new Sq[_width][_height];
+        _allSquares = new ArrayList<Sq>();
+
         for (int i = 0; i< _width; i++){
             for (int j=0; j<_height; j++){
-                _board[i][j] = new Sq(i,j, model._board[i][j].sequenceNum(), model._board[i][j].hasFixedNum(), model._board[i][j].direction(), model._board[i][j].group());
+                _board[i][j] = new Sq(i,j, model.get(i,j).sequenceNum(),
+                        model.get(i,j).hasFixedNum(),
+                        model.get(i,j).direction(), model.get(i,j).group());
+                _allSquares.add(_board[i][j]);
             }
         }
 
-        for (int i = 0; i < _width; i++){
-            for (int j = 0; j <_height; j++){
-                for (int x = 0; x <_width; x++){
-                    for (int y = 0; y <_height; y++){
-                        if (_solution[x][y] - _solution[i][j] == 1){
-                            _board[i][j]._successor = _board[x][y];
-                            _board[x][y]._predecessor = _board[i][j];
-                            _board[i][j]._head = _board[i][j];
-                            _board[x][y]._head = _board[x][y];
-                        }
-                    }
-                }
+        for (Sq s: _allSquares) {
+            Sq oldsq = model.get(s.x, s.y);
+            s._successors = oldsq._successors;
+            s._predecessors = oldsq._predecessors;
+
+            if (oldsq.head() != null) {
+                s._head = get(oldsq.head().pl);
             }
+
+            if (oldsq._successor != null) {
+                s._successor = get(oldsq.successor().pl);
+            }
+            if (oldsq._predecessor != null) {
+                s._predecessor = get(oldsq.predecessor().pl);
+            }
+
         }
 
     }
@@ -247,14 +243,9 @@ class Model implements Iterable<Model.Sq> {
         //        direction from (x, y).
 
         _board = new Sq[width()][height()];
-        for (int i = 0; i<_width; i++){
-            for (int j =0; j<_height; j++){
-                _board[i][j] = null;
-            }
-        }
         _allSquares.clear();
-        PlaceList[][][] _allSuccSquares = Place.successorCells(_width, _height);
 
+        _allSuccessors = Place.successorCells(_width, _height);
 
     }
 
@@ -309,18 +300,17 @@ class Model implements Iterable<Model.Sq> {
     /** Connect all numbered cells with successive numbers that as yet are
      *  unconnected and are separated by a queen move.  Returns true iff
      *  any changes were made. */
-    boolean autoconnect() {
+    /* boolean autoconnect() {
             int initial_conn = unconnected();
             for (int x = 0; x < width(); x++) {
-                for (int y = 0; y < height(); y++){
-                    for (int i = 0; i < width(); i++){
-                        for (int j = 0; j<height(); j++){
-                            if (get(x,y).sequenceNum() != 0 && get(i,j).sequenceNum() != 0){
+                for (int y = 0; y < height(); y++) {
+                    for (int i = 0; i < width(); i++) {
+                        for (int j = 0; j < height(); j++) {
+                            if (get(x,y).sequenceNum() != 0 && get(i,j).sequenceNum() != 0) {
                                 get(x, y).connect(get(i, j));
                             }
                         }
                     }
-
                 }
             }
             int final_conn = unconnected();
@@ -328,15 +318,36 @@ class Model implements Iterable<Model.Sq> {
 
       return result; // FIXME
 
+    } */
+    boolean autoconnect() {
+        Sq present, next;
+        boolean change = false;
+        for (int i = 0; i < _allSquares.size(); i++) {
+            present = _allSquares.get(i);
+            for (int j = 0; j < _allSquares.size(); j++) {
+                if (j != i) {
+                    next = _allSquares.get(j);
+
+                    if (present.sequenceNum() != 0 && next.sequenceNum() != 0) {
+                        if (present.connectable(next)) {
+                            present.connect(next);
+                            change = true;
+                        }
+                    }
+                }
+            }
+        }
+        return change;
     }
 
     /** Sets the numbers in my squares to the solution from which I was
      *  last initialized by the constructor. */
     void solve() {
-        // FIXME
-        for (int x = 0; x < width(); x ++){
-            for (int y = 0; y < height(); y++){
-                get(x, y)._sequenceNum = _solution[x][y];
+        for (Sq i: _allSquares) {
+            for (Sq j: _allSquares) {
+                if (_solution[i.x][i.y] == _solution[j.x][j.y] - 1) {
+                    i.connect(j);
+                }
             }
         }
         _unconnected = 0;
@@ -346,27 +357,17 @@ class Model implements Iterable<Model.Sq> {
      *  successor, or 0 if it has none. */
     private int arrowDirection(int x, int y) {
         int seq0 = _solution[x][y];
-        if (seq0 == size()){
-            return 0;
-        }
-        /* else{
-            int count_x = 0;
-            int count_y = 0;
-
-            for (int i = 0; i < _width; i++ ){
-                for (int j = 0; j < _height; j++){
-                    if (_solution[i][j] == seq0+1){
-                        count_x = i;
-                        count_y = j;
-
-                    }
-
+//        if (seq0 == size()){
+//            return 0;
+//        }
+        for (int i = 0; i < _solution.length; i++) {
+            for (int j = 0; j < _solution[0].length; j++) {
+                if (_solution[i][j] == seq0 + 1) {
+                    return Place.dirOf(x, y, i, j);
                 }
             }
-
-            return Place.dirOf(x, y, count_x, count_y);
-        } */
-        return Place.dirOf(x, y, solnNumToPlace(seq0 + 1).x, solnNumToPlace(seq0 + 1).y);
+        }
+        return 0;
     }
 
     /** Return a new, currently unused group number > 0.  Selects the
@@ -620,19 +621,36 @@ potential predecessors. */
          *    of the same connected sequence.
          */
         boolean connectable(Sq s1) {
-            if (Place.dirOf(x, y, s1.x, s1.y) == direction()) {
-                if (_successor == null && s1._predecessor == null) {
-                    if (sequenceNum() != 0 && s1.sequenceNum() != 0) {
-                            return sequenceNum() == s1.sequenceNum()-1;
-                    }
-                    if (_sequenceNum == 0 && s1._sequenceNum == 0) {
-                        boolean check = (group() == -1 && s1.group() == -1);
-                        return check || (group() != s1.group());
-                    }
-                    return true;
-                }
+
+            boolean pred_succ = (this._successor == null
+                    && s1._predecessor == null);
+            boolean dir_check = (this.direction()
+                    == Place.dirOf(this.x, this.y, s1.x, s1.y));
+            boolean seq_diff = true;
+
+            if (this.sequenceNum() != 0 && s1.sequenceNum() != 0) {
+                seq_diff = (_sequenceNum == s1._sequenceNum - 1);
+            } else if (this.sequenceNum() == 0 && s1.sequenceNum() == 0) {
+                seq_diff = !check_connect(this, s1, 0);
             }
-            return false;
+            return (dir_check && pred_succ && seq_diff);
+
+        }
+
+        private boolean check_connect(Sq s1, Sq s2, int dir) {
+            if (s1 == s2) {
+                return true;
+            }if (s1 == null) {
+                return false;
+            }
+            if (dir == 0) {
+                return check_connect(s1.successor(), s2, 1)
+                        || check_connect(s1.predecessor(), s2, -1);
+            } else if (dir == 1) {
+                return check_connect(s1.successor(), s2, 1);
+            } else {
+                return check_connect(s1.predecessor(), s2, -1);
+            }
         }
 
         /** Connect me to S1, if we are connectable; otherwise do nothing.
@@ -661,6 +679,8 @@ potential predecessors. */
 
             _successor = s1;
             s1._predecessor = this;
+
+
             int s1_num = s1._sequenceNum;
             int this_num = _sequenceNum;
 
@@ -697,7 +717,7 @@ potential predecessors. */
             }
 
             if (s1._sequenceNum == 0 && _sequenceNum == 0){
-                _head._group = joinGroups(_group, s1._group);
+                _head._group = joinGroups(_group, sgroup);
             }
 
 
@@ -722,7 +742,6 @@ potential predecessors. */
                 //        Otherwise, the group has been split into two multi-
                 //        element groups.  Create a new group for next. #DONE
                 if (_predecessor == null && next._successor == null) {
-                    releaseGroup(next.group());
                     releaseGroup(group());
                     _group = next._group = -1;
                 }
@@ -733,7 +752,10 @@ potential predecessors. */
                     _group = -1;
                 }
                 else {
-                    next._group = newGroup();
+                    while (next != null){
+                        next._group = newGroup();
+                        next = next.successor();
+                    }
                 }
             } else {
                 // FIXME: If neither this nor any square in its group that
@@ -749,7 +771,7 @@ potential predecessors. */
                     }
                     current = current.predecessor();
                 }
-                if (check == true) {
+                if (check) {
                     if (_predecessor == null) {
                         _group = -1;
                     }
@@ -773,12 +795,13 @@ potential predecessors. */
                 while (current != null) {
                     if (current.hasFixedNum()) {
                         check = false;
+                        break;
                     }
                     current = current.successor();
                 }
-                if (check == true) {
+                if (check) {
                     if (next.successor() == null) {
-                        _group = -1;
+                        next._group = -1;
                     }
                     else {
                         current = next;
@@ -800,6 +823,9 @@ potential predecessors. */
                 current = current.successor();
             }
         }
+
+
+
         @Override
         public boolean equals(Object obj) {
             Sq sq = (Sq) obj;
@@ -812,7 +838,7 @@ potential predecessors. */
                 && (_predecessor == null
                     || _predecessor.pl == sq._predecessor.pl)
                 && (_successor == null || _successor.pl == sq._successor.pl);
-        }
+                }
 
         @Override
         public int hashCode() {
