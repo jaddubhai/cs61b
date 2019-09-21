@@ -120,18 +120,18 @@ class PuzzleGenerator implements PuzzleSource {
         int result = 1;
 
         for (Sq sq : model) {
-            Sq found = null;
-            int nFound = 0;
 
             if (sq.successor() == null && sq.direction() != 0) {
 
-                int[] solution = helper_func(sq, sq.successors(), model, true);
-                nFound = solution[0];
+                int[] results = helper_func(sq, sq.successors(), model, true);
+                int nFound = results[0];
 
                 if (nFound == 0) {
-                    return 0;
+                    result = 0;
+
                 } else if (nFound == 1) {
-                    found = model.get(solution[1], solution[2]);
+
+                    Sq found = model.get(results[1], results[2]);
                     sq.connect(found);
                     result = 2;
                 }
@@ -149,17 +149,16 @@ class PuzzleGenerator implements PuzzleSource {
         int result = 1;
 
         for (Sq sq : model) {
-            Sq found = null;
-            int nFound = 0;
 
             if (sq.predecessor() == null && sq.sequenceNum() != 1) {
-                int[] solution = helper_func(sq, sq.predecessors(), model, false);
-                nFound = solution[0];
+
+                int[] results = helper_func(sq, sq.predecessors(), model, false);
+                int nFound = results[0];
 
                 if (nFound == 0) {
-                    return 0;
+                    result =  0;
                 } else if (nFound == 1) {
-                    found = model.get(solution[1], solution[2]);
+                    Sq found = model.get(results[1], results[2]);
                     found.connect(sq);
                     result = 2;
                 }
@@ -167,6 +166,7 @@ class PuzzleGenerator implements PuzzleSource {
         }
         return result;
     }
+
     /** Remove all links in MODEL and unfix numbers (other than the first and
      *  last) that do not affect solvability.  Not all such numbers are
      *  necessarily removed. */
@@ -227,30 +227,28 @@ class PuzzleGenerator implements PuzzleSource {
 //    Class HelperSuite{}
 
     private int[] helper_func(Sq sq, PlaceList pl, Model model, boolean next) {
-        int[] connections = {0, -1, -1};
+        int[] results = {0, -1, -1};
 
         for (Place p: pl) {
             if (connectable_help(sq, model.get(p), next)) {
                 if (sq.sequenceNum() != 0 && model.get(p).sequenceNum() != 0) {
-                    connections[0] = 1;
-                    connections[1] = p.x;
-                    connections[2] = p.y;
-                    return connections;
+                    results[0] = 1;
+                    results[1] = p.x;
+                    results[2] = p.y;
+                    return results;
                 }
-                connections[0]++;
+                results[0]++;
             }
         }
-        if (connections[0] == 1) {
-            for (Place p: pl) {
-                if (connectable_help(sq, model.get(p), next)) {
-
-                    connections[0] = 1;
-                    connections[1] = p.x;
-                    connections[2] = p.y;
+        if (results[0] == 1) {
+            for (Place j: pl) {
+                if (connectable_help(sq, model.get(j), next)) {
+                    results[1] = j.x;
+                    results[2] = j.y;
                 }
             }
         }
-        return connections;
+        return results;
     }
 
     private boolean connectable_help(Sq s1, Sq s2, boolean sequence) {
