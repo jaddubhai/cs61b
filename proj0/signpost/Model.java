@@ -300,7 +300,7 @@ class Model implements Iterable<Model.Sq> {
     /** Connect all numbered cells with successive numbers that as yet are
      *  unconnected and are separated by a queen move.  Returns true iff
      *  any changes were made. */
-    /* boolean autoconnect() {
+    boolean autoconnect() {
             int initial_conn = unconnected();
             for (int x = 0; x < width(); x++) {
                 for (int y = 0; y < height(); y++) {
@@ -316,28 +316,8 @@ class Model implements Iterable<Model.Sq> {
             int final_conn = unconnected();
             boolean result = (final_conn != initial_conn);
 
-      return result; // FIXME
+      return result;
 
-    } */
-    boolean autoconnect() {
-        Sq present, next;
-        boolean change = false;
-        for (int i = 0; i < _allSquares.size(); i++) {
-            present = _allSquares.get(i);
-            for (int j = 0; j < _allSquares.size(); j++) {
-                if (j != i) {
-                    next = _allSquares.get(j);
-
-                    if (present.sequenceNum() != 0 && next.sequenceNum() != 0) {
-                        if (present.connectable(next)) {
-                            present.connect(next);
-                            change = true;
-                        }
-                    }
-                }
-            }
-        }
-        return change;
     }
 
     /** Sets the numbers in my squares to the solution from which I was
@@ -357,9 +337,9 @@ class Model implements Iterable<Model.Sq> {
      *  successor, or 0 if it has none. */
     private int arrowDirection(int x, int y) {
         int seq0 = _solution[x][y];
-//        if (seq0 == size()){
-//            return 0;
-//        }
+        if (seq0 == size()){
+            return 0;
+        }
         for (int i = 0; i < _solution.length; i++) {
             for (int j = 0; j < _solution[0].length; j++) {
                 if (_solution[i][j] == seq0 + 1) {
@@ -622,15 +602,18 @@ potential predecessors. */
          */
         boolean connectable(Sq s1) {
 
-            boolean pred_succ = (this._successor == null
+            boolean pred_succ = (_successor == null
                     && s1._predecessor == null);
-            boolean dir_check = (this.direction()
-                    == Place.dirOf(this.x, this.y, s1.x, s1.y));
+
+            boolean dir_check = (direction()
+                    == Place.dirOf(x, y, s1.x, s1.y));
+
             boolean seq_diff = true;
 
-            if (this.sequenceNum() != 0 && s1.sequenceNum() != 0) {
+            if (sequenceNum() != 0 && s1.sequenceNum() != 0) {
                 seq_diff = (_sequenceNum == s1._sequenceNum - 1);
-            } else if (this.sequenceNum() == 0 && s1.sequenceNum() == 0) {
+
+            } else if (sequenceNum() == 0 && s1.sequenceNum() == 0) {
                 seq_diff = !check_connect(this, s1, 0);
             }
             return (dir_check && pred_succ && seq_diff);
@@ -643,12 +626,15 @@ potential predecessors. */
             }if (s1 == null) {
                 return false;
             }
+
+            if (dir == 1) {
+                return check_connect(s1.successor(), s2, 1);
+            }
             if (dir == 0) {
                 return check_connect(s1.successor(), s2, 1)
                         || check_connect(s1.predecessor(), s2, -1);
-            } else if (dir == 1) {
-                return check_connect(s1.successor(), s2, 1);
-            } else {
+            }
+            else {
                 return check_connect(s1.predecessor(), s2, -1);
             }
         }
@@ -680,16 +666,18 @@ potential predecessors. */
             _successor = s1;
             s1._predecessor = this;
 
-
             int s1_num = s1._sequenceNum;
             int this_num = _sequenceNum;
+
+            if (_sequenceNum != 0 && s1.sequenceNum() != 0){
+                return true;
+            }
 
             if (_sequenceNum != 0){
                 Sq succ = _successor;
                 int num = _sequenceNum;
                 while (succ != null){
                     succ._sequenceNum = num + 1;
-                    succ._head = _head;
                     succ = succ._successor;
                     num = num + 1;
                 }
@@ -707,9 +695,15 @@ potential predecessors. */
 
             }
 
+            Sq curr = this;
+            while (curr.successor() != null){
+                curr._successor._head = _head;
+                curr = curr._successor;
+            }
+
             if (s1_num != s1._sequenceNum || this_num != _sequenceNum){
                 if (s1_num == 0){
-                    releaseGroup(s1.group());
+                    releaseGroup(sgroup);
                 }
                 else if (this_num == 0){
                     releaseGroup(this.group());
@@ -745,16 +739,16 @@ potential predecessors. */
                     releaseGroup(group());
                     _group = next._group = -1;
                 }
-                else if (next.successor() == null) {
+                else if (next._successor == null) {
                     next._group = -1;
                 }
-                else if (predecessor() == null) {
+                else if (_predecessor == null) {
                     _group = -1;
                 }
                 else {
-                    while (next != null){
+                    while (next._successor != null){
                         next._group = newGroup();
-                        next = next.successor();
+                        next = next._successor;
                     }
                 }
             } else {

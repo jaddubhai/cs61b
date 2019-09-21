@@ -115,105 +115,17 @@ class PuzzleGenerator implements PuzzleSource {
      *  a single possible successor).  Return 2 if changes made, 1 if no
      *  changes made, 0 if a non-final square with no possible connections
      *  encountered. */
-    /* private int makeForwardConnections(Model model) {
-        int w = model.width(), h = model.height();
-        int result;
-        result = 1;
-        for (Sq sq : model) {
-            int nFound = 0;
-            //nFound = model.allSuccessors(sq.x, sq.y, sq.direction()).size();
-            if (sq.successor() == null && sq.direction() != 0) {
-                // FIXME: Set nFound to the number of squares in the
-                //        direction sq.direction() from sq that can
-                //        be connected to it and set found to one of those
-                //        squares.  If sq is numbered and can be connected to
-                //        a numbered square, then set nFound to 1 and found
-                //        to that numbered square.
-                for (int x = 0; x < model.width(); x++) {
-                    for (int y = 0; y < model.height(); y++) {
-                        if (sq.connectable(model.get(x, y))) {
-                            Sq found = model.get(x, y);
-                            if (model.get(x, y).sequenceNum() != 0 && sq.sequenceNum() != 0) {
-                                nFound = 1;
-                                sq.connect(found);
-                                result = 2;
-                                break;
-                            }
-                            nFound += 1;
-
-                        }
-                        else {
-                            result = 1;
-                        }
-                    }
-                }
-                if (nFound == 0) {
-                    result = 0;
-                }
-
-            }
-
-        }
-        return result;
-    }
-
-
-    /** Make all unique backward connections in MODEL (those in which there is
-     *  a single possible predecessor).  Return 2 if changes made, 1 if no
-     *  changes made, 0 if a non-final square with no possible connections
-     *  encountered. */
-    /* private int makeBackwardConnections(Model model) {
-        int w = model.width(), h = model.height();
-        int result;
-        result = 1;
-        for (Sq sq : model) {
-            int nFound = 0;
-            if (sq.predecessor() == null && sq.sequenceNum() != 1) {
-                // FIXME: Set nFound to the number of squares that are
-                //        possible predecessors of sq and connectable to it,
-                //        and set found to one of those squares.  If sq is
-                //        numbered and one of these connectable predecessors
-                //        is numbered, then set nFound to 1 and found
-                //        to that numbered predecessor.
-
-                for (int x = 0; x < model.width(); x++){
-                    for (int y = 0; y < model.height(); y++){
-                        if (model.get(x,y).connectable(sq)){
-                            Sq found = model.get(x, y);
-                            if (sq.sequenceNum() != 0 && model.get(x,y).sequenceNum() != 0){
-                                nFound = 1;
-                                found.connect(sq);
-                                result = 2;
-                                break;
-                            }
-                            nFound += 1;
-                        }
-                        else {
-                            result = 1;
-                        }
-                    }
-                }
-                if (nFound == 0) {
-                    result = 0;
-                }
-            }
-        }
-        return result;
-    }
-    */
 
     private int makeForwardConnections(Model model) {
-        int w = model.width(), h = model.height();
-        int result;
-        result = 1;
+        int result = 1;
+
         for (Sq sq : model) {
-            Sq found;
-            found = null;
-            int nFound;
-            nFound = 0;
+            Sq found = null;
+            int nFound = 0;
+
             if (sq.successor() == null && sq.direction() != 0) {
 
-                int[] solution = findHelp(sq, sq.successors(), model, true);
+                int[] solution = helper_func(sq, sq.successors(), model, true);
                 nFound = solution[0];
 
                 if (nFound == 0) {
@@ -228,62 +140,20 @@ class PuzzleGenerator implements PuzzleSource {
         return result;
     }
 
-    /**Helper function that returns an array signifying the number of possible
-     * successors for SQ based on PL and MODEL, and if it is 1, then it returns
-     * the coordinates of the successor in the array. This can be used to find
-     * predecessors as well, if SUCC = false.
-     * */
-    private int[] findHelp(Sq sq, PlaceList pl, Model model, boolean succ) {
-        int[] connections = {0, -1, -1};
-        for (Place p: pl) {
-            if (connectableMod(sq, model.get(p), succ)) {
-                if (sq.sequenceNum() != 0 && model.get(p).sequenceNum() != 0) {
-                    connections[0] = 1;
-                    connections[1] = p.x;
-                    connections[2] = p.y;
-                    return connections;
-                }
-                connections[0]++;
-            }
-        }
-        if (connections[0] == 1) {
-            for (Place p: pl) {
-                if (connectableMod(sq, model.get(p), succ)) {
-                    connections[0] = 1;
-                    connections[1] = p.x;
-                    connections[2] = p.y;
-                }
-            }
-        }
-        return connections;
-    }
-
-    /**Helper function that returns whether SQ1 and SQ2 are connectable,
-     * based on ORDER.*/
-    private boolean connectableMod(Sq sq1, Sq sq2, boolean order) {
-        if (order) {
-            return sq1.connectable(sq2);
-        } else {
-            return sq2.connectable(sq1);
-        }
-    }
-
 
     /** Make all unique backward connections in MODEL (those in which there is
      *  a single possible predecessor).  Return 2 if changes made, 1 if no
      *  changes made, 0 if a non-final square with no possible connections
      *  encountered. */
     private int makeBackwardConnections(Model model) {
-        int w = model.width(), h = model.height();
-        int result;
-        result = 1;
+        int result = 1;
+
         for (Sq sq : model) {
-            Sq found;
-            int nFound;
-            found = null;
-            nFound = 0;
+            Sq found = null;
+            int nFound = 0;
+
             if (sq.predecessor() == null && sq.sequenceNum() != 1) {
-                int[] solution = findHelp(sq, sq.predecessors(), model, false);
+                int[] solution = helper_func(sq, sq.predecessors(), model, false);
                 nFound = solution[0];
 
                 if (nFound == 0) {
@@ -353,6 +223,46 @@ class PuzzleGenerator implements PuzzleSource {
             throw badArgs("no solution found");
         }
     }
+
+//    Class HelperSuite{}
+
+    private int[] helper_func(Sq sq, PlaceList pl, Model model, boolean next) {
+        int[] connections = {0, -1, -1};
+
+        for (Place p: pl) {
+            if (connectable_help(sq, model.get(p), next)) {
+                if (sq.sequenceNum() != 0 && model.get(p).sequenceNum() != 0) {
+                    connections[0] = 1;
+                    connections[1] = p.x;
+                    connections[2] = p.y;
+                    return connections;
+                }
+                connections[0]++;
+            }
+        }
+        if (connections[0] == 1) {
+            for (Place p: pl) {
+                if (connectable_help(sq, model.get(p), next)) {
+
+                    connections[0] = 1;
+                    connections[1] = p.x;
+                    connections[2] = p.y;
+                }
+            }
+        }
+        return connections;
+    }
+
+    private boolean connectable_help(Sq s1, Sq s2, boolean sequence) {
+
+        if (sequence) {
+            return s1.connectable(s2);
+        } else {
+            return s2.connectable(s1);
+        }
+    }
+
+
 
     @Override
     public void setSeed(long seed) {
