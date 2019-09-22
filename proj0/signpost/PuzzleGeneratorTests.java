@@ -16,7 +16,7 @@ public class PuzzleGeneratorTests {
                    soln.length == width && soln[0].length == height);
         int last = width * height;
         for (int x0 = 0; x0 < width; x0 += 1) {
-            for (int y0 = 0; y0 < width; y0 += 1) {
+            for (int y0 = 0; y0 < height; y0 += 1) {
                 int v = soln[x0][y0];
                 if (v == last) {
                     continue;

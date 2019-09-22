@@ -72,6 +72,7 @@ class PuzzleGenerator implements PuzzleSource {
         int v;
         int start = _vals[x0][y0] + 1;
         PlaceList moves = _successorCells[x0][y0][0];
+
         Collections.shuffle(moves, _random);
         for (Place p : moves) {
             v = _vals[p.x][p.y];
