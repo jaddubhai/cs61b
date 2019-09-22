@@ -228,11 +228,12 @@ class PuzzleGenerator implements PuzzleSource {
 //    Class HelperSuite{}
 
     private int[] helper_func(Sq sq, PlaceList pl, Model model, boolean next) {
-        int[] results = {0, -1, -1};
+        int[] results = {0, 1, -1};
 
         for (Place p: pl) {
             if (connectable_help(sq, model.get(p), next)) {
                 if (sq.sequenceNum() != 0 && model.get(p).sequenceNum() != 0) {
+
                     results[0] = 1;
                     results[1] = p.x;
                     results[2] = p.y;
@@ -241,8 +242,10 @@ class PuzzleGenerator implements PuzzleSource {
                 results[0]++;
             }
         }
+
         if (results[0] == 1) {
             for (Place j: pl) {
+
                 if (connectable_help(sq, model.get(j), next)) {
                     results[1] = j.x;
                     results[2] = j.y;

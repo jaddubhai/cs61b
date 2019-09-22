@@ -158,9 +158,7 @@ class Model implements Iterable<Model.Sq> {
 
         for (int i = 0; i< _width; i++){
             for (int j=0; j<_height; j++){
-                _board[i][j] = new Sq(i,j, model.get(i,j).sequenceNum(),
-                        model.get(i,j).hasFixedNum(),
-                        model.get(i,j).direction(), model.get(i,j).group());
+                _board[i][j] = new Sq(model._board[i][j]);
                 _allSquares.add(_board[i][j]);
             }
         }
@@ -617,6 +615,8 @@ potential predecessors. */
             return (dir_check && pred_succ && seq_diff);
 
         }
+
+        //I took the logic for this helper function from my friend Aaron Sun who is also taking 61b
 
         private boolean check_connect(Sq s1, Sq s2, int dir) {
             if (s1 == s2) {
