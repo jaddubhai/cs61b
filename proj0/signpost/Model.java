@@ -324,7 +324,11 @@ class Model implements Iterable<Model.Sq> {
      *  last initialized by the constructor. */
     void solve() {
         for (Sq i: _allSquares) {
-            i._sequenceNum = _solution[i.x][i.y];
+            for (Sq j: _allSquares){
+                if (_solution[i.x][i.y] + 1 == _solution[j.x][j.y]){
+                    i.connect(j);
+                }
+            }
         }
         _unconnected = 0;
     }
@@ -671,10 +675,10 @@ potential predecessors. */
                 return true;
             }
 
-            if (_sequenceNum != 0){
+            if (_sequenceNum != 0) {
                 Sq succ = _successor;
                 int num = _sequenceNum;
-                while (succ != null){
+                while (succ != null) {
                     succ._sequenceNum = num + 1;
                     succ = succ._successor;
                     num = num + 1;
@@ -682,10 +686,10 @@ potential predecessors. */
 
             }
 
-            if (s1._sequenceNum != 0){
+            if (s1._sequenceNum != 0) {
                 Sq pred = s1._predecessor;
                 int num = s1._sequenceNum;
-                while (pred != null){
+                while (pred != null) {
                     pred._sequenceNum = num - 1;
                     pred = pred._predecessor;
                     num = num - 1;
@@ -699,16 +703,16 @@ potential predecessors. */
                 curr = curr._successor;
             }
 
-            if (s1_num != s1._sequenceNum || this_num != _sequenceNum){
+            if (s1_num != s1._sequenceNum || this_num != _sequenceNum) {
                 if (s1_num == 0){
                     releaseGroup(sgroup);
                 }
-                else if (this_num == 0){
+                else if (this_num == 0) {
                     releaseGroup(this.group());
                 }
             }
 
-            if (s1._sequenceNum == 0 && _sequenceNum == 0){
+            if (s1._sequenceNum == 0 && _sequenceNum == 0) {
                 _head._group = joinGroups(_group, sgroup);
             }
 
@@ -744,7 +748,7 @@ potential predecessors. */
                     _group = -1;
                 }
                 else {
-                    while (next._successor != null){
+                    while (next._successor != null) {
                         next._group = newGroup();
                         next = next._successor;
                     }
