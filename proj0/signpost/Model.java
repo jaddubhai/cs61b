@@ -307,7 +307,9 @@ class Model implements Iterable<Model.Sq> {
                     for (int i = 0; i < width(); i++) {
                         for (int j = 0; j < height(); j++) {
                             if (get(x,y).sequenceNum() != 0 && get(i,j).sequenceNum() != 0) {
-                                get(x, y).connect(get(i, j));
+                                if (get(x,y).sequenceNum() + 1 == get(i,j).sequenceNum()) {
+                                    get(x, y).connect(get(i, j));
+                                }
                             }
                         }
                     }
@@ -324,11 +326,7 @@ class Model implements Iterable<Model.Sq> {
      *  last initialized by the constructor. */
     void solve() {
         for (Sq i: _allSquares) {
-            for (Sq j: _allSquares) {
-                if (_solution[i.x][i.y] == _solution[j.x][j.y] - 1) {
-                    i.connect(j);
-                }
-            }
+            i._sequenceNum = _solution[i.x][i.y];
         }
         _unconnected = 0;
     }
