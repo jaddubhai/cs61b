@@ -271,24 +271,24 @@ class Model implements Iterable<Model.Sq> {
      *  unconnected and are separated by a queen move.  Returns true iff
      *  any changes were made. */
     boolean autoconnect() {
-            int initial_conn = unconnected();
-            for (int x = 0; x < width(); x++) {
-                for (int y = 0; y < height(); y++) {
-                    for (int i = 0; i < width(); i++) {
-                        for (int j = 0; j < height(); j++) {
-                            if (get(x,y).sequenceNum() != 0 && get(i,j).sequenceNum() != 0) {
-                                if (get(x,y).sequenceNum() + 1 == get(i,j).sequenceNum()) {
-                                    get(x, y).connect(get(i, j));
-                                }
+        int initial_conn = unconnected();
+        for (int x = 0; x < width(); x++) {
+            for (int y = 0; y < height(); y++) {
+                for (int i = 0; i < width(); i++) {
+                    for (int j = 0; j < height(); j++) {
+                        if (get(x,y).sequenceNum() != 0 && get(i,j).sequenceNum() != 0) {
+                            if (get(x,y).sequenceNum() + 1 == get(i,j).sequenceNum()) {
+                                get(x, y).connect(get(i, j));
                             }
                         }
                     }
                 }
             }
-            int final_conn = unconnected();
-            boolean result = (final_conn != initial_conn);
+        }
+        int final_conn = unconnected();
+        boolean result = (final_conn != initial_conn);
 
-      return result;
+        return result;
 
     }
 
@@ -390,7 +390,7 @@ class Model implements Iterable<Model.Sq> {
                     out.format(" ");
                 }
                 if (sq.successor() == null
-                    && sq.sequenceNum() != size()) {
+                        && sq.sequenceNum() != size()) {
                     out.format("o ");
                 } else {
                     out.format("  ");
@@ -435,7 +435,7 @@ class Model implements Iterable<Model.Sq> {
         /** A copy of OTHER, excluding head, successor, and predecessor. */
         Sq(Sq other) {
             this(other.x, other.y, other._sequenceNum, other._hasFixedNum,
-                 other._dir, other._group);
+                    other._dir, other._group);
             _successor = _predecessor = null;
             _head = this;
             _successors = other._successors;
@@ -536,12 +536,12 @@ class Model implements Iterable<Model.Sq> {
             }
 
             String groupName =
-                String.format("%s%s",
-                              g < ALPHA_SIZE ? ""
-                              : Character.toString((char) (g / ALPHA_SIZE
-                                                           + 'a')),
-                              Character.toString((char) (g % ALPHA_SIZE
-                                                         + 'a')));
+                    String.format("%s%s",
+                            g < ALPHA_SIZE ? ""
+                                    : Character.toString((char) (g / ALPHA_SIZE
+                                    + 'a')),
+                            Character.toString((char) (g % ALPHA_SIZE
+                                    + 'a')));
             if (this == _head) {
                 return groupName;
             }
@@ -643,11 +643,6 @@ class Model implements Iterable<Model.Sq> {
                     num = num + 1;
                 }
 
-                Sq s1_square = s1;
-                while (s1_square != null){
-                    s1_square._group = 0;
-                    s1_square = s1_square._successor;
-                }
             }
 
             if (s1._sequenceNum != 0) {
@@ -657,12 +652,8 @@ class Model implements Iterable<Model.Sq> {
                     pred._sequenceNum = num - 1;
                     pred = pred._predecessor;
                     num = num - 1;
-                    Sq this_square = this;
-                    while (this_square != null){
-                        this_square._group = 0;
-                        this_square = this_square._predecessor;
-                    }
                 }
+
             }
 
             Sq curr = this;
@@ -699,6 +690,7 @@ class Model implements Iterable<Model.Sq> {
             if (_sequenceNum == 0) {
 
                 if (_predecessor == null && next._successor == null) {
+                    releaseGroup(group());
                     _group = next._group = -1;
                 }
                 else if (next._successor == null) {
@@ -779,20 +771,20 @@ class Model implements Iterable<Model.Sq> {
         public boolean equals(Object obj) {
             Sq sq = (Sq) obj;
             return sq != null
-                && pl == sq.pl
-                && _hasFixedNum == sq._hasFixedNum
-                && _sequenceNum == sq._sequenceNum
-                && _dir == sq._dir
-                && (_predecessor == null) == (sq._predecessor == null)
-                && (_predecessor == null
+                    && pl == sq.pl
+                    && _hasFixedNum == sq._hasFixedNum
+                    && _sequenceNum == sq._sequenceNum
+                    && _dir == sq._dir
+                    && (_predecessor == null) == (sq._predecessor == null)
+                    && (_predecessor == null
                     || _predecessor.pl == sq._predecessor.pl)
-                && (_successor == null || _successor.pl == sq._successor.pl);
-                }
+                    && (_successor == null || _successor.pl == sq._successor.pl);
+        }
 
         @Override
         public int hashCode() {
             return (x + 1) * (y + 1) * (_dir + 1)
-                * (_hasFixedNum ? 3 : 1) * (_sequenceNum + 1);
+                    * (_hasFixedNum ? 3 : 1) * (_sequenceNum + 1);
         }
 
         /** The coordinates of this square in the board. */
@@ -830,7 +822,7 @@ class Model implements Iterable<Model.Sq> {
 
     /** ASCII denotations of arrows, indexed by direction. */
     private static final String[] ARROWS = {
-        " *", "NE", "E ", "SE", "S ", "SW", "W ", "NW", "N "
+            " *", "NE", "E ", "SE", "S ", "SW", "W ", "NW", "N "
     };
 
     /** Number of squares that haven't been connected. */
@@ -854,3 +846,4 @@ class Model implements Iterable<Model.Sq> {
     private HashSet<Integer> _usedGroups = new HashSet<>();
 
 }
+
