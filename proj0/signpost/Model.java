@@ -643,6 +643,14 @@ class Model implements Iterable<Model.Sq> {
                     num = num + 1;
                 }
 
+                if (sgroup > 0){
+                    releaseGroup(sgroup);
+                }
+                Sq s1_square = s1;
+                while (s1_square != null){
+                    s1_square._group = 0;
+                    s1_square = s1_square._successor;
+                }
             }
 
             if (s1._sequenceNum != 0) {
@@ -652,28 +660,71 @@ class Model implements Iterable<Model.Sq> {
                     pred._sequenceNum = num - 1;
                     pred = pred._predecessor;
                     num = num - 1;
+                    if (curr_group > 0){
+                        releaseGroup(curr_group);
+                    }
+                    Sq this_square = this;
+                    while (this_square != null){
+                        this_square._group = 0;
+                        this_square = this_square._predecessor;
+                    }
                 }
-
             }
 
-            Sq curr = this;
-            while (curr.successor() != null){
-                curr._successor._head = _head;
-                curr = curr._successor;
-            }
-
-            if (s1_num != s1._sequenceNum || this_num != _sequenceNum) {
-                if (s1_num == 0){
-                    releaseGroup(sgroup);
+            if (curr_group == -1) {
+                if (sgroup == -1) {
+                    Sq this_square = this;
+                    while (this_square != null) {
+                        this_square._group = newGroup();
+                        this_square = this_square._successor;
+                    }
+                } else {
+                    Sq this_square = this;
+                    while (this_square != null) {
+                        this_square._group = sgroup;
+                        this_square = this_square._predecessor;
+                    }
                 }
-                else if (this_num == 0) {
+            }
+            else {
+                if (sgroup == -1){
+                    Sq s1_square = s1;
+                    while (s1_square != null){
+                        s1_square._group = curr_group;
+                        s1_square = s1_square._successor;
+                    }
+                }
+                else {
                     releaseGroup(curr_group);
+                    Sq this_square = this;
+                    while (this_square != null) {
+                        this_square._group = sgroup;
+                        this_square = this_square._predecessor;
+                    }
                 }
+
             }
 
-            if (s1._sequenceNum == 0 && _sequenceNum == 0) {
-                _head._group = joinGroups(curr_group, sgroup);
-            }
+
+
+//            Sq curr = this;
+//            while (curr.successor() != null){
+//                curr._successor._head = _head;
+//                curr = curr._successor;
+//            }
+//
+//            if (s1_num != s1._sequenceNum || this_num != _sequenceNum) {
+//                if (s1_num == 0){
+//                    releaseGroup(sgroup);
+//                }
+//                else if (this_num == 0) {
+//                    releaseGroup(curr_group);
+//                }
+//            }
+//
+//            if (s1._sequenceNum == 0 && _sequenceNum == 0) {
+//                _head._group = joinGroups(curr_group, sgroup);
+//            }
 
 
             return true;
