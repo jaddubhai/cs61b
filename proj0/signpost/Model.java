@@ -715,7 +715,7 @@ potential predecessors. */
             }
 
             if (s1._sequenceNum == 0 && _sequenceNum == 0) {
-                _head._group = joinGroups(_group, sgroup);
+                _head._group = joinGroups(curr_group, sgroup);
             }
 
 
@@ -750,8 +750,10 @@ potential predecessors. */
                     _group = -1;
                 }
                 else {
+                    next._group = newGroup();
+                    int nex_group = next._group;
                     while (next._successor != null) {
-                        next._group = newGroup();
+                        next._group = nex_group;
                         next = next._successor;
                     }
                 }
