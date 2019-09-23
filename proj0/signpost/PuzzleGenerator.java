@@ -228,40 +228,53 @@ class PuzzleGenerator implements PuzzleSource {
 //    Class HelperSuite{}
 
     private int[] helper_func(Sq sq, PlaceList pl, Model model, boolean next) {
-        int[] results = {0, 1, -1};
+        int[] results = {0, -1, -1};
 
         for (Place p: pl) {
-            if (connectable_help(sq, model.get(p), next)) {
-                if (sq.sequenceNum() != 0 && model.get(p).sequenceNum() != 0) {
+            if (next) {
+                if (sq.connectable(model.get(p))) {
+                    if (sq.sequenceNum() != 0 && model.get(p).sequenceNum() != 0) {
 
-                    results[0] = 1;
-                    results[1] = p.x;
-                    results[2] = p.y;
-                    return results;
+                        results[0] = 1;
+                        results[1] = p.x;
+                        results[2] = p.y;
+
+                        return results;
+                    }
+                    results[0] = results[0] + 1;
                 }
-                results[0]++;
+            }
+            else {
+                if (model.get(p).connectable(sq)) {
+                    if (sq.sequenceNum() != 0 && model.get(p).sequenceNum() != 0) {
+
+                        results[0] = 1;
+                        results[1] = p.x;
+                        results[2] = p.y;
+                        return results;
+                    }
+                    results[0] = results[0] + 1;
+                }
             }
         }
 
         if (results[0] == 1) {
             for (Place j: pl) {
-
-                if (connectable_help(sq, model.get(j), next)) {
-                    results[1] = j.x;
-                    results[2] = j.y;
+                if (next) {
+                    if (sq.connectable(model.get(j))) {
+                        results[1] = j.x;
+                        results[2] = j.y;
+                    }
+                }
+                else {
+                    if (model.get(j).connectable(sq)) {
+                        results[1] = j.x;
+                        results[2] = j.y;
+                    }
                 }
             }
         }
         return results;
-    }
-
-    private boolean connectable_help(Sq s1, Sq s2, boolean sequence) {
-
-        if (sequence) {
-            return s1.connectable(s2);
-        } else {
-            return s2.connectable(s1);
-        }
     }
 
 
