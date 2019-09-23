@@ -75,27 +75,12 @@ class Model implements Iterable<Model.Sq> {
         _solution = new int[_width][_height];
         deepCopy(solution, _solution);
 
-        // FIXME: Initialize _board so that _board[x][y] contains the Sq object
-        //        representing the contents at cell (x, y), _allSquares
-        //        contains the list of all Sq objects on the board, and
-        //        _solnNumToPlace[k] contains the Place in _solution that
-        //        contains sequence number k.  Check that all numbers from
-        //        1 - last appear; else throw IllegalArgumentException (see
-        //        badArgs utility).
-
-
-        // FIXME: For each Sq object on the board, set its _successors and
-        //        _predecessor lists to the lists of locations of all cells
-        //        that it might connect to (i.e., all cells that are a queen
-        //        move away in the direction of its arrow, and of all cells
-        //        that might connect to it.
-
         _board = new Sq[width()][height()];
-        _solnNumToPlace = new Place[last+1];
+        _solnNumToPlace = new Place[last + 1];
 
-        for (int i =0; i<width(); i++){
-            for (int j =0; j<height(); j++){
-                if (_solution[i][j] == 1 || _solution[i][j] == last){
+        for (int i = 0; i < width(); i++){
+            for (int j = 0; j < height(); j++){
+                if (_solution[i][j] == 1 || _solution[i][j] == last) {
                     _board[i][j] = new Sq(i, j, _solution[i][j], true,
                             arrowDirection(i, j), 0);
                 }
@@ -108,24 +93,24 @@ class Model implements Iterable<Model.Sq> {
 
         }
 
-        for (int i =0; i<width(); i++) {
+        for (int i = 0; i < width(); i++) {
             for (int j = 0; j < height(); j++) {
-                _solnNumToPlace[_solution[i][j]] = Place.pl(i,j);
+                _solnNumToPlace[_solution[i][j]] = Place.pl(i, j);
             }
         }
 
         for (int i = 1; i < _solnNumToPlace.length; i++) {
-            if (_solnNumToPlace[i] == null){
+            if (_solnNumToPlace[i] == null) {
                 throw new IllegalArgumentException("All Squares not used!");
             }
         }
 
-        for (int i = 0; i < width(); i++){
-            for (int j = 0; j < height(); j++){
+        for (int i = 0; i < width(); i++) {
+            for (int j = 0; j < height(); j++) {
                 if (_board[i][j].direction() != 0){
-                _board[i][j]._successors = _allSuccessors[i][j][_board[i][j].direction()];
+                    _board[i][j]._successors = _allSuccessors[i][j][_board[i][j].direction()];
                     for (Place p : _board[i][j].successors()) {
-                        if (_board[p.x][p.y]._predecessors == null){
+                        if (_board[p.x][p.y]._predecessors == null) {
                             _board[p.x][p.y]._predecessors = new PlaceList();
                         }
                         _board[p.x][p.y]._predecessors.add(_board[i][j].pl);
@@ -134,6 +119,7 @@ class Model implements Iterable<Model.Sq> {
 
             }
         }
+
         _unconnected = last - 1;
     }
 
@@ -146,13 +132,6 @@ class Model implements Iterable<Model.Sq> {
         _usedGroups.addAll(model._usedGroups);
         _allSuccessors = model._allSuccessors;
 
-        // FIXME: Initialize _board and _allSquares to contain copies of the
-        //        the Sq objects in MODEL other than their _successor,
-        //        _predecessor, and _head fields (which can't necessarily be
-        //        set until all the necessary Sq objects are first created.)
-
-        // FIXME: Fill in the _successor, _predecessor, and _head fields of the
-        //        copied Sq objects.
         _board = new Sq[_width][_height];
         _allSquares = new ArrayList<Sq>();
 
@@ -163,7 +142,7 @@ class Model implements Iterable<Model.Sq> {
             }
         }
 
-        for (Sq s: _allSquares) {
+        for (Sq s : _allSquares) {
             Sq oldsq = model.get(s.x, s.y);
 
             s._successors = oldsq._successors;
@@ -232,14 +211,6 @@ class Model implements Iterable<Model.Sq> {
         _unconnected = _width * _height - 1;
         _solution = null;
         _usedGroups.clear();
-        // FIXME: Initialize _board to contain nulls and clear all objects from
-        //        _allSquares.
-
-        // FIXME: Initialize _allSuccSquares so that _allSuccSquares[x][y][dir]
-        //        is a list of all the Places on the board that are a queen
-        //        move in direction DIR from (x, y) and _allSuccSquares[x][y][0]
-        //        is a list of all Places that are one queen move from in
-        //        direction from (x, y).
 
         _board = new Sq[width()][height()];
         _allSquares.clear();
@@ -338,7 +309,7 @@ class Model implements Iterable<Model.Sq> {
      *  successor, or 0 if it has none. */
     private int arrowDirection(int x, int y) {
         int seq0 = _solution[x][y];
-        if (seq0 == size()){
+        if (seq0 == size()) {
             return 0;
         }
         for (int i = 0; i < width(); i++) {
@@ -587,8 +558,7 @@ class Model implements Iterable<Model.Sq> {
             return _successors;
         }
 
-        /** Return locations of my
-potential predecessors. */
+        /** Return locations of my potential predecessors. */
         PlaceList predecessors() {
             return _predecessors;
         }
@@ -654,19 +624,6 @@ potential predecessors. */
 
             _unconnected -= 1;
 
-            // FIXME: Connect me to my successor:
-            //        + Set my _successor field and S1's _predecessor field.
-            //        + If I have a number, number all my successors
-            //          accordingly (if needed).
-            //        + If S1 is numbered, number me and my predecessors
-            //          accordingly (if needed).
-            //        + Set the _head fields of my successors to my _head.
-            //        + If either of this or S1 used to be unnumbered and is
-            //          now numbered, release its group of whichever was
-            //          unnumbered, so that it can be reused.
-            //        + If both this and S1 are unnumbered, set the group of
-            //          my head to the result of joining the two groups.
-
             _successor = s1;
             s1._predecessor = this;
 
@@ -731,14 +688,7 @@ potential predecessors. */
             _unconnected += 1;
             next._predecessor = _successor = null;
             if (_sequenceNum == 0) {
-                // FIXME: If both this and next are now one-element groups,
-                //        release their former group and set both group
-                //        numbers to -1.
-                //        Otherwise, if either is now a one-element group, set
-                //        its group number to -1 without releasing the group
-                //        number.
-                //        Otherwise, the group has been split into two multi-
-                //        element groups.  Create a new group for next. #DONE
+
                 if (_predecessor == null && next._successor == null) {
                     releaseGroup(group());
                     _group = next._group = -1;
@@ -758,14 +708,11 @@ potential predecessors. */
                     }
                 }
             } else {
-                // FIXME: If neither this nor any square in its group that
-                //        precedes it has a fixed sequence number, set all
-                //        their sequence numbers to 0 and create a new group
-                //        for them if this has a current predecessor (other
-                //        set group to -1). #DONE
+
                 Sq current = this;
                 boolean check = true;
                 while (current != null) {
+
                     if (current.hasFixedNum()) {
                         check = false;
                     }
@@ -785,11 +732,7 @@ potential predecessors. */
                         }
                     }
                 }
-                // FIXME: If neither next nor any square in its group that
-                //        follows it has a fixed sequence number, set all
-                //        their sequence numbers to 0 and create a new
-                //        group for them if next has a current successor
-                //        (otherwise set next's group to -1.) #DONE
+
                 current = next;
                 boolean check1 = true;
                 while (current != null) {
@@ -815,8 +758,6 @@ potential predecessors. */
                 }
             }
 
-            // FIXME: Set the _head of next and all squares in its group to
-            //        next. #DONE
             Sq current = next;
             while (current != null) {
                 current._head = next;
