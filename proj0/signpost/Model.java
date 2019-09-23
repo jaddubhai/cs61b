@@ -791,15 +791,15 @@ potential predecessors. */
                 //        group for them if next has a current successor
                 //        (otherwise set next's group to -1.) #DONE
                 current = next;
-                check = true;
+                boolean check1 = true;
                 while (current != null) {
                     if (current.hasFixedNum()) {
-                        check = false;
+                        check1 = false;
                         break;
                     }
                     current = current.successor();
                 }
-                if (check) {
+                if (check1) {
                     if (next.successor() == null) {
                         next._group = -1;
                     }
@@ -807,8 +807,8 @@ potential predecessors. */
                         current = next;
                         int new_group_num = newGroup();
                         while (current != null) {
-                            current._sequenceNum = 0;
-                            current._group = new_group_num;
+                            next._sequenceNum = 0;
+                            next._group = new_group_num;
                             current = current.successor();
                         }
                     }
