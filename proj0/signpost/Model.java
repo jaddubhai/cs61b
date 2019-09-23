@@ -643,9 +643,6 @@ class Model implements Iterable<Model.Sq> {
                     num = num + 1;
                 }
 
-                if (sgroup > 0){
-                    releaseGroup(sgroup);
-                }
                 Sq s1_square = s1;
                 while (s1_square != null){
                     s1_square._group = 0;
@@ -660,9 +657,6 @@ class Model implements Iterable<Model.Sq> {
                     pred._sequenceNum = num - 1;
                     pred = pred._predecessor;
                     num = num - 1;
-                    if (curr_group > 0){
-                        releaseGroup(curr_group);
-                    }
                     Sq this_square = this;
                     while (this_square != null){
                         this_square._group = 0;
@@ -671,60 +665,24 @@ class Model implements Iterable<Model.Sq> {
                 }
             }
 
-            if (curr_group == -1) {
-                if (sgroup == -1) {
-                    Sq this_square = this;
-                    while (this_square != null) {
-                        this_square._group = newGroup();
-                        this_square = this_square._successor;
-                    }
-                } else {
-                    Sq this_square = this;
-                    while (this_square != null) {
-                        this_square._group = sgroup;
-                        this_square = this_square._predecessor;
-                    }
-                }
+            Sq curr = this;
+            while (curr.successor() != null){
+                curr._successor._head = _head;
+                curr = curr._successor;
             }
-            else {
-                if (sgroup == -1){
-                    Sq s1_square = s1;
-                    while (s1_square != null){
-                        s1_square._group = curr_group;
-                        s1_square = s1_square._successor;
-                    }
+
+            if (s1_num != s1._sequenceNum || this_num != _sequenceNum) {
+                if (s1_num == 0){
+                    releaseGroup(sgroup);
                 }
-                else {
+                else if (this_num == 0) {
                     releaseGroup(curr_group);
-                    Sq this_square = this;
-                    while (this_square != null) {
-                        this_square._group = sgroup;
-                        this_square = this_square._predecessor;
-                    }
                 }
-
             }
 
-
-
-//            Sq curr = this;
-//            while (curr.successor() != null){
-//                curr._successor._head = _head;
-//                curr = curr._successor;
-//            }
-//
-//            if (s1_num != s1._sequenceNum || this_num != _sequenceNum) {
-//                if (s1_num == 0){
-//                    releaseGroup(sgroup);
-//                }
-//                else if (this_num == 0) {
-//                    releaseGroup(curr_group);
-//                }
-//            }
-//
-//            if (s1._sequenceNum == 0 && _sequenceNum == 0) {
-//                _head._group = joinGroups(curr_group, sgroup);
-//            }
+            if (s1._sequenceNum == 0 && _sequenceNum == 0) {
+                _head._group = joinGroups(curr_group, sgroup);
+            }
 
 
             return true;
@@ -741,7 +699,6 @@ class Model implements Iterable<Model.Sq> {
             if (_sequenceNum == 0) {
 
                 if (_predecessor == null && next._successor == null) {
-                    releaseGroup(group());
                     _group = next._group = -1;
                 }
                 else if (next._successor == null) {
@@ -775,11 +732,7 @@ class Model implements Iterable<Model.Sq> {
                     }
                     else {
                         current = this;
-                        int new_group_num = -1;
-                        if (next._successor != null) {
-                            new_group_num = newGroup();
-                        }
-
+                        int new_group_num = newGroup();
                         while (current != null) {
                             current._sequenceNum = 0;
                             current._group = new_group_num;
@@ -803,10 +756,7 @@ class Model implements Iterable<Model.Sq> {
                     }
                     else {
                         current = next;
-                        int new_group_num = -1;
-                        if (next._successor != null) {
-                            new_group_num = newGroup();
-                        }
+                        int new_group_num = newGroup();
                         while (current != null) {
                             next._sequenceNum = 0;
                             next._group = new_group_num;
