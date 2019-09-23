@@ -775,7 +775,11 @@ class Model implements Iterable<Model.Sq> {
                     }
                     else {
                         current = this;
-                        int new_group_num = newGroup();
+                        int new_group_num = -1;
+                        if (next._successor != null) {
+                            new_group_num = newGroup();
+                        }
+
                         while (current != null) {
                             current._sequenceNum = 0;
                             current._group = new_group_num;
@@ -799,7 +803,10 @@ class Model implements Iterable<Model.Sq> {
                     }
                     else {
                         current = next;
-                        int new_group_num = newGroup();
+                        int new_group_num = -1;
+                        if (next._successor != null) {
+                            new_group_num = newGroup();
+                        }
                         while (current != null) {
                             next._sequenceNum = 0;
                             next._group = new_group_num;
