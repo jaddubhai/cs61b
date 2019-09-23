@@ -165,6 +165,7 @@ class Model implements Iterable<Model.Sq> {
 
         for (Sq s: _allSquares) {
             Sq oldsq = model.get(s.x, s.y);
+
             s._successors = oldsq._successors;
             s._predecessors = oldsq._predecessors;
 
@@ -340,8 +341,8 @@ class Model implements Iterable<Model.Sq> {
         if (seq0 == size()){
             return 0;
         }
-        for (int i = 0; i < _solution.length; i++) {
-            for (int j = 0; j < _solution[0].length; j++) {
+        for (int i = 0; i < width(); i++) {
+            for (int j = 0; j < height(); j++) {
                 if (_solution[i][j] == seq0 + 1) {
                     return Place.dirOf(x, y, i, j);
                 }
