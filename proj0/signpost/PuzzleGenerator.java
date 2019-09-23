@@ -8,7 +8,7 @@ import static signpost.Place.PlaceList;
 import static signpost.Utils.*;
 
 /** A creator of random Signpost puzzles.
- *  @author
+ *  @author cs61b-student
  */
 class PuzzleGenerator implements PuzzleSource {
 
@@ -20,8 +20,9 @@ class PuzzleGenerator implements PuzzleSource {
 
     @Override
     public Model getPuzzle(int width, int height, boolean allowFreeEnds) {
-        Model model = new Model(makePuzzleSolution(width, height, allowFreeEnds));
-        // FIXME: Remove the "//" on the following two lines.
+        Model model = new Model(
+                makePuzzleSolution(width, height, allowFreeEnds)
+                                );
         makeSolutionUnique(model);
         model.autoconnect();
         return model;
@@ -124,7 +125,7 @@ class PuzzleGenerator implements PuzzleSource {
 
             if (sq.successor() == null && sq.direction() != 0) {
 
-                int[] results = helper_func(sq, sq.successors(), model, true);
+                int[] results = helperfunc(sq, sq.successors(), model, true);
                 int nFound = results[0];
 
                 if (nFound == 0) {
@@ -153,7 +154,7 @@ class PuzzleGenerator implements PuzzleSource {
 
             if (sq.predecessor() == null && sq.sequenceNum() != 1) {
 
-                int[] results = helper_func(sq, sq.predecessors(), model, false);
+                int[] results = helperfunc(sq, sq.predecessors(), model, false);
                 int nFound = results[0];
 
                 if (nFound == 0) {
@@ -225,15 +226,16 @@ class PuzzleGenerator implements PuzzleSource {
         }
     }
 
-//    Class HelperSuite{}
+    /** Helper function to find nFound and x, y of found. */
 
-    private int[] helper_func(Sq sq, PlaceList pl, Model model, boolean next) {
+    private int[] helperfunc(Sq sq, PlaceList pl, Model model, boolean next) {
         int[] results = {0, -1, -1};
 
         for (Place p: pl) {
             if (next) {
                 if (sq.connectable(model.get(p))) {
-                    if (sq.sequenceNum() != 0 && model.get(p).sequenceNum() != 0) {
+                    if (sq.sequenceNum() != 0 &&
+                            model.get(p).sequenceNum() != 0) {
 
                         results[0] = 1;
                         results[1] = p.x;
@@ -243,10 +245,10 @@ class PuzzleGenerator implements PuzzleSource {
                     }
                     results[0] = results[0] + 1;
                 }
-            }
-            else {
+            } else {
                 if (model.get(p).connectable(sq)) {
-                    if (sq.sequenceNum() != 0 && model.get(p).sequenceNum() != 0) {
+                    if (sq.sequenceNum() != 0
+                            && model.get(p).sequenceNum() != 0) {
 
                         results[0] = 1;
                         results[1] = p.x;
@@ -265,8 +267,7 @@ class PuzzleGenerator implements PuzzleSource {
                         results[1] = j.x;
                         results[2] = j.y;
                     }
-                }
-                else {
+                } else {
                     if (model.get(j).connectable(sq)) {
                         results[1] = j.x;
                         results[2] = j.y;
