@@ -650,6 +650,7 @@ potential predecessors. */
                 return false;
             }
             int sgroup = s1.group();
+            int curr_group = this.group();
 
             _unconnected -= 1;
 
@@ -709,7 +710,7 @@ potential predecessors. */
                     releaseGroup(sgroup);
                 }
                 else if (this_num == 0) {
-                    releaseGroup(this.group());
+                    releaseGroup(curr_group);
                 }
             }
 
