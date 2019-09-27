@@ -7,19 +7,27 @@ import utils.Filter;
  *  @author You
  */
 class PredicateFilter<Value> extends Filter<Value> {
+    private Predicate<Value> func;
 
     /** A filter of values from INPUT that tests them with PRED,
      *  delivering only those for which PRED is true. */
     PredicateFilter(Predicate<Value> pred, Iterator<Value> input) {
         super(input); //FIXME ??
-        // FIXME: REPLACE THIS LINE WITH YOUR CODE
+        func = pred;
     }
 
     @Override
     protected boolean keep() {
+
+        if (func.test(_next)){
+            current = _next;
+            return true;
+
+        }
+
         return false;  // FIXME: REPLACE THIS LINE WITH YOUR CODE
     }
 
-    // FIXME: REPLACE THIS LINE WITH YOUR CODE
+    private Value current;
 
 }

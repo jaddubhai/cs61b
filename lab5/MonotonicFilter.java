@@ -18,9 +18,19 @@ class MonotonicFilter<Value extends Comparable<Value>> extends Filter<Value> {
 
     @Override
     protected boolean keep() {
+        if (currentmax == null){
+            currentmax = _next;
+            return true;
+        }
+
+        if (currentmax.compareTo(_next) < 0){
+            currentmax = _next;
+            return true;
+        }
+
         return false;  // FIXME: REPLACE THIS LINE WITH YOUR CODE
     }
     
-    // FIXME: ADD ANY ADDITIONAL FIELDS REQUIRED HERE
+    private Value currentmax;
 
 }
