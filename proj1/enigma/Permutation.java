@@ -15,7 +15,7 @@ class Permutation {
      *  Whitespace is ignored. */
     Permutation(String cycles, Alphabet alphabet) {
         _alphabet = alphabet;
-
+        _CYCLE = cycles;
     }
 
     /** Add the cycle c0->c1->...->cm->c0 to the permutation, where CYCLE is

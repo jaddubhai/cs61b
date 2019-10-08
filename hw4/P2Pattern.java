@@ -10,7 +10,7 @@ public class P2Pattern {
     public static final String P2 = "\"\\\\(((0|[1-9]\\\\d*),(\\\\s*))*(0|[1-9]\\\\d*)\\\\)\"";
 
     /* Pattern to match a valid domain name. Eg: www.support.facebook-login.com */
-    public static final String P3 = "^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\\\.)+[A-Za-z]{2,6}"; 
+    public static final String P3 = "^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\\\.)+[A-Za-z]{2,6}";
 
     /* Pattern to match a valid java variable name. Eg: _child13$ */
     public static final String P4 = "^[a-zA-Z_$][a-zA-Z_$0-9]*$";
