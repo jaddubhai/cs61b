@@ -13,6 +13,7 @@ class MonotonicFilter<Value extends Comparable<Value>> extends Filter<Value> {
      *  subsequence.  */
     MonotonicFilter(Iterator<Value> input) {
         super(input); //FIXME?
+
         // FIXME: REPLACE THIS LINE WITH YOUR CODE
     }
 
@@ -28,7 +29,11 @@ class MonotonicFilter<Value extends Comparable<Value>> extends Filter<Value> {
             return true;
         }
 
-        return false;  // FIXME: REPLACE THIS LINE WITH YOUR CODE
+        else{
+            currentmax = _next;
+            return false;
+        }
+          // FIXME: REPLACE THIS LINE WITH YOUR CODE
     }
     
     private Value currentmax;

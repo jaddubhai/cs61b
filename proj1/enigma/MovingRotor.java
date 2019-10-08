@@ -1,5 +1,7 @@
 package enigma;
 
+import afu.org.checkerframework.checker.oigj.qual.O;
+
 import static enigma.EnigmaException.*;
 
 /** Class that represents a rotating rotor in the enigma machine.
@@ -14,16 +16,45 @@ class MovingRotor extends Rotor {
      */
     MovingRotor(String name, Permutation perm, String notches) {
         super(name, perm);
-        // FIXME
+
+        if (notches == null) {
+            _notches = null;
+        }
+
+        _notches = new int[notches.length()];
+
+        int counter = 0;
+        while(counter < notches.length()){
+            _notches[counter] = alphabet().toInt(notches.charAt(counter));
+            counter++;
+        }
     }
 
-    // FIXME?
 
     @Override
     void advance() {
-        // FIXME
+        set(permutation().wrap(setting() + 1));
     }
 
-    // FIXME: ADDITIONAL FIELDS HERE, AS NEEDED
+    @Override
+    boolean atNotch() {
+        if (_notches == null){
+            return false;
 
+        }
+        for (int notch : _notches) {
+            if (setting() == notch) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    boolean rotates() {
+        return true;
+    }
+
+    private int[] _notches;
 }
