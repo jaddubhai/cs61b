@@ -56,7 +56,7 @@ class Rotor {
 
     /** Set setting() to character CPOSN. */
     void set(char cposn) {
-        _position = alphabet().toChar(cposn);
+        _position = alphabet().toInt(cposn);
     }
 
     /** Return the conversion of P (an integer in the range 0..size()-1)

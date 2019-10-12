@@ -35,7 +35,7 @@ class Permutation {
 
     /** Returns the size of the alphabet I permute. */
     int size() {
-        return _alphabet.size(); // FIXME
+        return _alphabet.size();
     }
 
     /** Return the result of applying this permutation to P modulo the
