@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -114,7 +115,7 @@ public final class Main {
      *  file _config. */
     private Machine readConfig() {
 
-        ArrayList _rotors = new ArrayList<>();
+        Collection<Rotor> _rotors = new ArrayList<Rotor>();
         int dummy;
         try {
             _alphabet = new Alphabet(_config.next("\\S+"));
