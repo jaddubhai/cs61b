@@ -4,7 +4,7 @@ import static enigma.EnigmaException.*;
 
 /** Represents a permutation of a range of integers starting at 0 corresponding
  *  to the characters of an alphabet.
- *  @author
+ *  @author Varun Jadia
  */
 class Permutation {
 
@@ -15,13 +15,13 @@ class Permutation {
      *  Whitespace is ignored. */
     Permutation(String cycles, Alphabet alphabet) {
         _alphabet = alphabet;
-        _CYCLE = cycles;
+        _cYCLE = cycles;
     }
 
     /** Add the cycle c0->c1->...->cm->c0 to the permutation, where CYCLE is
      *  c0c1...cm. */
     private void addCycle(String cycle) {
-        _CYCLE += cycle;
+        _cYCLE += cycle;
     }
 
     /** Return the value of P modulo the size of this permutation. */
@@ -58,26 +58,26 @@ class Permutation {
      *  in ALPHABET, and converting the result to a character of ALPHABET. */
     char permute(char p) {
 
-        if (_alphabet.contains(p) == false){
+        if (!_alphabet.contains(p)) {
             return p;
         }
 
-        if (_CYCLE == null){
+        if (_cYCLE == null) {
             return p;
         }
 
         String s = Character.toString(p);
 
-        if (_CYCLE.indexOf(s) != -1){
-            char nxtChar = _CYCLE.charAt(_CYCLE.indexOf(s) + 1);
-            if (nxtChar == ')'){
-                int currIndex = _CYCLE.indexOf(s);
-                while (_CYCLE.charAt(currIndex - 1) != '('){
+        if (_cYCLE.indexOf(s) != -1) {
+            char nxtChar = _cYCLE.charAt(_cYCLE.indexOf(s) + 1);
+            if (nxtChar == ')') {
+                int currIndex = _cYCLE.indexOf(s);
+                while (_cYCLE.charAt(currIndex - 1) != '(') {
                     currIndex--;
                 }
-                return _CYCLE.charAt(currIndex);
+                return _cYCLE.charAt(currIndex);
             } else {
-                return  _CYCLE.charAt(_CYCLE.indexOf(s) + 1);
+                return  _cYCLE.charAt(_cYCLE.indexOf(s) + 1);
             }
         }
         return p;
@@ -85,26 +85,26 @@ class Permutation {
 
     /** Return the result of applying the inverse of this permutation to C. */
     char invert(char c) {
-        if (_alphabet.contains(c) == false){
+        if (!_alphabet.contains(c)) {
             return c;
         }
 
-        if (_CYCLE == null){
+        if (_cYCLE == null) {
             return c;
         }
 
         String s = Character.toString(c);
 
-        if (_CYCLE.indexOf(s) != -1){
-            char nxtChar = _CYCLE.charAt(_CYCLE.indexOf(s) - 1);
-            if (nxtChar == '('){
-                int currIndex = _CYCLE.indexOf(s);
-                while (_CYCLE.charAt(currIndex + 1) != ')'){
+        if (_cYCLE.indexOf(s) != -1) {
+            char nxtChar = _cYCLE.charAt(_cYCLE.indexOf(s) - 1);
+            if (nxtChar == '(') {
+                int currIndex = _cYCLE.indexOf(s);
+                while (_cYCLE.charAt(currIndex + 1) != ')') {
                     currIndex++;
                 }
-                return _CYCLE.charAt(currIndex);
+                return _cYCLE.charAt(currIndex);
             } else {
-                return  _CYCLE.charAt(_CYCLE.indexOf(s) - 1);
+                return  _cYCLE.charAt(_cYCLE.indexOf(s) - 1);
             }
         }
         return c;
@@ -120,8 +120,8 @@ class Permutation {
     boolean derangement() {
         int count = 0;
 
-        while (count < _alphabet.size()){
-            if (_alphabet.toChar(count) == permute(_alphabet.toChar(count))){
+        while (count < _alphabet.size()) {
+            if (_alphabet.toChar(count) == permute(_alphabet.toChar(count))) {
                 return false;
             }
         }
@@ -129,7 +129,8 @@ class Permutation {
         return true;
     }
 
-    private String _CYCLE;
+    /** Permutation cycle. */
+    private String _cYCLE;
 
     /** Alphabet of this permutation. */
     private Alphabet _alphabet;

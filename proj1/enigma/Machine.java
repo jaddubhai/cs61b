@@ -1,14 +1,12 @@
 package enigma;
 
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Collection;
-import java.util.Iterator;
 
 import static enigma.EnigmaException.*;
 
 /** Class that represents a complete enigma machine.
- *  @author
+ *  @author Varun Jadia
  */
 class Machine {
 
@@ -59,10 +57,10 @@ class Machine {
      *  to the leftmost rotor setting (not counting the reflector).  */
     void setRotors(String setting) {
 
-        assert(setting.length() == _rotors.length - 1);
+        assert (setting.length() == _rotors.length - 1);
 
         int counter = 0;
-        while(counter < setting.length()) {
+        while (counter < setting.length()) {
             _rotors[counter + 1].set(setting.charAt(counter));
             counter++;
         }
@@ -84,25 +82,25 @@ class Machine {
         int permuted = _plugboard.permute(c);
         boolean hasadvanced = false;
 
-        for (int i = _rotors.length - 1; i > 0; i--){
+        for (int i = _rotors.length - 1; i > 0; i--) {
             if (_rotors[i].atNotch()) {
                 _rotors[i].advance();
-                _rotors[i-1].advance();
+                _rotors[i - 1].advance();
                 if (i == _rotors.length - 1) {
                     hasadvanced = true;
                 }
             }
         }
 
-        if (hasadvanced== false) {
+        if (!hasadvanced) {
             _rotors[_rotors.length - 1].advance();
         }
 
-        for (int i = _rotors.length - 1; i >= 0; i-- ){
+        for (int i = _rotors.length - 1; i >= 0; i--) {
             permuted = _rotors[i].convertForward(permuted);
         }
 
-        for (int i = 1; i < _rotors.length; i++ ){
+        for (int i = 1; i < _rotors.length; i++) {
             permuted = _rotors[i].convertBackward(permuted);
         }
 
@@ -112,13 +110,14 @@ class Machine {
     /** Returns the encoding/decoding of MSG, updating the state of
      *  the rotors accordingly. */
     String convert(String msg) {
-        String replaced = msg.replaceAll("\\s","");
+        String replaced = msg.replaceAll("\\s", "");
         String[] msgarray = replaced.split("(?!^)");
 
         char[] output = new char[msgarray.length];
 
-        for (int i = 0; i < msgarray.length; i++){
-            output[i] = _alphabet.toChar(convert(_alphabet.toInt(replaced.charAt(i))));
+        for (int i = 0; i < msgarray.length; i++) {
+            output[i] = _alphabet.toChar(convert(
+                    _alphabet.toInt(replaced.charAt(i))));
         }
 
         return new String(output);
@@ -126,17 +125,20 @@ class Machine {
 
     /** Common alphabet of my rotors. */
     private final Alphabet _alphabet;
+    /** method to check if a rotor is in the machine.
+     * @param name rotor name
+     * @return boolean*/
 
     boolean contains(String name) {
         return _availableRotors.containsKey(name);
     }
-
+    /** plugboard. */
     private Permutation _plugboard;
-
+    /** pawls. */
     private int _pawls;
-
+    /** available rotors. */
     private HashMap<String, Rotor> _availableRotors;
-
+    /** Rotors. */
     private Rotor[] _rotors;
 
 }

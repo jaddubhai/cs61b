@@ -2,7 +2,7 @@ package enigma;
 
 /** An alphabet of encodable characters.  Provides a mapping from characters
  *  to and from indices into the alphabet.
- *  @author
+ *  @author Varun Jadia
  */
 class Alphabet {
 
@@ -39,17 +39,7 @@ class Alphabet {
         return _alphabet.indexOf(ch);
     }
 
+    /** alphabet in consideration. */
     private String _alphabet;
-
-    private static boolean check(String g) {
-        for (int i = 0; i < g.length(); i++) {
-            for (int j = i + 1; j < g.length(); j++) {
-                if (g.charAt(i) == g.charAt(j)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
 }

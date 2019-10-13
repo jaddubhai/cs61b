@@ -1,6 +1,5 @@
 package enigma;
 
-import javax.crypto.Mac;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -13,7 +12,7 @@ import java.util.Scanner;
 import static enigma.EnigmaException.*;
 
 /** Enigma simulator.
- *  @author
+ *  @author Varun Jadia
  */
 public final class Main {
 
@@ -79,7 +78,7 @@ public final class Main {
      *  file _config and apply it to the messages in _input, sending the
      *  results to _output. */
     private void process() {
-        Machine _machine = readConfig();
+        Machine machine = readConfig();
         String firstline = _input.nextLine();
 
         if (firstline.charAt(0) != '*') {
@@ -97,17 +96,16 @@ public final class Main {
                 firstline = firstline.replaceAll("\\*", "");
                 firstline = firstline.trim();
 
-                setUp(_machine, firstline);
+                setUp(machine, firstline);
 
                 String nextline = _input.nextLine().trim();
 
                 while (nextline.charAt(0) != '*') {
                     nextline = nextline.replaceAll("\\s", "");
-                    printMessageLine(_machine.convert(nextline));
+                    printMessageLine(machine.convert(nextline));
                     try {
                         nextline = _input.nextLine().trim();
-                    }
-                    catch (NoSuchElementException excp) {
+                    } catch (NoSuchElementException excp) {
                         break;
                     }
                 }
@@ -123,7 +121,7 @@ public final class Main {
      *  file _config. */
     private Machine readConfig() {
 
-        Collection<Rotor> _rotors = new ArrayList<Rotor>();
+        Collection<Rotor> rotors = new ArrayList<Rotor>();
         int dummy;
         try {
             _alphabet = new Alphabet(_config.next("\\S+"));
@@ -131,16 +129,15 @@ public final class Main {
             int pawls = _config.nextInt();
 
             while (_config.hasNext(".+")) {
-                _rotors.add(readRotor());
+                rotors.add(readRotor());
             }
-            if (_rotors.size() != 0) {
+            if (rotors.size() != 0) {
                 dummy = 0;
-            }
-            else {
+            } else {
                 throw new EnigmaException("Config error");
             }
 
-            return new Machine(_alphabet, numrotors, pawls, _rotors);
+            return new Machine(_alphabet, numrotors, pawls, rotors);
 
         } catch (NoSuchElementException excp) {
             throw error("configuration file truncated");
@@ -163,23 +160,18 @@ public final class Main {
             while (_config.hasNext("\\s*[(].+[)]\\s*")) {
                 cycles += _config.next("\\s*[(].+[)]\\s*");
             }
-
             if (rotortype == 'R') {
                 return new Reflector(name, new Permutation(cycles, _alphabet));
             }
-
             if (rotortype == 'M') {
-                return new MovingRotor(name, new Permutation(cycles, _alphabet), notches);
+                return new MovingRotor(name,
+                        new Permutation(cycles, _alphabet), notches);
             }
-
             if (rotortype == 'N') {
                 return new FixedRotor(name, new Permutation(cycles, _alphabet));
-            }
-
-            else {
+            } else {
                 throw new EnigmaException("Invalid Rotor");
             }
-
         } catch (NoSuchElementException excp) {
             throw error("bad rotor description");
         }
@@ -200,7 +192,7 @@ public final class Main {
         String set = components[setrotors];
         String[] insertrotrs = new String[setrotors];
 
-        System.arraycopy(components, 0 , insertrotrs, 0, setrotors);
+        System.arraycopy(components, 0, insertrotrs, 0, setrotors);
         M.insertRotors(insertrotrs);
         M.setRotors(set);
 
