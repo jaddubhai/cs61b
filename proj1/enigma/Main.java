@@ -80,19 +80,32 @@ public final class Main {
     private void process() {
         Machine _machine = readConfig();
         String firstline = _input.nextLine();
-        if (!(firstline.substring(0, 1).equals("*"))) {
-            throw error("configuration required!");
-        }
-
-        firstline = firstline.replaceAll("\\*", "");
-        firstline = firstline.trim();
-
-        setUp(_machine, firstline);
 
         while (_input.hasNextLine()) {
-            String nextline = _input.nextLine().trim();
-            nextline = nextline.replaceAll("\\s", "");
-            printMessageLine(_machine.convert(nextline));
+
+            if (firstline.charAt(0) == '*') {
+
+                firstline = firstline.replaceAll("\\*", "");
+                firstline = firstline.trim();
+
+                setUp(_machine, firstline);
+
+                String nextline = _input.nextLine().trim();
+
+                while (nextline.charAt(0) != '*') {
+                    nextline = nextline.replaceAll("\\s", "");
+                    printMessageLine(_machine.convert(nextline));
+                    try {
+                        nextline = _input.nextLine().trim();
+                    }
+                    catch (NoSuchElementException excp) {
+                        break;
+                    }
+                }
+
+                firstline = nextline;
+            }
+
         }
 
     }
@@ -102,37 +115,23 @@ public final class Main {
     private Machine readConfig() {
 
         ArrayList _rotors = new ArrayList<>();
+        int dummy;
         try {
+            _alphabet = new Alphabet(_config.next("\\S+"));
+            int numrotors = _config.nextInt();
+            int pawls = _config.nextInt();
 
-            String alphabetline = _config.nextLine();
-            alphabetline = alphabetline.replaceAll("\\s","");
-
-            //convert everything to uppercase!
-
-            _alphabet = new Alphabet(alphabetline);
-
-            String rotorinfo = _config.nextLine();
-            rotorinfo = rotorinfo.replaceAll("\\s","");
-
-            int numRotors = Character.getNumericValue(rotorinfo.charAt(0));
-            int pawls = Character.getNumericValue(rotorinfo.charAt(1));
-
-            while (_config.hasNextLine()) {
-                Scanner oldconfig = _config;
-                String rotorline = _config.nextLine().trim();
-                String nextline = _config.nextLine().trim();
-
-                if (nextline.charAt(0) == '(') {
-                    rotorline = rotorline + " " + nextline;
-
-                } else {
-                    _config = oldconfig;
-                }
-
-                _rotors.add(readRotor(rotorline));
+            while (_config.hasNext(".+")) {
+                _rotors.add(readRotor());
+            }
+            if (_rotors.size() != 0) {
+                dummy = 0;
+            }
+            else {
+                throw new EnigmaException("Config error");
             }
 
-            return new Machine(_alphabet, numRotors, pawls, _rotors);
+            return new Machine(_alphabet, numrotors, pawls, _rotors);
 
         } catch (NoSuchElementException excp) {
             throw error("configuration file truncated");
@@ -140,48 +139,32 @@ public final class Main {
     }
 
     /** Return a rotor, reading its description from _config. */
-    private Rotor readRotor(String rotorline) {
+    private Rotor readRotor() {
         String name = "";
         String notches = "";
-        int breakindex = 0;
+        String cycles = "";
+        char rotortype;
 
         try {
-            for (int i = 0; i < rotorline.length(); i++) {
-                if (Character.isWhitespace(rotorline.charAt(i))) {
-                    breakindex = i;
-                    break;
-                }
-                name += rotorline.charAt(i);
+            name = _config.next("[^()\\s]+");
+            String rotornotches = _config.next("[^()\\s]+");
+            rotortype = rotornotches.charAt(0);
+            notches = rotornotches.substring(1);
+
+            while (_config.hasNext("\\s*[(].+[)]\\s*")) {
+                cycles += _config.next("\\s*[(].+[)]\\s*");
             }
-
-            String remaining = rotorline.substring(breakindex);
-            remaining = remaining.trim();
-
-            char rotortype = remaining.charAt(0);
-            remaining = remaining.substring(1);
-            int break2 = 0;
-
-            for (int i = 0; i < remaining.length(); i++) {
-                if (Character.isWhitespace(rotorline.charAt(i))) {
-                    break2 = i;
-                    break;
-                }
-                 notches += remaining.charAt(i);
-            }
-
-            String cycles = remaining.substring(break2);
-            cycles = cycles.trim();
 
             if (rotortype == 'R') {
-                return new Reflector(name.toUpperCase(), new Permutation(cycles, _alphabet));
+                return new Reflector(name, new Permutation(cycles, _alphabet));
             }
 
             if (rotortype == 'M') {
-                return new MovingRotor(name.toUpperCase(), new Permutation(cycles, _alphabet), notches);
+                return new MovingRotor(name, new Permutation(cycles, _alphabet), notches);
             }
 
             if (rotortype == 'N') {
-                return new FixedRotor(name.toUpperCase(), new Permutation(cycles, _alphabet));
+                return new FixedRotor(name, new Permutation(cycles, _alphabet));
             }
 
             else {
@@ -225,19 +208,23 @@ public final class Main {
 
     /** Print MSG in groups of five (except that the last group may
      *  have fewer letters). */
-    private void printMessageLine(String msg) {
-        String output = "";
-        int counttofive = 1;
 
-        for (int i = 0; i < msg.length(); i++) {
-            if (counttofive % 5 == 0) {
-                _output.println(output);
-                output = "";
+    private void printMessageLine(String msg) {
+        String msgline = msg;
+        if (msgline.length() == 0) {
+            _output.println();
+        } else {
+            while (msgline.length() > 0) {
+                if (msgline.length() <= 5) {
+                    _output.println(msgline);
+                    msgline = "";
+                } else {
+                    _output.print(msgline.substring(0, 5) + " ");
+                    msgline = msgline.substring
+                            (5, msgline.length());
+                }
             }
-            output += msg.charAt(i);
-            counttofive += 1;
         }
-        _output.println(output);
     }
 
     /** Alphabet used in this machine. */
