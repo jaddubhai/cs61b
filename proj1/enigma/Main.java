@@ -82,7 +82,15 @@ public final class Main {
         Machine _machine = readConfig();
         String firstline = _input.nextLine();
 
+        if (firstline.charAt(0) != '*') {
+            throw new EnigmaException("Invalid Config!");
+        }
+
         while (_input.hasNextLine()) {
+
+            if (firstline.charAt(0) != '*') {
+                throw new EnigmaException("Invalid Config!");
+            }
 
             if (firstline.charAt(0) == '*') {
 
