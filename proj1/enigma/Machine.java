@@ -42,6 +42,14 @@ class Machine {
      *  Initially, all rotors are set at their 0 setting. */
     void insertRotors(String[] rotors) {
 
+        HashMap<String, Integer>map = new HashMap<>();
+        for (String c : rotors) {
+            if (map.containsKey(c)) {
+                throw new EnigmaException("Duplicate Rotors");
+            }
+            map.put(c, 1);
+        }
+
         int counter = 0;
 
         for (String rtr : rotors) {

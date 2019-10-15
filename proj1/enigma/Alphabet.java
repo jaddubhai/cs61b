@@ -1,5 +1,7 @@
 package enigma;
 
+import java.util.HashMap;
+
 /** An alphabet of encodable characters.  Provides a mapping from characters
  *  to and from indices into the alphabet.
  *  @author Varun Jadia
@@ -9,7 +11,16 @@ class Alphabet {
     /** A new alphabet containing CHARS.  Character number #k has index
      *  K (numbering from 0). No character may be duplicated. */
     Alphabet(String chars) {
-        _alphabet = chars;
+        _alphabet = chars.toUpperCase();
+        char[] charray = _alphabet.toCharArray();
+
+        HashMap<Character, Integer> map = new HashMap<>();
+        for(char c : charray) {
+            if (map.containsKey(c)) {
+                throw new EnigmaException("Only unique characters in alphabet!");
+            }
+            map.put(c, 1);
+        }
     }
 
     /** A default alphabet of all upper-case characters. */

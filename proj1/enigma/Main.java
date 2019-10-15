@@ -196,6 +196,7 @@ public final class Main {
         M.insertRotors(insertrotrs);
         M.setRotors(set);
 
+
         String joined = "";
         for (int i = setrotors + 1; i < components.length; i++) {
             joined += components[i];
