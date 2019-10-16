@@ -68,7 +68,7 @@ class Permutation {
 
         String s = Character.toString(p);
 
-        if (_cYCLE.indexOf(s) != -1) {
+        if (_cYCLE.contains(s)) {
             char nxtChar = _cYCLE.charAt(_cYCLE.indexOf(s) + 1);
             if (nxtChar == ')') {
                 int currIndex = _cYCLE.indexOf(s);

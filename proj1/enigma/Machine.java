@@ -42,7 +42,7 @@ class Machine {
      *  Initially, all rotors are set at their 0 setting. */
     void insertRotors(String[] rotors) {
 
-        HashMap<String, Integer>map = new HashMap<>();
+        HashMap<String, Integer> map = new HashMap<>();
         for (String c : rotors) {
             if (map.containsKey(c)) {
                 throw new EnigmaException("Duplicate Rotors");
@@ -131,6 +131,18 @@ class Machine {
         return new String(output);
     }
 
+    /** Change rotor positions based on ringsetting.
+     * @param setting */
+    void ringsetting(String setting) {
+
+        assert (setting.length() == numRotors() - 1);
+        char[] settingarr = setting.toCharArray();
+
+        for (int i = 1; i < _rotors.length - 1; i++) {
+            _rotors[i].setringset(Character.toString(settingarr[i]));
+        }
+    }
+
     /** Common alphabet of my rotors. */
     private final Alphabet _alphabet;
     /** method to check if a rotor is in the machine.
@@ -140,6 +152,7 @@ class Machine {
     boolean contains(String name) {
         return _availableRotors.containsKey(name);
     }
+
     /** plugboard. */
     private Permutation _plugboard;
     /** pawls. */

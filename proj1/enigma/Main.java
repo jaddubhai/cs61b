@@ -6,6 +6,7 @@ import java.io.PrintStream;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -182,19 +183,38 @@ public final class Main {
     private void setUp(Machine M, String settings) {
         int setrotors = 0;
 
+        HashMap<String, Integer> map = new HashMap<>();
+
         String[] components = settings.split(" ");
         for (String component : components) {
             if (M.contains(component)) {
-                setrotors += 1;
+                if (!map.containsKey(component)) {
+                    setrotors += 1;
+                } else {
+                    throw new EnigmaException("Duplicate rotors");
+                }
+                map.put(component, 1);
             }
         }
 
         String set = components[setrotors];
         String[] insertrotrs = new String[setrotors];
+        String ringsetting = "";
 
         System.arraycopy(components, 0, insertrotrs, 0, setrotors);
         M.insertRotors(insertrotrs);
         M.setRotors(set);
+
+
+        try {
+            if (components[setrotors + 1].matches("[^()\\s]+")) {
+                ringsetting = components[setrotors + 1];
+                M.ringsetting(ringsetting);
+                setrotors += 1;
+            }
+        } catch (java.lang.ArrayIndexOutOfBoundsException excp) {
+            ringsetting = "";
+        }
 
 
         String joined = "";
@@ -215,15 +235,17 @@ public final class Main {
         String msgline = msg;
         if (msgline.length() == 0) {
             _output.println();
+
         } else {
             while (msgline.length() > 0) {
-                if (msgline.length() <= 5) {
+                int msglen = msgline.length();
+                if (msglen <= 5) {
                     _output.println(msgline);
                     msgline = "";
                 } else {
                     _output.print(msgline.substring(0, 5) + " ");
                     msgline = msgline.substring
-                            (5, msgline.length());
+                            (5, msglen);
                 }
             }
         }

@@ -12,6 +12,8 @@ class Rotor {
         _name = name;
         _permutation = perm;
         _position = 0;
+        _ringset = "";
+
     }
 
     /** Return my name. */
@@ -83,6 +85,12 @@ class Rotor {
     void advance() {
     }
 
+    /** Return ringsetting. Changes notches based on ringsetting as well.
+     * @param set */
+    void setringset(String set) {
+        _ringset = set;
+    }
+
     @Override
     public String toString() {
         return "Rotor " + _name;
@@ -96,5 +104,8 @@ class Rotor {
 
     /** current rotor position. */
     private int _position;
+
+    /** ringsetting. */
+    private String _ringset;
 
 }

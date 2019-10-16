@@ -15,9 +15,10 @@ class Alphabet {
         char[] charray = _alphabet.toCharArray();
 
         HashMap<Character, Integer> map = new HashMap<>();
-        for(char c : charray) {
+        for (char c : charray) {
             if (map.containsKey(c)) {
-                throw new EnigmaException("Only unique characters in alphabet!");
+                throw new EnigmaException(
+                        "Only unique characters in alphabet!");
             }
             map.put(c, 1);
         }
