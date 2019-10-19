@@ -11,7 +11,7 @@ class Alphabet {
     /** A new alphabet containing CHARS.  Character number #k has index
      *  K (numbering from 0). No character may be duplicated. */
     Alphabet(String chars) {
-        _alphabet = chars.toUpperCase();
+        _alphabet = chars;
         char[] charray = _alphabet.toCharArray();
 
         HashMap<Character, Integer> map = new HashMap<>();

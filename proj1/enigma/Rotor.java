@@ -88,7 +88,8 @@ class Rotor {
     /** Return ringsetting. Changes notches based on ringsetting as well.
      * @param set */
     void setringset(String set) {
-        _ringset = set;
+        assert (alphabet().contains(set.charAt(0)));
+        set(alphabet().toInt(set.charAt(0)) + setting());
     }
 
     @Override

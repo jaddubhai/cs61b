@@ -138,8 +138,8 @@ class Machine {
         assert (setting.length() == numRotors() - 1);
         char[] settingarr = setting.toCharArray();
 
-        for (int i = 1; i < _rotors.length - 1; i++) {
-            _rotors[i].setringset(Character.toString(settingarr[i]));
+        for (int i = 1; i < _rotors.length; i++) {
+            _rotors[i].setringset(Character.toString(settingarr[i-1]));
         }
     }
 

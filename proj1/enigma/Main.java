@@ -205,7 +205,6 @@ public final class Main {
         M.insertRotors(insertrotrs);
         M.setRotors(set);
 
-
         try {
             if (components[setrotors + 1].matches("[^()\\s]+")) {
                 ringsetting = components[setrotors + 1];

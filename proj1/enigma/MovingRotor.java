@@ -57,10 +57,10 @@ class MovingRotor extends Rotor {
     @Override
     void setringset(String set) {
         assert (alphabet().contains(set.charAt(0)));
-        set(alphabet().toInt(set.charAt(0)));
+        set(wrap(alphabet().toInt(set.charAt(0)) + setting()));
 
         for (int i = 0; i < _notches.length; i++) {
-            _notches[i] = wrap(_notches[i] - setting());
+            _notches[i] = wrap(_notches[i] -  alphabet().toInt(set.charAt(0)));
         }
     }
 
