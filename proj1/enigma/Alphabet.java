@@ -20,6 +20,12 @@ class Alphabet {
                 throw new EnigmaException(
                         "Only unique characters in alphabet!");
             }
+
+            if (c == '(' || c == ')' || c == '*') {
+                throw new EnigmaException(
+                        "Invalid characters in alphabet!"
+                );
+            }
             map.put(c, 1);
         }
     }

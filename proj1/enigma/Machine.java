@@ -65,10 +65,15 @@ class Machine {
      *  to the leftmost rotor setting (not counting the reflector).  */
     void setRotors(String setting) {
 
-        assert (setting.length() == _rotors.length - 1);
+        if (setting.length() != _rotors.length - 1) {
+            throw new EnigmaException("invalid setting length");
+        }
 
         int counter = 0;
         while (counter < setting.length()) {
+            if (!_alphabet.contains(setting.charAt(counter))) {
+                throw new EnigmaException("Setting character not in Alphabet");
+            }
             _rotors[counter + 1].set(setting.charAt(counter));
             counter++;
         }
@@ -89,6 +94,10 @@ class Machine {
 
         int permuted = _plugboard.permute(c);
         boolean hasadvanced = false;
+
+        if (c == -1) {
+            throw new EnigmaException("Character not in Alphabet!");
+        }
 
         for (int i = _rotors.length - 1; i > 0; i--) {
             if (_rotors[i].atNotch()) {

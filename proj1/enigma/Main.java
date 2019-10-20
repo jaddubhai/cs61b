@@ -101,9 +101,17 @@ public final class Main {
 
                 String nextline = _input.nextLine().trim();
 
-                while (nextline.charAt(0) != '*') {
-                    nextline = nextline.replaceAll("\\s", "");
-                    printMessageLine(machine.convert(nextline));
+                if (nextline != "") {
+                    while (nextline.charAt(0) != '*') {
+                        nextline = nextline.replaceAll("\\s", "");
+                        printMessageLine(machine.convert(nextline));
+                        try {
+                            nextline = _input.nextLine().trim();
+                        } catch (NoSuchElementException excp) {
+                            break;
+                        }
+                    }
+                } else {
                     try {
                         nextline = _input.nextLine().trim();
                     } catch (NoSuchElementException excp) {
