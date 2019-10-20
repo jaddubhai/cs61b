@@ -101,7 +101,7 @@ public final class Main {
 
                 String nextline = _input.nextLine().trim();
 
-                if (nextline != "") {
+                if (!nextline.equals("")) {
                     while (nextline.charAt(0) != '*') {
                         nextline = nextline.replaceAll("\\s", "");
                         printMessageLine(machine.convert(nextline));

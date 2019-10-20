@@ -170,5 +170,4 @@ class Machine {
     private HashMap<String, Rotor> _availableRotors;
     /** Rotors. */
     private Rotor[] _rotors;
-
 }
