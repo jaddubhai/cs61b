@@ -139,7 +139,7 @@ class Machine {
         char[] settingarr = setting.toCharArray();
 
         for (int i = 1; i < _rotors.length; i++) {
-            _rotors[i].setringset(Character.toString(settingarr[i-1]));
+            _rotors[i].setringsetting(_alphabet.toInt(settingarr[i - 1]));
         }
     }
 

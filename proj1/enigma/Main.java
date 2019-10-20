@@ -215,7 +215,6 @@ public final class Main {
             ringsetting = "";
         }
 
-
         String joined = "";
         for (int i = setrotors + 1; i < components.length; i++) {
             joined += components[i];

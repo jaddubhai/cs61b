@@ -53,5 +53,4 @@ class Alphabet {
 
     /** alphabet in consideration. */
     private String _alphabet;
-
 }

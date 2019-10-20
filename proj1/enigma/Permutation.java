@@ -135,4 +135,9 @@ class Permutation {
     /** Alphabet of this permutation. */
     private Alphabet _alphabet;
 
+    /** get cycles.
+     * @return */
+    public String getcycles() {
+        return _cYCLE;
+    }
 }

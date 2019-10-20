@@ -12,8 +12,6 @@ class Rotor {
         _name = name;
         _permutation = perm;
         _position = 0;
-        _ringset = "";
-
     }
 
     /** Return my name. */
@@ -64,15 +62,17 @@ class Rotor {
     /** Return the conversion of P (an integer in the range 0..size()-1)
      *  according to my permutation. */
     int convertForward(int p) {
-        int permuted = _permutation.permute(_permutation.wrap(p + _position));
-        return _permutation.wrap(permuted - _position);
+        int permuted = _permutation.permute(wrap(p
+                + setting() - getringsetting()));
+        return _permutation.wrap(permuted - setting() + getringsetting());
     }
 
     /** Return the conversion of E (an integer in the range 0..size()-1)
      *  according to the inverse of my permutation. */
     int convertBackward(int e) {
-        int permuted = _permutation.invert(_permutation.wrap(e + _position));
-        return _permutation.wrap(permuted - _position);
+        int permuted = _permutation.invert(wrap(e
+                + setting() - getringsetting()));
+        return _permutation.wrap(permuted -  setting() + getringsetting());
     }
 
     /** Returns true iff I am positioned to allow the rotor to my left
@@ -85,16 +85,30 @@ class Rotor {
     void advance() {
     }
 
-    /** Return ringsetting. Changes notches based on ringsetting as well.
-     * @param set */
-    void setringset(String set) {
-        assert (alphabet().contains(set.charAt(0)));
-        set(alphabet().toInt(set.charAt(0)) + setting());
+    /**wrap.*/
+    /** @param p
+    /** @return */
+    public int wrap(int p) {
+        int r = p % alphabet().size();
+        if (r < 0) {
+            r += alphabet().size();
+        }
+        return r;
     }
 
-    @Override
-    public String toString() {
-        return "Rotor " + _name;
+    /** ringsetting variable. */
+    private int _ringsetting;
+
+    /** set ringsetting.
+     * @param ring  */
+    public void setringsetting(int ring) {
+        _ringsetting = ring;
+    }
+
+    /** get ringsetting.
+     * @return */
+    public int getringsetting() {
+        return _ringsetting;
     }
 
     /** My name. */
@@ -106,7 +120,5 @@ class Rotor {
     /** current rotor position. */
     private int _position;
 
-    /** ringsetting. */
-    private String _ringset;
 
 }
