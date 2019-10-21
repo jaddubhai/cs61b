@@ -221,7 +221,7 @@ public final class Main {
         if (msgline.length() == 0) {
             _output.println();
         } else {
-            while (msgline.length() > 0) {
+            while (msgline.length() >  0) {
                 int msglen = msgline.length();
                 if (msglen <= 5) {
                     _output.println(msgline);
