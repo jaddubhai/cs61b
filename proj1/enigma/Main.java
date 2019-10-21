@@ -224,12 +224,7 @@ public final class Main {
             while (msgline.length() > 0) {
                 int msglen = msgline.length();
                 if (msglen <= 5) {
-                    if (_input.hasNextLine()) {
-                        _output.println(msgline);
-                    }
-                    else {
-                        _output.print(msgline);
-                    }
+                    _output.println(msgline);
                     msgline = "";
                 } else {
                     _output.print(msgline.substring(0, 5) + " ");
