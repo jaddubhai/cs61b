@@ -70,6 +70,10 @@ class Machine {
         }
 
         int counter = 0;
+
+        if (!_rotors[0].reflecting()) {
+            throw new EnigmaException("First rotor should be reflector!");
+        }
         while (counter < setting.length()) {
             if (!_alphabet.contains(setting.charAt(counter))) {
                 throw new EnigmaException("Setting character not in Alphabet");
@@ -103,9 +107,9 @@ class Machine {
 
         for (int i = _rotors.length - 1; i > 0; i--) {
             if (_rotors[i].atNotch()) {
-                if (_rotors[i-1].rotates()) {
+                if (_rotors[i - 1].rotates()) {
                     rotate[i] = true;
-                    rotate[i-1] = true;
+                    rotate[i - 1] = true;
                 }
                 if (i == _rotors.length - 1) {
                     _rotors[i].advance();
@@ -120,7 +124,7 @@ class Machine {
             rotate[rotate.length - 1] = false;
         }
 
-        for (int i = rotate.length - 1; i > 0 ; i--) {
+        for (int i = rotate.length - 1; i > 0; i--) {
             if (rotate[i]) {
                 _rotors[i].advance();
             }
