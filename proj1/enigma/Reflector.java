@@ -25,4 +25,9 @@ class Reflector extends FixedRotor {
         }
     }
 
+    @Override
+    boolean atNotch() {
+        return false;
+    }
+
 }

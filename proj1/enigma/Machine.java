@@ -95,7 +95,7 @@ class Machine {
         int permuted = _plugboard.permute(c);
         boolean hasadvanced = false;
 
-        boolean[] rotate = new boolean[_rotors.length];
+        boolean[] rotate = new boolean[_rotors.length - 1];
 
         if (c == -1) {
             throw new EnigmaException("Character not in Alphabet!");
@@ -108,6 +108,7 @@ class Machine {
                     rotate[i-1] = true;
                 }
                 if (i == _rotors.length - 1) {
+                    _rotors[i].advance();
                     hasadvanced = true;
                 }
             }
@@ -115,7 +116,7 @@ class Machine {
 
         if (!hasadvanced) {
             _rotors[_rotors.length - 1].advance();
-            rotate[_rotors.length -1] = false;
+            rotate[rotate.length - 1] = false;
         }
 
         for (int i = rotate.length - 1; i >= 0 ; i--) {
