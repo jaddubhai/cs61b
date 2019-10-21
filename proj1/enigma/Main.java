@@ -80,48 +80,26 @@ public final class Main {
      *  results to _output. */
     private void process() {
         Machine machine = readConfig();
-        String firstline = _input.nextLine();
 
-        if (firstline.charAt(0) != '*') {
-            throw new EnigmaException("Invalid Config!");
+        if (!_input.hasNext("\\*.*")) {
+            throw error("Invalid Config!");
         }
 
+        setUp(machine, _input.nextLine().replace("*", "").trim());
+
         while (_input.hasNextLine()) {
-
-            if (firstline.charAt(0) != '*') {
-                throw new EnigmaException("Invalid Config!");
-            }
-
-            if (firstline.charAt(0) == '*') {
-
-                firstline = firstline.replaceAll("\\*", "");
-                firstline = firstline.trim();
-
-                setUp(machine, firstline);
-
-                String nextline = _input.nextLine().trim();
-
-                if (!nextline.equals("")) {
-                    while (nextline.charAt(0) != '*') {
-                        nextline = nextline.replaceAll("\\s", "");
-                        printMessageLine(machine.convert(nextline));
-                        try {
-                            nextline = _input.nextLine().trim();
-                        } catch (NoSuchElementException excp) {
-                            break;
-                        }
+            if (!_input.hasNext("\\*.*")) {
+                printMessageLine(machine.convert(_input.nextLine()));
+            } else {
+                if (_input.hasNext("\\*.*")) {
+                    String currline = _input.nextLine();
+                    if (currline.equals("")) {
+                        printMessageLine(machine.convert(currline));
+                        currline = _input.nextLine();
                     }
-                } else {
-                    try {
-                        nextline = _input.nextLine().trim();
-                    } catch (NoSuchElementException excp) {
-                        break;
-                    }
+                    setUp(machine, currline.replace("*", "").trim());
                 }
-
-                firstline = nextline;
             }
-
         }
 
     }
@@ -133,7 +111,7 @@ public final class Main {
         Collection<Rotor> rotors = new ArrayList<Rotor>();
         int dummy;
         try {
-            _alphabet = new Alphabet(_config.next("\\S+"));
+            _alphabet = new Alphabet(_config.next("[^(\\*\\(\\)\\s)]+"));
             int numrotors = _config.nextInt();
             int pawls = _config.nextInt();
 
@@ -239,14 +217,19 @@ public final class Main {
 
     private void printMessageLine(String msg) {
         String msgline = msg;
+
         if (msgline.length() == 0) {
             _output.println();
-
         } else {
             while (msgline.length() > 0) {
                 int msglen = msgline.length();
                 if (msglen <= 5) {
-                    _output.println(msgline);
+                    if (_input.hasNextLine()) {
+                        _output.println(msgline);
+                    }
+                    else {
+                        _output.print(msgline);
+                    }
                     msgline = "";
                 } else {
                     _output.print(msgline.substring(0, 5) + " ");

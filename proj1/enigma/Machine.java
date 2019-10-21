@@ -95,14 +95,18 @@ class Machine {
         int permuted = _plugboard.permute(c);
         boolean hasadvanced = false;
 
+        boolean[] rotate = new boolean[_rotors.length];
+
         if (c == -1) {
             throw new EnigmaException("Character not in Alphabet!");
         }
 
         for (int i = _rotors.length - 1; i > 0; i--) {
             if (_rotors[i].atNotch()) {
-                _rotors[i].advance();
-                _rotors[i - 1].advance();
+                if (_rotors[i-1].rotates()) {
+                    rotate[i] = true;
+                    rotate[i-1] = true;
+                }
                 if (i == _rotors.length - 1) {
                     hasadvanced = true;
                 }
@@ -111,6 +115,13 @@ class Machine {
 
         if (!hasadvanced) {
             _rotors[_rotors.length - 1].advance();
+            rotate[_rotors.length -1] = false;
+        }
+
+        for (int i = rotate.length - 1; i >= 0 ; i--) {
+            if (rotate[i]) {
+                _rotors[i].advance();
+            }
         }
 
         for (int i = _rotors.length - 1; i >= 0; i--) {
@@ -127,6 +138,10 @@ class Machine {
     /** Returns the encoding/decoding of MSG, updating the state of
      *  the rotors accordingly. */
     String convert(String msg) {
+        if (msg.equals("")) {
+            return msg;
+        }
+
         String replaced = msg.replaceAll("\\s", "");
         String[] msgarray = replaced.split("(?!^)");
 
