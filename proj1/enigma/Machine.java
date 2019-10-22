@@ -165,11 +165,17 @@ class Machine {
      * @param setting */
     void ringsetting(String setting) {
 
-        assert (setting.length() == numRotors() - 1);
-        char[] settingarr = setting.toCharArray();
+        if (setting.equals("")) {
+            for (int i = 1; i < _rotors.length; i++) {
+                _rotors[i].setringsetting(0);
+            }
+        } else {
+            assert (setting.length() == numRotors() - 1);
+            char[] settingarr = setting.toCharArray();
 
-        for (int i = 1; i < _rotors.length; i++) {
-            _rotors[i].setringsetting(_alphabet.toInt(settingarr[i - 1]));
+            for (int i = 1; i < _rotors.length; i++) {
+                _rotors[i].setringsetting(_alphabet.toInt(settingarr[i - 1]));
+            }
         }
     }
 

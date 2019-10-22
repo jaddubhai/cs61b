@@ -199,6 +199,9 @@ public final class Main {
             }
         } catch (java.lang.ArrayIndexOutOfBoundsException excp) {
             ringsetting = "";
+            for (int i = 0; i < M.numRotors(); i++) {
+                M.ringsetting(ringsetting);
+            }
         }
 
         String joined = "";
