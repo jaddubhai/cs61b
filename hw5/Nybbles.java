@@ -26,7 +26,7 @@ public class Nybbles {
             throw new IndexOutOfBoundsException();
         } else {
             int index = k / 8;
-
+        return 0;
         }
     }
 

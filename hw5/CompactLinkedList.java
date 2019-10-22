@@ -70,7 +70,14 @@ public class CompactLinkedList<T> extends AbstractSequentialList<T> {
 
         @Override
         public T next() {
-            return null; // REPLACE WITH SOLUTION
+            if (_next == -1) {
+                throw new IllegalStateException();
+            }
+            T item = _data[_next];
+            int curr = _next;
+            _next = _link[_next] ^ _prev;
+            _prev = curr;
+            return item;
         }
 
         @Override
@@ -85,7 +92,14 @@ public class CompactLinkedList<T> extends AbstractSequentialList<T> {
 
         @Override
         public T previous() {
-            return null; // REPLACE WITH SOLUTION
+            if (_last == -1) {
+                throw new IllegalStateException();
+            }
+            T item = _data[_prev];
+            int curr = _prev;
+            _prev = _link[_prev] ^ _next;
+            _next = curr;
+            return item;
         }
 
         @Override
@@ -107,6 +121,27 @@ public class CompactLinkedList<T> extends AbstractSequentialList<T> {
              * no longer in use (for example, that were being used, but were
              * then removed).  For this exercise, you needn't bother. */
             // FILL IN
+            if (_size + 1 > _data.length) {
+                throw new IllegalStateException();
+            }
+            _link[_size] = _next ^ _prev;
+            _data[_size] = obj;
+
+            int checkprev = _prev;
+            int checknext = _next;
+
+            if (checkprev == -1) {
+                _first = _size;
+            } else {
+                _link[_prev] = _link[_prev] ^ _size ^ _next;
+            }
+            if (checknext == -1) {
+                _last = _size;
+            } else {
+                _link[_next] ^= _size ^ _prev;
+            }
+            _prev = _size;
+            _size += 1;
         }
 
 

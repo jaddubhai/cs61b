@@ -3,25 +3,26 @@ HW #5.
 
 Question D.
 
-1.
+1. Θ(x^2), only the degree-setting term matters
 
 
-2.
+2. O(logx), take 2x^2 common inside the log, and split it into two terms. Ignore constant terms and scaling factors
 
 
-3.
+3. Θ(n^2), the total number of increments = 1 + 2 + .... + N-1 + N = N(N-1)/2
 
 
-4.
+4. Θ(M+N), Worst case run time is when bump is always false, and loop never breaks. In this case, there are a total
+of M + N increments.
 
 
-5.
+5. Θ(n^2), the run time of f1 is linear
 
 
-6.
+6. akjdf
 
 
-7.
+7. aslfb
 
 
 8.
