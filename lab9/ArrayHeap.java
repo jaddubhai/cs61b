@@ -17,7 +17,7 @@ public class ArrayHeap<T> {
         contents.add(null);
     }
 
-    /* Returns the number of elments in the priority queue. */
+    /* Returns the number of elements in the priority queue. */
     public int size() {
         return contents.size() - 1;
     }
@@ -119,44 +119,43 @@ public class ArrayHeap<T> {
 
     /* Returns the index of the left child of the node at i. */
     private int getLeftOf(int i) {
-        //TODO
-        return 0;
+        return i*2;
     }
 
     /* Returns the index of the right child of the node at i. */
     private int getRightOf(int i) {
-        //TODO
-        return 0;
+        return i*2 + 1;
     }
 
     /* Returns the index of the node that is the parent of the node at i. */
     private int getParentOf(int i) {
-        //TODO
-        return 0;
+        return i/2;
     }
 
     /* Adds the given node as a left child of the node at the given index. */
     private void setLeft(int index, Node n) {
-        //TODO
+        setNode(getLeftOf(index), n);
     }
 
     /* Adds the given node as the right child of the node at the given index. */
     private void setRight(int index, Node n) {
-        //TODO
+        setNode(getRightOf(index), n);
     }
 
     /** Returns the index of the node with smaller priority. Precondition: not
       * both nodes are null. */
     private int min(int index1, int index2) {
-        //TODO
-        return 0;
+        assert (getNode(index1) != null && getNode(index2) != null);
+        if (getNode(index1).priority < getNode(index2).priority) {
+            return index1;
+        }
+        return index2;
     }
 
     /* Returns the Node with the smallest priority value, but does not remove it
      * from the heap. */
     public Node peek() {
-        //TODO
-        return null;
+        return getNode(1);
     }
 
     /* Bubbles up the node currently at the given index. */
