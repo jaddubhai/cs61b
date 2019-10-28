@@ -8,7 +8,7 @@ import java.util.Stack;
  * Implementation of a BST based String Set.
  * @author
  */
-public class BSTStringSet implements StringSet, Iterable<String> {
+public class BSTStringSet implements StringSet, Iterable<String>, SortedStringSet{
     /** Creates a new empty set. */
     public BSTStringSet() {
         _root = null;
@@ -16,17 +16,56 @@ public class BSTStringSet implements StringSet, Iterable<String> {
 
     @Override
     public void put(String s) {
-        // FIXME: PART A
+        if (_root == null) {
+            _root = new Node(s);
+        } else {
+            put(s, _root);
+        }
+    }
+
+    public Node put(String s, Node n) {
+
+        if (n == null) {
+            return  new Node(s);
+        }
+
+        if (s.compareTo(n.s) > 0) {
+            n.right =  put(s, n.right);
+        } else if (s.compareTo(n.s) < 0) {
+            n.left = put(s, n.left);
+        }
+        return n;
     }
 
     @Override
     public boolean contains(String s) {
-        return false; // FIXME: PART A
+        return contains(s, _root);
+    }
+
+    public boolean contains(String s, Node n) {
+        if (n == null) {
+            return false;
+        }
+
+        if (n.s.equals(s)) {
+            return true;
+        }
+        if (s.compareTo(n.s) > 0) {
+            return contains(s, n.right);
+        } else if (s.compareTo(n.s) < 0) {
+            return contains(s, n.left);
+        } else {
+            return true;
+        }
     }
 
     @Override
     public List<String> asList() {
-        return null; // FIXME: PART A
+        ArrayList<String> retarr = new ArrayList<String>();
+        while (this.iterator().hasNext()) {
+            retarr.add(this.iterator().next());
+        }
+        return retarr;
     }
 
 
@@ -95,10 +134,9 @@ public class BSTStringSet implements StringSet, Iterable<String> {
         return new BSTIterator(_root);
     }
 
-    // FIXME: UNCOMMENT THE NEXT LINE FOR PART B
-    // @Override
+     @Override
     public Iterator<String> iterator(String low, String high) {
-        return null;  // FIXME: PART B
+        return new BSTIterator(_root);
     }
 
 

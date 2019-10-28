@@ -198,7 +198,7 @@ public class ArrayHeap<T> {
      * the heap. Same as dequeue, or poll. */
     public T removeMin() {
         if (size() == 1) {
-            return removeNode(1).item(); 
+            return removeNode(1).item();
         }
 
         T smallest = getNode(1).item();

@@ -11,6 +11,14 @@ public class BSTStringSetTest  {
 
     @Test
     public void testNothing() {
-        // FIXME: Delete this function and add your own tests
+        BSTStringSet bst = new BSTStringSet();
+        String yeboi = "Hello world";
+        bst.put(yeboi);
+        assert(bst.contains(yeboi));
+
+        String yeboi2 = "Lowkey";
+        bst.put(yeboi2);
+
+        assert(bst.contains(yeboi2));
     }
 }
