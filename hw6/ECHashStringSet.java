@@ -24,6 +24,9 @@ class ECHashStringSet implements StringSet {
 
             for (Object elem : vals) {
                 int idx = (elem.hashCode() & 0x7fffffff) %_HashMap.length;
+                if (_HashMap[idx] == null) {
+                    _HashMap[idx] = new LinkedList<>();
+                }
                 _HashMap[idx].add((String) elem);
             }
         }

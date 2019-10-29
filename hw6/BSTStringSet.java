@@ -18,6 +18,8 @@ public class BSTStringSet implements StringSet, Iterable<String>, SortedStringSe
     public void put(String s) {
         if (_root == null) {
             _root = new Node(s);
+        } else if (contains(s)) {
+            return;
         } else {
             put(s, _root);
         }
