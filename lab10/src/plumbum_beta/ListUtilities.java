@@ -1,5 +1,6 @@
 package plumbum_beta;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -13,12 +14,14 @@ public class ListUtilities {
 	 * @param predicate a predicate function, returns 'true' if an element should be kept
 	 */
 	public static <T> List<T> filter(List<T> input, Predicate<T> predicate) {
+		List<T> retarr = new ArrayList<T>();
+
 		for (int i = 0; i < input.size(); i++) {
-			if (!predicate.test(input.get(i))) {
-				input.remove(i);
+			if (predicate.test(input.get(i))) {
+				retarr.add(input.get(i));
 			}
 		}
 
-		return input;
+		return retarr;
 	}
 }
