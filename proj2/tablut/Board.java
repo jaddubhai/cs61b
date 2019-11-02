@@ -1,6 +1,7 @@
 package tablut;
 
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -60,7 +61,17 @@ class Board {
 
     /** Clears the board to the initial position. */
     void init() {
-        // FIXME
+        for (int i = 0; i < INITIAL_ATTACKERS.length; i++) {
+            int row = INITIAL_ATTACKERS[i].row();
+            int col = INITIAL_ATTACKERS[i].col();
+            _allSquares[row][col] = BLACK;
+        }
+        for (int i = 0; i < INITIAL_DEFENDERS.length; i++) {
+            int row = INITIAL_DEFENDERS[i].row();
+            int col = INITIAL_DEFENDERS[i].col();
+            _allSquares[row][col] = WHITE;
+        }
+        _allSquares[THRONE.row()][THRONE.col()] = KING;
     }
 
     /** Set the move limit to LIM.  It is an error if 2*LIM <= moveCount(). */
@@ -98,7 +109,7 @@ class Board {
 
     /** Return location of the king. */
     Square kingPosition() {
-        return null; // FIXME
+        return _kingposition;
     }
 
     /** Return the contents the square at S. */
@@ -109,7 +120,9 @@ class Board {
     /** Return the contents of the square at (COL, ROW), where
      *  0 <= COL, ROW <= 9. */
     final Piece get(int col, int row) {
-        return null; // FIXME
+        assert (Square.exists(col, row));
+
+        return _allSquares[col][row];
     }
 
     /** Return the contents of the square at COL ROW. */
@@ -136,7 +149,20 @@ class Board {
      *  board.  For this to be true, FROM-TO must be a rook move and the
      *  squares along it, other than FROM, must be empty. */
     boolean isUnblockedMove(Square from, Square to) {
-        return false; // FIXME
+        if (from.isRookMove(to)) {
+            int dir = from.direction(to);
+            int steps;
+            if (dir == 0 || dir == 2) {
+                steps = to.row() - from.row();
+            } else {
+                steps = to.col() - from.col();
+            }
+            if (steps < 0) {
+                steps = steps*-1;
+            }
+            return from.rookMove(dir, steps) == null;
+        }
+        return false;
     }
 
     /** Return true iff FROM is a valid starting square for a move. */
@@ -146,7 +172,11 @@ class Board {
 
     /** Return true iff FROM-TO is a valid move. */
     boolean isLegal(Square from, Square to) {
-        return false; // FIXME
+        boolean checkturn = isLegal(from);
+        boolean checkpaths = isUnblockedMove(from, to);
+        boolean checkmove = from.isRookMove(to);
+
+        return checkturn && checkpaths && checkmove;
     }
 
     /** Return true iff MOVE is a legal move in the current
@@ -158,7 +188,10 @@ class Board {
     /** Move FROM-TO, assuming this is a legal move. */
     void makeMove(Square from, Square to) {
         assert isLegal(from, to);
-        // FIXME
+        Move move = Move.mv(from, to);
+        _moves.add(move);
+        _moveCount += 1;
+        // need to update squares and keep track of moves
     }
 
     /** Move according to MOVE, assuming it is a legal move. */
@@ -166,10 +199,36 @@ class Board {
         makeMove(move.from(), move.to());
     }
 
+    private void capture(Square sq0, Square sq1, Square sq2, Square sq3) {
+        if (_allSquares[sq0.row()][sq0.col()] == BLACK
+                && _allSquares[sq1.row()][sq1.col()] == BLACK
+                && _allSquares[sq2.row()][sq2.col()] == BLACK
+                && _allSquares[sq3.row()][sq3.col()] == BLACK) {
+            Square captured = sq0.between(sq2);
+
+            if (_allSquares[captured.row()][captured.col()] == KING) {
+                _SquareMap.remove(captured);
+                _SquareMap.put(captured, null);
+                _allSquares[captured.row()][captured.col()] = null;
+            }
+        }
+    }
+
     /** Capture the piece between SQ0 and SQ2, assuming a piece just moved to
      *  SQ0 and the necessary conditions are satisfied. */
     private void capture(Square sq0, Square sq2) {
-        // FIXME
+        Square captured = sq0.between(sq2);
+        if (captured == THRONE || captured == NTHRONE ||
+                captured == ETHRONE || captured == WTHRONE || captured == STHRONE) {
+            capture(captured.rookMove(0, 1),
+                    captured.rookMove(1, 1),
+                    captured.rookMove(2, 1),
+                    captured.rookMove(3, 1));
+        }
+
+        _SquareMap.remove(captured);
+        _SquareMap.put(captured, null);
+        _allSquares[captured.row()][captured.col()] = null;
     }
 
     /** Undo one move.  Has no effect on the initial board. */
@@ -201,7 +260,7 @@ class Board {
 
     /** Return true iff SIDE has a legal move. */
     boolean hasMove(Piece side) {
-        return false; // FIXME
+        return legalMoves(side) != null;
     }
 
     @Override
@@ -238,7 +297,15 @@ class Board {
     /** Return the locations of all pieces on SIDE. */
     private HashSet<Square> pieceLocations(Piece side) {
         assert side != EMPTY;
-        return null; // FIXME
+        HashSet<Square> retset = new HashSet<Square>();
+        for (int i = 0; i < 9;  i++) {
+            for (int j = 0; j < 9; j++) {
+                if (_allSquares[i][j] == side) {
+                    retset.add(Square.sq(i, j));
+                }
+            }
+        }
+        return retset;
     }
 
     /** Return the contents of _board in the order of SQUARE_LIST as a sequence
@@ -261,6 +328,21 @@ class Board {
     private int _moveCount;
     /** True when current board is a repeated position (ending the game). */
     private boolean _repeated;
+
+    /** Tracks king position */
+    private Square _kingposition;
+
+    /** Tracks all squares */
+    private Piece[][] _allSquares = new Piece[9][9];
+
+    /** Tracks all moves */
+    private Move.MoveList _moves = new Move.MoveList();
+
+    /** Tracks pieces in squares */
+    private HashMap<Square, Piece> _SquareMap = new HashMap<Square, Piece>();
+
+    /** Square List. Possible matching with _allSquares */
+    private SqList _squarelist = new SqList();
 
     // FIXME: Other state?
 
