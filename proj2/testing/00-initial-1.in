@@ -1,4 +1,0 @@
-#* java -ea tablut.Main
-# Check that initial board is right.
-dump
-quit
