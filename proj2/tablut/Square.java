@@ -66,7 +66,7 @@ final class Square {
         { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 }
     };
 
-    /** Return the Square that is STEPS>0 squares away from me in direction
+    /** Return the Square that is STEPS>0 squares away from me in dir5ection
      *  DIR, or null if there is no such square.
      *  DIR = 0 for north, 1 for east, 2 for south and 3 for west.
      *  If DIR has another value, return null. Thus, unless the
@@ -229,6 +229,11 @@ final class Square {
                 }
             }
         }
+    }
+
+    /** return possible moves */
+    public SqList[][] retmoves() {
+        return ROOK_SQUARES;
     }
 
     /** My index position. */
