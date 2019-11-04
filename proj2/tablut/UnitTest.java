@@ -37,9 +37,21 @@ public class UnitTest {
     public void illegalmove() {
         Board board = new Board();
         board.init();
-        board.makeMove(Move.mv(Square.sq(3, 0 ), Square.sq(3, 1)));
+        board.makegitMove(Move.mv(Square.sq(3, 0 ), Square.sq(2, 1)));
         assert (board.pieceLocations(Piece.BLACK).contains(Square.sq(3, 0)));
         assertFalse(board.pieceLocations(Piece.BLACK).contains(Square.sq(3, 1)));
+    }
+
+    @Test
+    public void capturetest() {
+        Board board = new Board();
+        board.init();
+        board.makeMove(Move.mv(Square.sq(3, 0 ), Square.sq(3, 3)));
+        board.makeMove(Move.mv(Square.sq(2, 4), Square.sq(2, 8)));
+        board.makeMove(Move.mv(Square.sq(5, 0 ), Square.sq(5, 3)));
+
+        assertFalse(board.pieceLocations(Piece.WHITE).contains(Square.sq(4, 3)));
+
     }
 }
 

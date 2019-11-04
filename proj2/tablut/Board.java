@@ -92,7 +92,7 @@ class Board {
 
     /** Set the move limit to LIM.  It is an error if 2*LIM <= moveCount(). */
     void setMoveLimit(int n) {
-        // FIXME
+        _movelimit = n;
     }
 
     /** Return a Piece representing whose move it is (WHITE or BLACK). */
@@ -222,6 +222,7 @@ class Board {
 
         try {
             assert hasMove(_turn);
+            assert _allSquares[from.row()][from.col()] == _turn;
             assert isLegal(from, to);
             assert isUnblockedMove(from, to);
 
@@ -239,10 +240,14 @@ class Board {
             if (_turn == BLACK) {
                 for (int dir = 0; dir < 4; dir++) {
                     Square capbud = to.rookMove(dir, 2);
-                    if (capbud == null) {
+                    try {
+                        if (_allSquares[capbud.row()][capbud.col()] == EMPTY) {
+                            continue;
+                        } else {
+                            capture(to, capbud);
+                        }
+                    } catch (NullPointerException excp) {
                         continue;
-                    } else {
-                        capture(to, capbud);
                     }
                 }
             }
@@ -254,7 +259,12 @@ class Board {
 
     /** Move according to MOVE, assuming it is a legal move. */
     void makeMove(Move move) {
-        makeMove(move.from(), move.to());
+        int dummy;
+        if (move == null) {
+            dummy = 0;
+        } else {
+            makeMove(move.from(), move.to());
+        }
     }
 
     private void capture(Square sq0, Square sq1, Square sq2, Square sq3) {
@@ -286,8 +296,9 @@ class Board {
         Piece capiece = getpiece(captured);
         Piece opposite = capiece.opponent();
 
-        if (captured == THRONE || captured == NTHRONE ||
-                captured == ETHRONE || captured == WTHRONE || captured == STHRONE) {
+        if (captured.equals(THRONE) || captured.equals(NTHRONE)  ||
+                captured.equals(ETHRONE) || captured.equals(WTHRONE) || captured.equals(STHRONE)
+                && capiece.equals(KING)) {
             capture(captured.rookMove(0, 1),
                     captured.rookMove(1, 1),
                     captured.rookMove(2, 1),
@@ -392,8 +403,8 @@ class Board {
         HashSet<Square> retset = new HashSet<Square>();
         for (int i = 0; i < 9;  i++) {
             for (int j = 0; j < 9; j++) {
-                if (_allSquares[i][j].side() == side) {
-                    retset.add(Square.sq(i, j));
+                if (_allSquares[i][j].side().equals(side)) {
+                    retset.add(Square.sq(j, i));
                 }
             }
         }
@@ -438,6 +449,9 @@ class Board {
 
     /** Keeps track of board positions */
     private static HashSet<Piece[][]> _positionhash = new HashSet<Piece[][]>();
+
+    /** move limit. */
+    private int _movelimit;
 
     // FIXME: Other state?
 
