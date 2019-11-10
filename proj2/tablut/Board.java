@@ -61,6 +61,7 @@ class Board {
         this._winner = model._winner;
         this._kingposition = model._kingposition;
         this._repeated = model._repeated;
+        this._moveCount = model.moveCount();
     }
 
     /** Clears the board to the initial position. */
@@ -74,16 +75,16 @@ class Board {
         for (int i = 0; i < INITIAL_ATTACKERS.length; i++) {
             int row = INITIAL_ATTACKERS[i].row();
             int col = INITIAL_ATTACKERS[i].col();
-            _allSquares[row][col] = BLACK;
+            _allSquares[col][row] = BLACK;
             _SquareMap.put(Square.sq(col, row), BLACK);
         }
         for (int i = 0; i < INITIAL_DEFENDERS.length; i++) {
             int row = INITIAL_DEFENDERS[i].row();
             int col = INITIAL_DEFENDERS[i].col();
-            _allSquares[row][col] = WHITE;
+            _allSquares[col][row] = WHITE;
             _SquareMap.put(Square.sq(col, row), WHITE);
         }
-        _allSquares[THRONE.row()][THRONE.col()] = KING;
+        _allSquares[THRONE.col()][THRONE.row()] = KING;
         _SquareMap.put(Square.sq(THRONE.col(), THRONE.row()), KING);
         _moveCount = 0;
         _moves = new Move.MoveList();
@@ -135,7 +136,7 @@ class Board {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 if (_allSquares[i][j] == KING) {
-                    _kingposition =  Square.sq(j, i);
+                    _kingposition =  Square.sq(i, j);
                 }
             }
         }
@@ -161,7 +162,7 @@ class Board {
 
     /** Set square S to P. */
     final void put(Piece p, Square s) {
-        _allSquares[s.row()][s.col()] = p;
+        _allSquares[s.col()][s.row()] = p;
         _SquareMap.put(s, p);
     }
 
@@ -191,7 +192,7 @@ class Board {
                 steps = steps*-1;
             }
             Square moved = from.rookMove(dir, steps);
-            return _allSquares[moved.row()][moved.col()] == EMPTY;
+            return _allSquares[moved.col()][moved.row()] == EMPTY;
         }
         return false;
     }
@@ -222,7 +223,7 @@ class Board {
 
         try {
             assert hasMove(_turn);
-            assert _allSquares[from.row()][from.col()] == _turn;
+            assert _allSquares[from.col()][from.row()] == _turn;
             assert isLegal(from, to);
             assert isUnblockedMove(from, to);
 
@@ -230,18 +231,18 @@ class Board {
             _moves.add(move);
             _moveCount += 1;
 
-            _allSquares[from.row()][from.col()] = EMPTY;
-            _allSquares[to.row()][to.col()] = _SquareMap.get(from);
+            _allSquares[from.col()][from.row()] = EMPTY;
+            _allSquares[to.col()][to.row()] = _SquareMap.get(from);
 
             _SquareMap.remove(from);
             _SquareMap.put(from, EMPTY);
-            _SquareMap.put(to, _allSquares[to.row()][to.col()]);
+            _SquareMap.put(to, _allSquares[to.col()][to.row()]);
 
             if (_turn == BLACK) {
                 for (int dir = 0; dir < 4; dir++) {
                     Square capbud = to.rookMove(dir, 2);
                     try {
-                        if (_allSquares[capbud.row()][capbud.col()] == EMPTY) {
+                        if (_allSquares[capbud.col()][capbud.row()] == EMPTY) {
                             continue;
                         } else {
                             capture(to, capbud);
@@ -264,6 +265,7 @@ class Board {
             dummy = 0;
         } else {
             makeMove(move.from(), move.to());
+            _allSquares[move.from().col()][move.from().row()] = EMPTY;
         }
     }
 
@@ -271,22 +273,22 @@ class Board {
         Square captured = sq0.between(sq2);
         Piece opposite = getpiece(captured).opponent();
 
-        if (_allSquares[sq0.row()][sq0.col()] == opposite
-                && _allSquares[sq1.row()][sq1.col()] == opposite
-                && _allSquares[sq2.row()][sq2.col()] == opposite
-                && _allSquares[sq3.row()][sq3.col()] == opposite) {
+        if (_allSquares[sq0.col()][sq0.row()] == opposite
+                && _allSquares[sq1.col()][sq1.row()] == opposite
+                && _allSquares[sq2.col()][sq2.row()] == opposite
+                && _allSquares[sq3.col()][sq3.row()] == opposite) {
 
             if (captured == kingPosition()) {
                 _SquareMap.remove(captured);
                 _SquareMap.put(captured, null);
-                _allSquares[captured.row()][captured.col()] = EMPTY;
+                _allSquares[captured.col()][captured.row()] = EMPTY;
             }
         }
     }
 
     /** return piece given a square. */
     private Piece getpiece(Square sq) {
-        return _allSquares[sq.row()][sq.col()];
+        return _allSquares[sq.col()][sq.row()];
     }
 
     /** Capture the piece between SQ0 and SQ2, assuming a piece just moved to
@@ -308,7 +310,7 @@ class Board {
         if (getpiece(sq0) == opposite && getpiece(sq2) == opposite) {
             _SquareMap.remove(captured);
             _SquareMap.put(captured, EMPTY);
-            _allSquares[captured.row()][captured.col()] = EMPTY;
+            _allSquares[captured.col()][captured.row()] = EMPTY;
         }
     }
 
@@ -404,7 +406,7 @@ class Board {
         for (int i = 0; i < 9;  i++) {
             for (int j = 0; j < 9; j++) {
                 if (_allSquares[i][j].side().equals(side)) {
-                    retset.add(Square.sq(j, i));
+                    retset.add(Square.sq(i, j));
                 }
             }
         }
@@ -443,9 +445,6 @@ class Board {
 
     /** Tracks pieces in squares */
     private HashMap<Square, Piece> _SquareMap = new HashMap<Square, Piece>();
-
-    /** Square List. Possible matching with _allSquares */
-    private SqList _squarelist = new SqList();
 
     /** Keeps track of board positions */
     private static HashSet<Piece[][]> _positionhash = new HashSet<Piece[][]>();
