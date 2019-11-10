@@ -115,13 +115,13 @@ class Board {
     /** Record current position and set winner() next mover if the current
      *  position is a repeat. */
     private void checkRepeated() {
-        for (Piece[][] elem : _positionhash) {
-            if (elem.equals(_allSquares)) {
-                _winner = _turn;
+
+        if (_encodedboards != null && _encodedboards.contains(encodedBoard())) {
+            int index = _encodedboards.indexOf(encodedBoard());
+            if (_encodedboards.get(index).charAt(0) == _turn.toString().charAt(0)) {
+                _winner = _turn.opponent();
             }
         }
-        _positionhash.add(_allSquares);
-        _repeated = true;
     }
 
     /** Return the number of moves since the initial position that have not been
@@ -208,6 +208,11 @@ class Board {
         boolean checkpaths = isUnblockedMove(from, to);
         boolean checkmove = from.isRookMove(to);
 
+        if (to.equals(THRONE)) {
+            if (get(from) != KING) {
+                return false;
+            }
+        }
         return checkturn && checkpaths && checkmove;
     }
 
@@ -217,45 +222,65 @@ class Board {
         return isLegal(move.from(), move.to());
     }
 
-    /** Move FROM-TO, assuming this is a legal move. */
-    void makeMove(Square from, Square to) {
-        int dummy;
+    /** returns opponent. */
+    Piece opponent() {
+        if (_turn == WHITE) {
+            return BLACK;
+        }
+        return WHITE;
+    }
 
-        try {
-            assert hasMove(_turn);
-            assert _allSquares[from.col()][from.row()] == _turn;
-            assert isLegal(from, to);
-            assert isUnblockedMove(from, to);
+    /** checks if a square is hostile. */
+    boolean ishostile(Square sq) {
+        Piece hostile = _SquareMap.get(sq);
+        if (sq.equals(THRONE)) {
+            if (hostile == EMPTY) {
+                return true;
 
-            Move move = Move.mv(from, to);
-            _moves.add(move);
-            _moveCount += 1;
-
-            _allSquares[from.col()][from.row()] = EMPTY;
-            _allSquares[to.col()][to.row()] = _SquareMap.get(from);
-
-            _SquareMap.remove(from);
-            _SquareMap.put(from, EMPTY);
-            _SquareMap.put(to, _allSquares[to.col()][to.row()]);
-
-            if (_turn == BLACK) {
-                for (int dir = 0; dir < 4; dir++) {
-                    Square capbud = to.rookMove(dir, 2);
-                    try {
-                        if (_allSquares[capbud.col()][capbud.row()] == EMPTY) {
-                            continue;
-                        } else {
-                            capture(to, capbud);
-                        }
-                    } catch (NullPointerException excp) {
-                        continue;
+            } else if (turn() == WHITE) {
+                int hostile_count = 0;
+                Square[] adj = {NTHRONE, STHRONE, ETHRONE, WTHRONE};
+                for (int i = 0; i < 4; i++) {
+                    if (getpiece(adj[i]) == BLACK) {
+                        hostile_count++;
                     }
                 }
+                return hostile_count == 3;
+            }
+        }
+        return hostile == _turn;
+    }
+
+    /** Move FROM-TO, assuming this is a legal move. */
+    void makeMove(Square from, Square to) {
+        assert hasMove(_turn);
+        assert _allSquares[from.col()][from.row()].side() == _turn;
+        assert isLegal(from, to);
+        assert isUnblockedMove(from, to);
+
+        _allSquares[from.col()][from.row()] = EMPTY;
+        _allSquares[to.col()][to.row()] = _SquareMap.get(from);
+
+        _SquareMap.remove(from);
+        _SquareMap.put(from, EMPTY);
+        _SquareMap.put(to, _allSquares[to.col()][to.row()]);
+
+        for (int dir = 0; dir < 4; dir++) {
+            Square capbud = to.rookMove(dir, 2);
+            try {
+                if (_allSquares[capbud.col()][capbud.row()] == EMPTY) {
+                    continue;
+                } else {
+                    capture(to, capbud);
+                }
+            } catch (NullPointerException excp) {
+                continue;
+                }
+            }
+            if (kingPosition().isEdge()) {
+                _winner = WHITE;
             }
             _turn = getpiece(to).opponent();
-        } catch (AssertionError excp) {
-            dummy = 0;
-        }
     }
 
     /** Move according to MOVE, assuming it is a legal move. */
@@ -265,23 +290,24 @@ class Board {
             dummy = 0;
         } else {
             makeMove(move.from(), move.to());
-            _allSquares[move.from().col()][move.from().row()] = EMPTY;
+            _positionhash.add(_allSquares);
+            _moves.add(move);
+            _moveCount += 1;
+            checkRepeated();
+            _encodedboards.add(encodedBoard());
         }
     }
 
+    /** capture for kings/throne */
     private void capture(Square sq0, Square sq1, Square sq2, Square sq3) {
         Square captured = sq0.between(sq2);
-        Piece opposite = getpiece(captured).opponent();
 
-        if (_allSquares[sq0.col()][sq0.row()] == opposite
-                && _allSquares[sq1.col()][sq1.row()] == opposite
-                && _allSquares[sq2.col()][sq2.row()] == opposite
-                && _allSquares[sq3.col()][sq3.row()] == opposite) {
-
+        if (ishostile(sq0) && ishostile(sq1) && ishostile(sq2) && ishostile(sq3)) {
             if (captured == kingPosition()) {
                 _SquareMap.remove(captured);
                 _SquareMap.put(captured, null);
                 _allSquares[captured.col()][captured.row()] = EMPTY;
+                _winner = BLACK;
             }
         }
     }
@@ -296,7 +322,6 @@ class Board {
     private void capture(Square sq0, Square sq2) {
         Square captured = sq0.between(sq2);
         Piece capiece = getpiece(captured);
-        Piece opposite = capiece.opponent();
 
         if (captured.equals(THRONE) || captured.equals(NTHRONE)  ||
                 captured.equals(ETHRONE) || captured.equals(WTHRONE) || captured.equals(STHRONE)
@@ -305,9 +330,8 @@ class Board {
                     captured.rookMove(1, 1),
                     captured.rookMove(2, 1),
                     captured.rookMove(3, 1));
-        }
 
-        if (getpiece(sq0) == opposite && getpiece(sq2) == opposite) {
+        } else if (ishostile(sq0)  && ishostile(sq2)) {
             _SquareMap.remove(captured);
             _SquareMap.put(captured, EMPTY);
             _allSquares[captured.col()][captured.row()] = EMPTY;
@@ -318,6 +342,7 @@ class Board {
     void undo() {
         if (_moveCount > 0) {
             undoPosition();
+            _allSquares = _positionhash.get(_positionhash.size() - 1);
             _moveCount -= 1;
         }
         _moves.remove(_moves.size() - 1);
@@ -326,6 +351,7 @@ class Board {
     /** Remove record of current position in the set of positions encountered,
      *  unless it is a repeated position or we are at the first move. */
     private void undoPosition() {
+        _positionhash.remove(_positionhash.size() - 1);
         _repeated = false;
     }
 
@@ -447,7 +473,10 @@ class Board {
     private HashMap<Square, Piece> _SquareMap = new HashMap<Square, Piece>();
 
     /** Keeps track of board positions */
-    private static HashSet<Piece[][]> _positionhash = new HashSet<Piece[][]>();
+    private ArrayList<Piece[][]> _positionhash = new ArrayList<>();
+
+    /** Keeps track of encoded boards. */
+    private ArrayList<String> _encodedboards = new ArrayList<>();
 
     /** move limit. */
     private int _movelimit;
