@@ -4,11 +4,9 @@ import java.util.*;
 
 import static tablut.Piece.*;
 import static tablut.Square.*;
-import static tablut.Move.mv;
-
 
 /** The state of a Tablut Game.
- *  @author
+ *  @author Varun Jadia
  */
 class Board {
 
@@ -54,14 +52,6 @@ class Board {
         }
 
         init();
-        this._allSquares = model._allSquares;
-        this._moves = model._moves;
-        this._turn = model._turn;
-        this._SquareMap = model._SquareMap;
-        this._winner = model._winner;
-        this._kingposition = model._kingposition;
-        this._repeated = model._repeated;
-        this._moveCount = model.moveCount();
     }
 
     /** Clears the board to the initial position. */
@@ -76,22 +66,21 @@ class Board {
             int row = INITIAL_ATTACKERS[i].row();
             int col = INITIAL_ATTACKERS[i].col();
             _allSquares[col][row] = BLACK;
-            _SquareMap.put(Square.sq(col, row), BLACK);
         }
         for (int i = 0; i < INITIAL_DEFENDERS.length; i++) {
             int row = INITIAL_DEFENDERS[i].row();
             int col = INITIAL_DEFENDERS[i].col();
             _allSquares[col][row] = WHITE;
-            _SquareMap.put(Square.sq(col, row), WHITE);
         }
         _allSquares[THRONE.col()][THRONE.row()] = KING;
-        _SquareMap.put(Square.sq(THRONE.col(), THRONE.row()), KING);
         _moveCount = 0;
         _moves = new Move.MoveList();
         _turn = BLACK;
+        _positionhash.add(new Tracker(this));
     }
 
     /** Set the move limit to LIM.  It is an error if 2*LIM <= moveCount(). */
+    /** @param n */
     void setMoveLimit(int n) {
         _movelimit = n;
     }
@@ -118,7 +107,8 @@ class Board {
 
         if (_encodedboards != null && _encodedboards.contains(encodedBoard())) {
             int index = _encodedboards.indexOf(encodedBoard());
-            if (_encodedboards.get(index).charAt(0) == _turn.toString().charAt(0)) {
+            if (_encodedboards.get(index).charAt(0)
+                    == _turn.toString().charAt(0)) {
                 _winner = _turn.opponent();
             }
         }
@@ -132,7 +122,6 @@ class Board {
 
     /** Return location of the king. */
     Square kingPosition() {
-        _kingposition = null;
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 if (_allSquares[i][j] == KING) {
@@ -163,7 +152,6 @@ class Board {
     /** Set square S to P. */
     final void put(Piece p, Square s) {
         _allSquares[s.col()][s.row()] = p;
-        _SquareMap.put(s, p);
     }
 
     /** Set square S to P and record for undoing. */
@@ -180,19 +168,22 @@ class Board {
      *  board.  For this to be true, FROM-TO must be a rook move and the
      *  squares along it, other than FROM, must be empty. */
     boolean isUnblockedMove(Square from, Square to) {
+        Square sway = null;
         if (from.isRookMove(to)) {
-            int dir = from.direction(to);
-            int steps;
-            if (dir == 0 || dir == 2) {
-                steps = to.row() - from.row();
+            for (Square s: ROOK_SQUARES[from.index()][from.direction(to)]) {
+                if (s.equals(to)) {
+                    sway = s;
+                    break;
+                }
+                if (getpiece(s) != EMPTY) {
+                    return false;
+                }
+            }
+            if (!get(sway).equals(EMPTY)) {
+                return false;
             } else {
-                steps = to.col() - from.col();
+                return true;
             }
-            if (steps < 0) {
-                steps = steps*-1;
-            }
-            Square moved = from.rookMove(dir, steps);
-            return _allSquares[moved.col()][moved.row()] == EMPTY;
         }
         return false;
     }
@@ -231,21 +222,23 @@ class Board {
     }
 
     /** checks if a square is hostile. */
+    /** @return */
+    /** @param sq */
     boolean ishostile(Square sq) {
-        Piece hostile = _SquareMap.get(sq);
+        Piece hostile = _allSquares[sq.col()][sq.row()];
         if (sq.equals(THRONE)) {
             if (hostile == EMPTY) {
                 return true;
 
             } else if (turn() == WHITE) {
-                int hostile_count = 0;
+                int hostilecount = 0;
                 Square[] adj = {NTHRONE, STHRONE, ETHRONE, WTHRONE};
                 for (int i = 0; i < 4; i++) {
                     if (getpiece(adj[i]) == BLACK) {
-                        hostile_count++;
+                        hostilecount++;
                     }
                 }
-                return hostile_count == 3;
+                return hostilecount == 3;
             }
         }
         return hostile == _turn;
@@ -256,31 +249,29 @@ class Board {
         assert hasMove(_turn);
         assert _allSquares[from.col()][from.row()].side() == _turn;
         assert isLegal(from, to);
-        assert isUnblockedMove(from, to);
 
         _allSquares[from.col()][from.row()] = EMPTY;
-        _allSquares[to.col()][to.row()] = _SquareMap.get(from);
-
-        _SquareMap.remove(from);
-        _SquareMap.put(from, EMPTY);
-        _SquareMap.put(to, _allSquares[to.col()][to.row()]);
+        _allSquares[to.col()][to.row()] = _turn;
 
         for (int dir = 0; dir < 4; dir++) {
             Square capbud = to.rookMove(dir, 2);
             try {
-                if (_allSquares[capbud.col()][capbud.row()] == EMPTY) {
+                if (!ishostile(capbud)) {
                     continue;
                 } else {
                     capture(to, capbud);
                 }
             } catch (NullPointerException excp) {
                 continue;
-                }
             }
-            if (kingPosition().isEdge()) {
-                _winner = WHITE;
-            }
-            _turn = getpiece(to).opponent();
+        }
+
+        if (kingPosition() == null) {
+            _winner = BLACK;
+        } else if (kingPosition().isEdge()) {
+            _winner = WHITE;
+        }
+        _turn = _turn.opponent();
     }
 
     /** Move according to MOVE, assuming it is a legal move. */
@@ -290,22 +281,25 @@ class Board {
             dummy = 0;
         } else {
             makeMove(move.from(), move.to());
-            _positionhash.add(_allSquares);
             _moves.add(move);
             _moveCount += 1;
             checkRepeated();
+            _positionhash.add(new Tracker(this));
             _encodedboards.add(encodedBoard());
         }
     }
 
-    /** capture for kings/throne */
+    /** capture for kings/throne.
+    @param sq0
+    @param sq1
+     @param sq2
+    @param sq3 */
     private void capture(Square sq0, Square sq1, Square sq2, Square sq3) {
         Square captured = sq0.between(sq2);
 
-        if (ishostile(sq0) && ishostile(sq1) && ishostile(sq2) && ishostile(sq3)) {
+        if (ishostile(sq0) && ishostile(sq1)
+                && ishostile(sq2) && ishostile(sq3)) {
             if (captured == kingPosition()) {
-                _SquareMap.remove(captured);
-                _SquareMap.put(captured, null);
                 _allSquares[captured.col()][captured.row()] = EMPTY;
                 _winner = BLACK;
             }
@@ -323,17 +317,15 @@ class Board {
         Square captured = sq0.between(sq2);
         Piece capiece = getpiece(captured);
 
-        if (captured.equals(THRONE) || captured.equals(NTHRONE)  ||
-                captured.equals(ETHRONE) || captured.equals(WTHRONE) || captured.equals(STHRONE)
-                && capiece.equals(KING)) {
+        if ((captured.equals(THRONE) || captured.equals(NTHRONE)
+                || captured.equals(ETHRONE) || captured.equals(WTHRONE)
+                || captured.equals(STHRONE)) && capiece.equals(KING)) {
             capture(captured.rookMove(0, 1),
                     captured.rookMove(1, 1),
                     captured.rookMove(2, 1),
                     captured.rookMove(3, 1));
 
         } else if (ishostile(sq0)  && ishostile(sq2)) {
-            _SquareMap.remove(captured);
-            _SquareMap.put(captured, EMPTY);
             _allSquares[captured.col()][captured.row()] = EMPTY;
         }
     }
@@ -342,10 +334,23 @@ class Board {
     void undo() {
         if (_moveCount > 0) {
             undoPosition();
-            _allSquares = _positionhash.get(_positionhash.size() - 1);
+            Tracker curr = _positionhash.get(_positionhash.size() - 1);
+            _allSquares = curr.squares;
             _moveCount -= 1;
+            _turn = convertchar(curr.boards.charAt(0));
+            _winner = curr.currwin;
+            _moves.remove(_moves.get(_moves.size() - 1));
         }
-        _moves.remove(_moves.size() - 1);
+    }
+
+    /**convert to piece. */
+    /** @param x */
+    /** @return */
+    private Piece convertchar(char x) {
+        if (x == WHITE.toString().charAt(0)) {
+            return WHITE;
+        }
+        return BLACK;
     }
 
     /** Remove record of current position in the set of positions encountered,
@@ -358,7 +363,6 @@ class Board {
     /** Clear the undo stack and board-position counts. Does not modify the
      *  current position or win status. */
     void clearUndo() {
-        // FIXME
     }
 
     /** Return a new mutable list of all legal moves on the current board for
@@ -460,20 +464,17 @@ class Board {
     /** True when current board is a repeated position (ending the game). */
     private boolean _repeated;
 
-    /** Tracks king position */
+    /** Tracks king position. */
     private Square _kingposition;
 
-    /** Tracks all squares */
+    /** Tracks all squares. */
     private Piece[][] _allSquares = new Piece[9][9];
 
-    /** Tracks all moves */
+    /** Tracks all moves. */
     private Move.MoveList _moves = new Move.MoveList();
 
-    /** Tracks pieces in squares */
-    private HashMap<Square, Piece> _SquareMap = new HashMap<Square, Piece>();
-
-    /** Keeps track of board positions */
-    private ArrayList<Piece[][]> _positionhash = new ArrayList<>();
+    /** Keeps track of board positions. */
+    private ArrayList<Tracker> _positionhash = new ArrayList<>();
 
     /** Keeps track of encoded boards. */
     private ArrayList<String> _encodedboards = new ArrayList<>();
@@ -481,6 +482,29 @@ class Board {
     /** move limit. */
     private int _movelimit;
 
-    // FIXME: Other state?
+    /** Tracker class for positionhash. */
+    private class Tracker {
+        /** init. */
+        /** @param x */
+        Tracker(Board x) {
+            squares = new Piece[9][9];
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 9; j++) {
+                    squares[i][j] = _allSquares[i][j];
+                }
+            }
+            boards = x.encodedBoard();
+            currturn = x.turn();
+            currwin = x.winner();
+        }
 
+        /** copy of squares. */
+        private Piece[][] squares;
+        /** copy of encoded board. */
+        private String boards;
+        /** curr turn. */
+        private Piece currturn;
+        /** current winner. */
+        private Piece currwin;
+    }
 }
