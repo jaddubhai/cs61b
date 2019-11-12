@@ -432,11 +432,15 @@ class Board {
     /** Return the locations of all pieces on SIDE. */
     public HashSet<Square> pieceLocations(Piece side) {
         assert side != EMPTY;
+        _edgemuscovites = 0;
         HashSet<Square> retset = new HashSet<Square>();
         for (int i = 0; i < 9;  i++) {
             for (int j = 0; j < 9; j++) {
                 if (_allSquares[i][j].side().equals(side)) {
                     retset.add(Square.sq(i, j));
+                    if ((i == 0 || i == 8 || j == 0 || j == 8)) {
+                        _edgemuscovites++;
+                    }
                 }
             }
         }
@@ -506,5 +510,13 @@ class Board {
         private Piece currturn;
         /** current winner. */
         private Piece currwin;
+    }
+
+    /** keeps track of number of muscovites on edges.*/
+    private int _edgemuscovites;
+
+    /** get edgemusc */
+    public int getedgemuscovites() {
+        return _edgemuscovites;
     }
 }

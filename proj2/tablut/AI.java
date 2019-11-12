@@ -1,5 +1,11 @@
 package tablut;
 
+import com.sun.xml.internal.xsom.impl.scd.Iterators;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
 import static java.lang.Math.*;
 
 import static tablut.Square.sq;
@@ -38,7 +44,9 @@ class AI extends Player {
 
     @Override
     String myMove() {
-        return ""; // FIXME
+        findMove();
+        System.out.println("* " + _lastFoundMove.toString());
+        return _lastFoundMove.toString();
     }
 
     @Override
@@ -51,7 +59,9 @@ class AI extends Player {
     private Move findMove() {
         Board b = new Board(board());
         _lastFoundMove = null;
-        // FIXME
+        int sense = ((myPiece() == BLACK) ? -1:1);
+
+        findMove(board(), maxDepth(board()), true, sense, -1 * INFTY, INFTY);
         return _lastFoundMove;
     }
 
@@ -67,7 +77,52 @@ class AI extends Player {
      *  of the board value and does not set _lastMoveFound. */
     private int findMove(Board board, int depth, boolean saveMove,
                          int sense, int alpha, int beta) {
-        return 0; // FIXME
+        if (depth == 0 || board.winner()!=null) {
+            _lastFoundMove = _lastFoundMove;
+            return staticScore(board);
+        }
+
+        if (sense == -1) {
+            int currbeta = INFTY;
+            int newbeta;
+            List<Move> muscomoves = board.legalMoves(BLACK);
+            for (Move m : muscomoves) {
+                board.makeMove(m);
+                newbeta = findMove(board, depth - 1, false, 1, alpha, beta);
+                board.undo();
+                currbeta = Math.min(currbeta, newbeta);
+                beta = min(beta, currbeta);
+
+                if (saveMove) {
+                    _lastFoundMove = m;
+                }
+
+                if (alpha >= beta) {
+                    break;
+                }
+            }
+            return currbeta;
+        } else {
+            int curralpha = -1 * INFTY;
+            int newalpha;
+            List<Move> swedeomoves = board.legalMoves(WHITE);
+            for (Move m : swedeomoves) {
+                board.makeMove(m);
+                newalpha = findMove(board, depth - 1, false, -1, alpha, beta);
+                board.undo();
+                curralpha = Math.max(curralpha, newalpha);
+                alpha = max(alpha, curralpha);
+
+                if (saveMove) {
+                    _lastFoundMove = m;
+                }
+
+                if (alpha >= beta) {
+                    break;
+                }
+            }
+            return curralpha;
+        }
     }
 
     /** Return a heuristically determined maximum search depth
@@ -78,9 +133,41 @@ class AI extends Player {
 
     /** Return a heuristic value for BOARD. */
     private int staticScore(Board board) {
-        return 0;  // FIXME
+        if (board.winner() == WHITE) {
+            return INFTY;
+        } else if (board.winner() == BLACK) {
+            return -1 * INFTY;
+        }
+        return boardstate(myPiece(), board);  // FIXME
     }
 
-    // FIXME: More here.
+    private int boardstate(Piece side, Board board) {
+        int diff = board.pieceLocations(side).size() - board.pieceLocations(side.opponent()).size();
+        int kingedge = closestkingedge(board);
+        int edgemusc = board.getedgemuscovites();
+
+        if (side.side() == WHITE) {
+            return diff + kingedge;
+        } else {
+            return diff + edgemusc -  kingedge;
+        }
+    }
+
+    private int closestkingedge(Board board) {
+        Square kingpos = board.kingPosition();
+        if (kingpos == board.THRONE) {
+            return 4;
+        }
+        int row = Math.abs(kingpos.row() - 4) ;
+        int col = Math.abs(kingpos.col() - 4);
+        if (row > col) {
+            return 4 - row;
+        } else if (col > row) {
+            return  4 - col;
+        } else {
+            return 4 - row;
+        }
+    }
+
 
 }
