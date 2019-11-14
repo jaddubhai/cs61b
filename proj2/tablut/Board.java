@@ -56,6 +56,9 @@ class Board {
 
     /** Clears the board to the initial position. */
     void init() {
+        _positionhash.clear();
+        _encodedboards.clear();
+
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 _allSquares[i][j] = EMPTY;
@@ -73,6 +76,7 @@ class Board {
             _allSquares[col][row] = WHITE;
         }
         _allSquares[THRONE.col()][THRONE.row()] = KING;
+        _kingposition = Square.sq(THRONE.col(), THRONE.row());
         _moveCount = 0;
         _moves = new Move.MoveList();
         _turn = BLACK;
@@ -122,13 +126,6 @@ class Board {
 
     /** Return location of the king. */
     Square kingPosition() {
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (_allSquares[i][j] == KING) {
-                    _kingposition =  Square.sq(i, j);
-                }
-            }
-        }
         return _kingposition;
     }
 
@@ -249,9 +246,10 @@ class Board {
         assert hasMove(_turn);
         assert _allSquares[from.col()][from.row()].side() == _turn;
         assert isLegal(from, to);
+        Piece topiece = _allSquares[from.col()][from.row()];
 
         _allSquares[from.col()][from.row()] = EMPTY;
-        _allSquares[to.col()][to.row()] = _turn;
+        _allSquares[to.col()][to.row()] = topiece;
 
         for (int dir = 0; dir < 4; dir++) {
             Square capbud = to.rookMove(dir, 2);
@@ -265,10 +263,13 @@ class Board {
                 continue;
             }
         }
+        if (kingPosition() != null && kingPosition().isEdge()) {
+            _winner = WHITE;
+        }
 
-        if (kingPosition() == null) {
+        if (legalMoves(WHITE) == null) {
             _winner = BLACK;
-        } else if (kingPosition().isEdge()) {
+        } else if (legalMoves(BLACK) == null) {
             _winner = WHITE;
         }
         _turn = _turn.opponent();
@@ -335,11 +336,19 @@ class Board {
         if (_moveCount > 0) {
             undoPosition();
             Tracker curr = _positionhash.get(_positionhash.size() - 1);
-            _allSquares = curr.squares;
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 9; j++) {
+                    _allSquares[i][j] = curr.squares[i][j];
+                }
+            }
             _moveCount -= 1;
-            _turn = convertchar(curr.boards.charAt(0));
-            _winner = curr.currwin;
+            Piece[] copy = new Piece[2];
+            copy[0] = convertchar(curr.boards.charAt(0));
+            copy[1] = curr.currwin;
+            _turn = copy[0];
+            _winner = copy[1];
             _moves.remove(_moves.get(_moves.size() - 1));
+            _encodedboards.remove(_encodedboards.get(_encodedboards.size() - 1));
         }
     }
 
@@ -374,6 +383,8 @@ class Board {
             for (int j = 0; j < 9; j++) {
                 if (_allSquares[i][j].side().equals(side)) {
                     squares.add(Square.sq(j, i));
+                } if (_allSquares[i][j] == KING) {
+                    _kingposition = Square.sq(i, j);
                 }
             }
         }
@@ -385,6 +396,12 @@ class Board {
                     Move move = Move.mv(square, to);
                     if (isLegal(move)) {
                         moves.add(move);
+                        if (square == _kingposition) {
+                            if (_kingmoves == null) {
+                                _kingmoves = new ArrayList<Move>();
+                            }
+                            _kingmoves.add(move);
+                        }
                     }
                 }
             }
@@ -514,6 +531,9 @@ class Board {
 
     /** keeps track of number of muscovites on edges.*/
     private int _edgemuscovites;
+
+    /** keeps track of king legal moves. */
+    public ArrayList<Move> _kingmoves;
 
     /** get edgemusc */
     public int getedgemuscovites() {

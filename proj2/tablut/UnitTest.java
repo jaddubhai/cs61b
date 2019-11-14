@@ -91,6 +91,36 @@ public class UnitTest {
         board.makeMove(Move.mv("d7-5"));
         assertEquals(board.winner(), Piece.BLACK);
     }
+
+    @Test
+    public void random() {
+        Board board = new Board();
+        board.makeMove(Move.mv("f9-6"));
+//        System.out.println(board);
+        board.makeMove(Move.mv("e7-a"));
+//        System.out.println(board);
+        board.makeMove(Move.mv("e9-i"));
+//        System.out.println(board);
+        board.makeMove(Move.mv("e6-b"));
+//        System.out.println(board);
+        board.makeMove(Move.mv("i9-e"));
+//        System.out.println(board);
+        board.makeMove(Move.mv("e5-7"));
+        System.out.println(board);
+        board.makeMove(Move.mv("e9-i"));
+        System.out.println(board);
+        board.makeMove(Move.mv("e7-b"));
+        System.out.println(board);
+        board.makeMove(Move.mv("i9-e"));
+        System.out.println(board);
+        board.makeMove(Move.mv("d5-2"));
+        System.out.println(board);
+        board.makeMove(Move.mv("e9-i"));
+        System.out.println(board);
+        board.makeMove(Move.mv("c5-1"));
+        System.out.println(board);
+        board.makeMove(Move.mv("f9-6"));
+    }
 }
 
 

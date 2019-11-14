@@ -60,7 +60,6 @@ public class Main {
             System.err.printf("Internal error: %s%n", excp.getMessage());
             System.exit(1);
         }
-
     }
 
     /** Return an appropriate Controller as indicated by OPTIONS. */

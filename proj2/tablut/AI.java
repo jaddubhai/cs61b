@@ -128,17 +128,17 @@ class AI extends Player {
     /** Return a heuristically determined maximum search depth
      *  based on characteristics of BOARD. */
     private static int maxDepth(Board board) {
-        return 4; // FIXME?
+        return 3; // FIXME?
     }
 
     /** Return a heuristic value for BOARD. */
     private int staticScore(Board board) {
         if (board.winner() == WHITE) {
-            return INFTY;
+            return WINNING_VALUE;
         } else if (board.winner() == BLACK) {
-            return -1 * INFTY;
+            return -1 * WINNING_VALUE;
         }
-        return boardstate(myPiece(), board);  // FIXME
+        return boardstate(myPiece(), board);
     }
 
     private int boardstate(Piece side, Board board) {
@@ -146,6 +146,9 @@ class AI extends Player {
         int kingedge = closestkingedge(board);
         int edgemusc = board.getedgemuscovites();
 
+        if (kingedge == -1 * WINNING_VALUE && side == BLACK) {
+            return kingedge;
+        }
         if (side.side() == WHITE) {
             return diff + kingedge;
         } else {
@@ -155,8 +158,17 @@ class AI extends Player {
 
     private int closestkingedge(Board board) {
         Square kingpos = board.kingPosition();
+
+        if (kingpos == null) {
+            return -1 * WINNING_VALUE;
+        }
         if (kingpos == board.THRONE) {
             return 4;
+        }
+        for (Move mv : board._kingmoves) {
+            if (mv.to().isEdge()) {
+                return WILL_WIN_VALUE;
+            }
         }
         int row = Math.abs(kingpos.row() - 4) ;
         int col = Math.abs(kingpos.col() - 4);
