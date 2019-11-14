@@ -12,13 +12,10 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import java.util.concurrent.ArrayBlockingQueue;
 
 /** The GUI controller for a Tablut board and buttons.
- *  @author
+ *  @author Varun Jadia
  */
 class GUI extends TopLevel implements View, Reporter {
 
@@ -38,7 +35,6 @@ class GUI extends TopLevel implements View, Reporter {
     GUI(String title) {
         super(title, true);
         addMenuButton("Game->Quit", this::quit);
-        // More commands?
         _widget = new BoardWidget(_pendingCommands);
         add(_widget,
             new LayoutSpec("y", 1,
@@ -48,16 +44,12 @@ class GUI extends TopLevel implements View, Reporter {
                  new LayoutSpec("x", 0, "y", 0,
                                 "height", 1,
                                 "width", 3));
-        // More stuff?
-
     }
 
     /** Response to "Quit" button click. */
     private void quit(String dummy) {
         _pendingCommands.offer("quit");
     }
-
-    // Other command responses?
 
     /** Return the next command from our widget, waiting for it as necessary.
      *  The BoardWidget uses _pendingCommands to queue up moves that it

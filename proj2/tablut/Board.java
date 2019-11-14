@@ -1,6 +1,9 @@
 package tablut;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Formatter;
+import java.util.HashSet;
+import java.util.List;
 
 import static tablut.Piece.*;
 import static tablut.Square.*;
@@ -176,11 +179,7 @@ class Board {
                     return false;
                 }
             }
-            if (!get(sway).equals(EMPTY)) {
-                return false;
-            } else {
-                return true;
-            }
+            return get(sway).equals(EMPTY);
         }
         return false;
     }
@@ -218,9 +217,10 @@ class Board {
         return WHITE;
     }
 
-    /** checks if a square is hostile. */
-    /** @return */
-    /** @param sq */
+    /** checks if a square is hostile.
+     * @param sq
+     * @return
+     */
     boolean ishostile(Square sq) {
         Piece hostile = _allSquares[sq.col()][sq.row()];
         if (sq.equals(THRONE)) {
@@ -348,13 +348,15 @@ class Board {
             _turn = copy[0];
             _winner = copy[1];
             _moves.remove(_moves.get(_moves.size() - 1));
-            _encodedboards.remove(_encodedboards.get(_encodedboards.size() - 1));
+            _encodedboards.remove(
+                    _encodedboards.get(_encodedboards.size() - 1));
         }
     }
 
-    /**convert to piece. */
-    /** @param x */
-    /** @return */
+    /**convert to piece.
+     * @param x
+     * @return
+     */
     private Piece convertchar(char x) {
         if (x == WHITE.toString().charAt(0)) {
             return WHITE;
@@ -383,7 +385,8 @@ class Board {
             for (int j = 0; j < 9; j++) {
                 if (_allSquares[i][j].side().equals(side)) {
                     squares.add(Square.sq(j, i));
-                } if (_allSquares[i][j] == KING) {
+                }
+                if (_allSquares[i][j] == KING) {
                     _kingposition = Square.sq(i, j);
                 }
             }
@@ -533,9 +536,18 @@ class Board {
     private int _edgemuscovites;
 
     /** keeps track of king legal moves. */
-    public ArrayList<Move> _kingmoves;
+    private ArrayList<Move> _kingmoves;
 
-    /** get edgemusc */
+    /** get king moves.
+     * @return
+     */
+    public ArrayList<Move> getkingmoves() {
+        return _kingmoves;
+    }
+
+    /** get edgemusc.
+     * @return
+     */
     public int getedgemuscovites() {
         return _edgemuscovites;
     }

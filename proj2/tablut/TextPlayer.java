@@ -4,7 +4,7 @@ import static tablut.Move.mv;
 
 
 /** A Player that takes input as text commands from its Controller.
- *  @author
+ *  @author Varun Jadia
  */
 class TextPlayer extends Player {
 

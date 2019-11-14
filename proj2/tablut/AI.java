@@ -1,19 +1,13 @@
 package tablut;
 
-import com.sun.xml.internal.xsom.impl.scd.Iterators;
-
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import static java.lang.Math.*;
 
-import static tablut.Square.sq;
-import static tablut.Board.THRONE;
 import static tablut.Piece.*;
 
 /** A Player that automatically generates moves.
- *  @author
+ *  @author Varun Jadia
  */
 class AI extends Player {
 
@@ -59,7 +53,7 @@ class AI extends Player {
     private Move findMove() {
         Board b = new Board(board());
         _lastFoundMove = null;
-        int sense = ((myPiece() == BLACK) ? -1:1);
+        int sense = ((myPiece() == BLACK) ? -1 : 1);
 
         findMove(board(), maxDepth(board()), true, sense, -1 * INFTY, INFTY);
         return _lastFoundMove;
@@ -77,7 +71,7 @@ class AI extends Player {
      *  of the board value and does not set _lastMoveFound. */
     private int findMove(Board board, int depth, boolean saveMove,
                          int sense, int alpha, int beta) {
-        if (depth == 0 || board.winner()!=null) {
+        if (depth == 0 || board.winner() != null) {
             _lastFoundMove = _lastFoundMove;
             return staticScore(board);
         }
@@ -128,7 +122,7 @@ class AI extends Player {
     /** Return a heuristically determined maximum search depth
      *  based on characteristics of BOARD. */
     private static int maxDepth(Board board) {
-        return 3; // FIXME?
+        return 3;
     }
 
     /** Return a heuristic value for BOARD. */
@@ -141,8 +135,14 @@ class AI extends Player {
         return boardstate(myPiece(), board);
     }
 
+    /** calculates a heuristic based on board state. */
+     /** @param side */
+     /** @param board */
+     /** @return */
+
     private int boardstate(Piece side, Board board) {
-        int diff = board.pieceLocations(side).size() - board.pieceLocations(side.opponent()).size();
+        int diff = board.pieceLocations(side).size()
+                - board.pieceLocations(side.opponent()).size();
         int kingedge = closestkingedge(board);
         int edgemusc = board.getedgemuscovites();
 
@@ -156,6 +156,10 @@ class AI extends Player {
         }
     }
 
+    /** returns closest king edge value.
+     * @param board
+     * @return
+     */
     private int closestkingedge(Board board) {
         Square kingpos = board.kingPosition();
 
@@ -165,12 +169,12 @@ class AI extends Player {
         if (kingpos == board.THRONE) {
             return 4;
         }
-        for (Move mv : board._kingmoves) {
+        for (Move mv : board.getkingmoves()) {
             if (mv.to().isEdge()) {
                 return WILL_WIN_VALUE;
             }
         }
-        int row = Math.abs(kingpos.row() - 4) ;
+        int row = Math.abs(kingpos.row() - 4);
         int col = Math.abs(kingpos.col() - 4);
         if (row > col) {
             return 4 - row;

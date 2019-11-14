@@ -29,9 +29,10 @@ public class UnitTest {
     public void movetest() {
         Board board = new Board();
         board.init();
-        board.makeMove(Move.mv(Square.sq(3, 0 ), Square.sq(0, 0)));
+        board.makeMove(Move.mv(Square.sq(3, 0), Square.sq(0, 0)));
         assert (board.pieceLocations(Piece.BLACK).contains(Square.sq(0, 0)));
-        assertFalse(board.pieceLocations(Piece.BLACK).contains(Square.sq(3, 0)));
+        assertFalse(board.pieceLocations(Piece.BLACK).contains
+                (Square.sq(3, 0)));
         System.out.println(board.encodedBoard());
     }
 
@@ -39,19 +40,21 @@ public class UnitTest {
     public void illegalmove() {
         Board board = new Board();
         board.init();
-        board.makeMove(Move.mv(Square.sq(3, 0 ), Square.sq(2, 1)));
+        board.makeMove(Move.mv(Square.sq(3, 0), Square.sq(2, 1)));
         assert (board.pieceLocations(Piece.BLACK).contains(Square.sq(3, 0)));
-        assertFalse(board.pieceLocations(Piece.BLACK).contains(Square.sq(3, 1)));
+        assertFalse(board.pieceLocations(Piece.BLACK).contains
+                (Square.sq(3, 1)));
     }
 
     @Test
     public void capturetest() {
         Board board = new Board();
         board.init();
-        board.makeMove(Move.mv(Square.sq(3, 0 ), Square.sq(3, 3)));
+        board.makeMove(Move.mv(Square.sq(3, 0), Square.sq(3, 3)));
         board.makeMove(Move.mv(Square.sq(2, 4), Square.sq(2, 8)));
-        board.makeMove(Move.mv(Square.sq(5, 0 ), Square.sq(5, 3)));
-        assertFalse(board.pieceLocations(Piece.WHITE).contains(Square.sq(4, 3)));
+        board.makeMove(Move.mv(Square.sq(5, 0), Square.sq(5, 3)));
+        assertFalse(board.pieceLocations(Piece.WHITE).contains
+                (Square.sq(4, 3)));
         System.out.println(board);
     }
 
@@ -59,13 +62,14 @@ public class UnitTest {
     public void capturetestthrone() {
         Board board = new Board();
         board.init();
-        board.makeMove(Move.mv(Square.sq(3, 0 ), Square.sq(3, 3)));
+        board.makeMove(Move.mv(Square.sq(3, 0), Square.sq(3, 3)));
         board.makeMove(Move.mv(Square.sq(2, 4), Square.sq(2, 8)));
-        board.makeMove(Move.mv(Square.sq(5, 0 ), Square.sq(5, 3)));
-        board.makeMove(Move.mv(Square.sq(3, 4 ), Square.sq(3, 7)));
-        board.makeMove(Move.mv(Square.sq(4, 0 ), Square.sq(8, 0)));
-        board.makeMove(Move.mv(Square.sq(5, 4 ), Square.sq(5, 7)));
-        assertFalse(board.pieceLocations(Piece.BLACK).contains(Square.sq(4, 7)));
+        board.makeMove(Move.mv(Square.sq(5, 0), Square.sq(5, 3)));
+        board.makeMove(Move.mv(Square.sq(3, 4), Square.sq(3, 7)));
+        board.makeMove(Move.mv(Square.sq(4, 0), Square.sq(8, 0)));
+        board.makeMove(Move.mv(Square.sq(5, 4), Square.sq(5, 7)));
+        assertFalse(board.pieceLocations(Piece.BLACK).contains
+                (Square.sq(4, 7)));
         board.makeMove(Move.mv("d4-5"));
         board.makeMove(Move.mv("c9-a"));
         board.makeMove(Move.mv("f4-5"));
@@ -73,12 +77,14 @@ public class UnitTest {
     }
 
     @Test
-    public void repeatedtest(){
+    public void repeatedtest() {
         Board board = new Board();
         board.init();
-        board.makeMove(Move.mv(Square.sq(3, 0 ), Square.sq(2, 1)));
-        assert (board.pieceLocations(Piece.BLACK).contains(Square.sq(3, 0)));
-        assertFalse(board.pieceLocations(Piece.BLACK).contains(Square.sq(3, 1)));
+        board.makeMove(Move.mv(Square.sq(3, 0), Square.sq(2, 1)));
+        assert (board.pieceLocations(Piece.BLACK).
+                contains(Square.sq(3, 0)));
+        assertFalse(board.pieceLocations(Piece.BLACK).contains
+                (Square.sq(3, 1)));
         assertNotSame(board.winner(), Piece.WHITE);
     }
 
@@ -90,36 +96,6 @@ public class UnitTest {
         board.makeMove(Move.mv("g6-i"));
         board.makeMove(Move.mv("d7-5"));
         assertEquals(board.winner(), Piece.BLACK);
-    }
-
-    @Test
-    public void random() {
-        Board board = new Board();
-        board.makeMove(Move.mv("f9-6"));
-//        System.out.println(board);
-        board.makeMove(Move.mv("e7-a"));
-//        System.out.println(board);
-        board.makeMove(Move.mv("e9-i"));
-//        System.out.println(board);
-        board.makeMove(Move.mv("e6-b"));
-//        System.out.println(board);
-        board.makeMove(Move.mv("i9-e"));
-//        System.out.println(board);
-        board.makeMove(Move.mv("e5-7"));
-        System.out.println(board);
-        board.makeMove(Move.mv("e9-i"));
-        System.out.println(board);
-        board.makeMove(Move.mv("e7-b"));
-        System.out.println(board);
-        board.makeMove(Move.mv("i9-e"));
-        System.out.println(board);
-        board.makeMove(Move.mv("d5-2"));
-        System.out.println(board);
-        board.makeMove(Move.mv("e9-i"));
-        System.out.println(board);
-        board.makeMove(Move.mv("c5-1"));
-        System.out.println(board);
-        board.makeMove(Move.mv("f9-6"));
     }
 }
 
