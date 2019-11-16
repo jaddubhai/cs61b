@@ -87,16 +87,6 @@ public class UnitTest {
                 (Square.sq(3, 1)));
         assertNotSame(board.winner(), Piece.WHITE);
     }
-
-    @Test
-    public void repeatTest() {
-        Board board = new Board();
-        board.makeMove(Move.mv("i6-g"));
-        board.makeMove(Move.mv("d5-7"));
-        board.makeMove(Move.mv("g6-i"));
-        board.makeMove(Move.mv("d7-5"));
-        assertEquals(board.winner(), Piece.BLACK);
-    }
 }
 
 

@@ -91,3 +91,8 @@ i8-6
 g8-f
 a6-8
 f8-9
+# Make both players into AIs
+auto white
+auto black
+# Play a complete game
+#* move/win
