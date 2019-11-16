@@ -253,6 +253,7 @@ class Board {
 
     /** Move FROM-TO, assuming this is a legal move. */
     void makeMove(Square from, Square to) {
+        assert isUnblockedMove(from, to);
         Piece topiece = _allSquares[from.col()][from.row()];
 
         _allSquares[from.col()][from.row()] = EMPTY;
@@ -274,8 +275,23 @@ class Board {
                 continue;
             }
         }
-        if (topiece == KING && to.isEdge()) {
+
+        Square kingpos = null;
+        for (int i = 0; i  < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (_allSquares[i][j] == KING) {
+                    kingpos = Square.sq(i, j);
+                    if (kingpos != null) {
+                        break;
+                    }
+                }
+            }
+        }
+        if (kingpos != null && kingpos.isEdge()) {
             _winner = WHITE;
+        }
+        if (kingpos == null) {
+            _winner = BLACK;
         }
 
         if (legalMoves(WHITE) == null) {
@@ -367,7 +383,6 @@ class Board {
             _moves.remove(_moves.get(_moves.size() - 1));
             _encodedboards.remove(
                     _encodedboards.get(_encodedboards.size() - 1));
-
         }
     }
 

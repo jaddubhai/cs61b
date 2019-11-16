@@ -139,6 +139,9 @@ class AI extends Player {
 
     /** Return a heuristic value for BOARD. */
     public int staticScore(Board board) {
+        if (board.repeatedPosition()) {
+            return WINNING_VALUE;
+        }
         return boardstate(myPiece(), board);
     }
 
@@ -149,7 +152,6 @@ class AI extends Player {
         if (kingpos == null) {
             return -1 * INFTY;
         }
-
         int row = min(kingpos.row(), 8 - kingpos.row());
         int col = min(kingpos.col(), 8 - kingpos.col());
 
