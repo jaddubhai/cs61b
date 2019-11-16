@@ -146,6 +146,10 @@ class AI extends Player {
 
     public int boardstate(Piece side, Board board) {
         Square kingpos = board.kingPosition();
+        if (kingpos == null) {
+            return -1 * INFTY;
+        }
+
         int row = min(kingpos.row(), 8 - kingpos.row());
         int col = min(kingpos.col(), 8 - kingpos.col());
 

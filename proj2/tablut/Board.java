@@ -274,12 +274,8 @@ class Board {
                 continue;
             }
         }
-        Square kingpos = kingPosition();
-        if (kingpos != null && kingpos.isEdge()) {
+        if (topiece == KING && to.isEdge()) {
             _winner = WHITE;
-        }
-        if (kingpos == null) {
-            _winner = BLACK;
         }
 
         if (legalMoves(WHITE) == null) {
@@ -357,6 +353,9 @@ class Board {
             for (int i = 0; i < 9; i++) {
                 for (int j = 0; j < 9; j++) {
                     _allSquares[i][j] = curr.squares[i][j];
+                    if (curr.squares[i][j] == KING) {
+                        _kingposition = Square.sq(i, j);
+                    }
                 }
             }
             _moveCount -= 1;
@@ -368,6 +367,7 @@ class Board {
             _moves.remove(_moves.get(_moves.size() - 1));
             _encodedboards.remove(
                     _encodedboards.get(_encodedboards.size() - 1));
+
         }
     }
 
