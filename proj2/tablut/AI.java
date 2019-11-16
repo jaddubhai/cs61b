@@ -134,7 +134,7 @@ class AI extends Player {
     /** Return a heuristically determined maximum search depth
      *  based on characteristics of BOARD. */
     private static int maxDepth(Board board) {
-        return 4;
+        return 3;
     }
 
     /** Return a heuristic value for BOARD. */

@@ -62,9 +62,9 @@ class BoardWidget extends Pad {
         setPreferredSize(BOARD_SIDE, BOARD_SIDE);
         _acceptingMoves = false;
         try {
-            black = ImageIO.read(Utils.getResource("blackCirc.png"));
-            white = ImageIO.read(Utils.getResource("whiteCirc.png"));
-            king = ImageIO.read(Utils.getResource("kingcirc.png"));
+            black = ImageIO.read(Utils.getResource("icon.png"));
+            white = ImageIO.read(Utils.getResource("circle-outline.png"));
+            king = ImageIO.read(Utils.getResource("crown.png"));
         } catch (IOException e) {
             System.exit(1);
         }
@@ -108,6 +108,8 @@ class BoardWidget extends Pad {
             clickpiece = s;
         } else if (_board.isLegal(Move.mv(clickpiece, s))) {
             _commands.offer(Move.mv(clickpiece, s).toString());
+            clickpiece = null;
+        } else {
             clickpiece = null;
         }
         repaint();
