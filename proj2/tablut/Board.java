@@ -141,13 +141,6 @@ class Board {
 
     /** Return location of the king. */
     Square kingPosition() {
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (_allSquares[i][j] == KING) {
-                    _kingposition = Square.sq(i, j);
-                }
-            }
-        }
         return _kingposition;
     }
 
@@ -265,6 +258,9 @@ class Board {
         _allSquares[from.col()][from.row()] = EMPTY;
         _allSquares[to.col()][to.row()] = topiece;
 
+        if (topiece == KING) {
+            _kingposition = to;
+        }
 
         for (int dir = 0; dir < 4; dir++) {
             Square capbud = to.rookMove(dir, 2);
@@ -278,8 +274,12 @@ class Board {
                 continue;
             }
         }
-        if (kingPosition() != null && kingPosition().isEdge()) {
+        Square kingpos = kingPosition();
+        if (kingpos != null && kingpos.isEdge()) {
             _winner = WHITE;
+        }
+        if (kingpos == null) {
+            _winner = BLACK;
         }
 
         if (legalMoves(WHITE) == null) {
@@ -315,6 +315,7 @@ class Board {
                 && getpiece(captured).side() == _turn.opponent()) {
             if (captured == kingPosition()) {
                 _allSquares[captured.col()][captured.row()] = EMPTY;
+                _kingposition = null;
                 _winner = BLACK;
             }
         }
@@ -342,6 +343,9 @@ class Board {
         } else if (ishostile(sq0)  && ishostile(sq2)
                 && capiece.side() == _turn.opponent()) {
             _allSquares[captured.col()][captured.row()] = EMPTY;
+            if (capiece == KING) {
+                _kingposition = null;
+            }
         }
     }
 
