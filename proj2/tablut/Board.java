@@ -53,8 +53,18 @@ class Board {
         if (model == this) {
             return;
         }
-
-        init();
+        _allSquares = model._allSquares.clone();
+        _winner = model.winner();
+        _turn = model.turn();
+        _kingmoves = model.getkingmoves();
+        _kingposition = model.kingPosition();
+        _encodedboards = (ArrayList<String>) model._encodedboards.clone();
+        _positionhash =  (ArrayList<Tracker>) model._positionhash.clone();
+        _edgemuscovites = model._edgemuscovites;
+        _moves = (Move.MoveList) model._moves.clone();
+        _moveCount = model._moveCount;
+        _movelimit = model._movelimit;
+        _repeated = model._repeated;
     }
 
     /** Clears the board to the initial position. */
@@ -84,6 +94,7 @@ class Board {
         _moves = new Move.MoveList();
         _turn = BLACK;
         _positionhash.add(new Tracker(this));
+        _winner = null;
     }
 
     /** Set the move limit to LIM.  It is an error if 2*LIM <= moveCount(). */
@@ -116,7 +127,8 @@ class Board {
             int index = _encodedboards.indexOf(encodedBoard());
             if (_encodedboards.get(index).charAt(0)
                     == _turn.toString().charAt(0)) {
-                _winner = _turn.opponent();
+                _winner = _turn;
+                _repeated = true;
             }
         }
     }
@@ -129,6 +141,13 @@ class Board {
 
     /** Return location of the king. */
     Square kingPosition() {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (_allSquares[i][j] == KING) {
+                    _kingposition = Square.sq(i, j);
+                }
+            }
+        }
         return _kingposition;
     }
 
@@ -217,9 +236,7 @@ class Board {
         return WHITE;
     }
 
-    /** checks if a square is hostile.
-     * @param sq
-     * @return
+    /** checks if a SQ is hostile. return.
      */
     boolean ishostile(Square sq) {
         Piece hostile = _allSquares[sq.col()][sq.row()];
@@ -238,18 +255,16 @@ class Board {
                 return hostilecount == 3;
             }
         }
-        return hostile == _turn;
+        return hostile.side() == _turn;
     }
 
     /** Move FROM-TO, assuming this is a legal move. */
     void makeMove(Square from, Square to) {
-        assert hasMove(_turn);
-        assert _allSquares[from.col()][from.row()].side() == _turn;
-        assert isLegal(from, to);
         Piece topiece = _allSquares[from.col()][from.row()];
 
         _allSquares[from.col()][from.row()] = EMPTY;
         _allSquares[to.col()][to.row()] = topiece;
+
 
         for (int dir = 0; dir < 4; dir++) {
             Square capbud = to.rookMove(dir, 2);
@@ -290,16 +305,14 @@ class Board {
         }
     }
 
-    /** capture for kings/throne.
-    @param sq0
-    @param sq1
-     @param sq2
-    @param sq3 */
+    /** capture for kings/throne SQ0 SQ1 SQ2 SQ3.
+    */
     private void capture(Square sq0, Square sq1, Square sq2, Square sq3) {
         Square captured = sq0.between(sq2);
 
         if (ishostile(sq0) && ishostile(sq1)
-                && ishostile(sq2) && ishostile(sq3)) {
+                && ishostile(sq2) && ishostile(sq3)
+                && getpiece(captured).side() == _turn.opponent()) {
             if (captured == kingPosition()) {
                 _allSquares[captured.col()][captured.row()] = EMPTY;
                 _winner = BLACK;
@@ -307,7 +320,7 @@ class Board {
         }
     }
 
-    /** return piece given a square. */
+    /** return piece given a SQ. */
     private Piece getpiece(Square sq) {
         return _allSquares[sq.col()][sq.row()];
     }
@@ -326,7 +339,8 @@ class Board {
                     captured.rookMove(2, 1),
                     captured.rookMove(3, 1));
 
-        } else if (ishostile(sq0)  && ishostile(sq2)) {
+        } else if (ishostile(sq0)  && ishostile(sq2)
+                && capiece.side() == _turn.opponent()) {
             _allSquares[captured.col()][captured.row()] = EMPTY;
         }
     }
@@ -353,9 +367,7 @@ class Board {
         }
     }
 
-    /**convert to piece.
-     * @param x
-     * @return
+    /** convert X to return char.
      */
     private Piece convertchar(char x) {
         if (x == WHITE.toString().charAt(0)) {
@@ -384,10 +396,7 @@ class Board {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 if (_allSquares[i][j].side().equals(side)) {
-                    squares.add(Square.sq(j, i));
-                }
-                if (_allSquares[i][j] == KING) {
-                    _kingposition = Square.sq(i, j);
+                    squares.add(Square.sq(i, j));
                 }
             }
         }
@@ -452,13 +461,17 @@ class Board {
     /** Return the locations of all pieces on SIDE. */
     public HashSet<Square> pieceLocations(Piece side) {
         assert side != EMPTY;
-        _edgemuscovites = 0;
+
+        if (side.equals(BLACK)) {
+            _edgemuscovites = 0;
+        }
         HashSet<Square> retset = new HashSet<Square>();
         for (int i = 0; i < 9;  i++) {
             for (int j = 0; j < 9; j++) {
                 if (_allSquares[i][j].side().equals(side)) {
                     retset.add(Square.sq(i, j));
-                    if ((i == 0 || i == 8 || j == 0 || j == 8)) {
+                    if ((i == 0 || i == 8 || j == 0 || j == 8)
+                            && side.equals(BLACK)) {
                         _edgemuscovites++;
                     }
                 }

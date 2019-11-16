@@ -69,10 +69,18 @@ class AI extends Player {
      *  and minimal value or value < ALPHA if SENSE==-1. Searches up to
      *  DEPTH levels.  Searching at level 0 simply returns a static estimate
      *  of the board value and does not set _lastMoveFound. */
-    private int findMove(Board board, int depth, boolean saveMove,
+    public int findMove(Board board, int depth, boolean saveMove,
                          int sense, int alpha, int beta) {
-        if (depth == 0 || board.winner() != null) {
-            _lastFoundMove = _lastFoundMove;
+        if (board.winner() != null) {
+            if (board.repeatedPosition() && depth >= maxDepth(board) - 2) {
+                return sense * INFTY;
+            }
+            if (depth >= maxDepth(board) - 2) {
+                return -sense * WINNING_VALUE;
+            } else {
+                return -sense * WILL_WIN_VALUE;
+            }
+        } else if (depth == 0) {
             return staticScore(board);
         }
 
@@ -84,13 +92,14 @@ class AI extends Player {
                 board.makeMove(m);
                 newbeta = findMove(board, depth - 1, false, 1, alpha, beta);
                 board.undo();
-                currbeta = Math.min(currbeta, newbeta);
-                beta = min(beta, currbeta);
 
-                if (saveMove) {
-                    _lastFoundMove = m;
+                if (newbeta < currbeta) {
+                    currbeta = Math.min(newbeta, currbeta);
+                    if (saveMove) {
+                        _lastFoundMove = m;
+                    }
                 }
-
+                beta = Math.min(currbeta, beta);
                 if (alpha >= beta) {
                     break;
                 }
@@ -104,12 +113,15 @@ class AI extends Player {
                 board.makeMove(m);
                 newalpha = findMove(board, depth - 1, false, -1, alpha, beta);
                 board.undo();
-                curralpha = Math.max(curralpha, newalpha);
-                alpha = max(alpha, curralpha);
 
-                if (saveMove) {
-                    _lastFoundMove = m;
+                if (newalpha > curralpha) {
+                    curralpha = Math.max(newalpha, curralpha);
+                    if (saveMove) {
+                        _lastFoundMove = m;
+                    }
                 }
+
+                alpha = max(alpha, curralpha);
 
                 if (alpha >= beta) {
                     break;
@@ -122,68 +134,53 @@ class AI extends Player {
     /** Return a heuristically determined maximum search depth
      *  based on characteristics of BOARD. */
     private static int maxDepth(Board board) {
-        return 3;
+        return 4;
     }
 
     /** Return a heuristic value for BOARD. */
-    private int staticScore(Board board) {
-        if (board.winner() == WHITE) {
-            return WINNING_VALUE;
-        } else if (board.winner() == BLACK) {
-            return -1 * WINNING_VALUE;
-        }
+    public int staticScore(Board board) {
         return boardstate(myPiece(), board);
     }
 
-    /** calculates a heuristic based on board state. */
-     /** @param side */
-     /** @param board */
-     /** @return */
+    /** calculates a heuristic based on board state. BOARD. SIDE. return.**/
 
-    private int boardstate(Piece side, Board board) {
+    public int boardstate(Piece side, Board board) {
+        Square kingpos = board.kingPosition();
+        int row = min(kingpos.row(), 8 - kingpos.row());
+        int col = min(kingpos.col(), 8 - kingpos.col());
+
+        int minkingmov = Math.floorDiv(Math.min(row, col), 4);
         int diff = board.pieceLocations(side).size()
                 - board.pieceLocations(side.opponent()).size();
         int kingedge = closestkingedge(board);
-        int edgemusc = board.getedgemuscovites();
+        int edgemusc = Math.floorDiv(board.getedgemuscovites(), 4);
 
-        if (kingedge == -1 * WINNING_VALUE && side == BLACK) {
-            return kingedge;
-        }
-        if (side.side() == WHITE) {
-            return diff + kingedge;
-        } else {
-            return diff + edgemusc -  kingedge;
-        }
+        return diff - 4 * kingedge - 5 * minkingmov + 5 * edgemusc;
     }
 
-    /** returns closest king edge value.
-     * @param board
-     * @return
-     */
+    /** return closest king edge value. BOARD.*/
     private int closestkingedge(Board board) {
         Square kingpos = board.kingPosition();
-
-        if (kingpos == null) {
-            return -1 * WINNING_VALUE;
-        }
-        if (kingpos == board.THRONE) {
-            return 4;
-        }
-        for (Move mv : board.getkingmoves()) {
-            if (mv.to().isEdge()) {
-                return WILL_WIN_VALUE;
+        int rowblock = 0;
+        int colblock = 0;
+        for (int i = 0; i < 9; i++) {
+            if (board.get(kingpos.col(), i) != EMPTY) {
+                rowblock++;
             }
         }
-        int row = Math.abs(kingpos.row() - 4);
-        int col = Math.abs(kingpos.col() - 4);
-        if (row > col) {
-            return 4 - row;
-        } else if (col > row) {
-            return  4 - col;
+
+        for (int i = 0; i < 9; i++) {
+            if (board.get(i, kingpos.row()) != EMPTY) {
+                colblock++;
+            }
+        }
+
+        if (colblock == 0 || rowblock == 0 && myPiece() == WHITE) {
+            return WINNING_VALUE;
+        } else if (colblock == 0 || rowblock == 0 && myPiece() == BLACK) {
+            return WILL_WIN_VALUE;
         } else {
-            return 4 - row;
+            return Math.floorDiv(rowblock + colblock, 4);
         }
     }
-
-
 }
