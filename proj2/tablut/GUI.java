@@ -35,6 +35,12 @@ class GUI extends TopLevel implements View, Reporter {
     GUI(String title) {
         super(title, true);
         addMenuButton("Game->Quit", this::quit);
+        addMenuButton("Game->New", this::clicknew);
+        addMenuButton("Player->Black->Manual", this::clickmuscoman);
+        addMenuButton("Player->Black->Auto", this::clickmusco);
+        addMenuButton("Player->White->Manual", this::clickswedoman);
+        addMenuButton("Player->White->Auto", this::clickswedo);
+
         _widget = new BoardWidget(_pendingCommands);
         add(_widget,
             new LayoutSpec("y", 1,
@@ -46,8 +52,33 @@ class GUI extends TopLevel implements View, Reporter {
                                 "width", 3));
     }
 
-    /** Response to "Quit" button click. */
-    private void quit(String dummy) {
+    /** Response to "new" button click. PLACEHOLDER.*/
+    private void clicknew(String placeholder) {
+        _pendingCommands.offer("new");
+    }
+
+    /** Response to "auto black" button click. PLACEHOLDER.*/
+    private void clickmusco(String placeholder) {
+        _pendingCommands.offer("auto black");
+    }
+
+    /** Response to "auto white" button click. PLACEHOLDER.*/
+    private void clickswedo(String placeholder) {
+        _pendingCommands.offer("auto white");
+    }
+
+    /** Response to "manual black" button click. PLACEHOLDER.*/
+    private void clickmuscoman(String placeholder) {
+        _pendingCommands.offer("manual black");
+    }
+
+    /** Response to "manual white" button click. PLACEHOLDER.*/
+    private void clickswedoman(String placeholder) {
+        _pendingCommands.offer("manual white");
+    }
+
+    /** Response to "Quit" button click. PLACEHOLDER.*/
+    private void quit(String placeholder) {
         _pendingCommands.offer("quit");
     }
 

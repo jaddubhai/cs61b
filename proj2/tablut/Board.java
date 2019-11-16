@@ -48,6 +48,7 @@ class Board {
         copy(model);
     }
 
+    /** Copies MODEL into me. */
     @SuppressWarnings("unchecked")
     /** Copies MODEL into me. */
     void copy(Board model) {

@@ -2,6 +2,9 @@ package tablut;
 
 import ucb.gui2.Pad;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import java.awt.Color;
@@ -58,6 +61,13 @@ class BoardWidget extends Pad {
         setMouseHandler("click", this::mouseClicked);
         setPreferredSize(BOARD_SIDE, BOARD_SIDE);
         _acceptingMoves = false;
+        try {
+            black = ImageIO.read(Utils.getResource("blackCirc.png"));
+            white = ImageIO.read(Utils.getResource("whiteCirc.png"));
+            king = ImageIO.read(Utils.getResource("kingcirc.png"));
+        } catch (IOException e) {
+            System.exit(1);
+        }
     }
 
     /** Draw the bare board G.  */
@@ -82,10 +92,24 @@ class BoardWidget extends Pad {
 
     /** Draw the contents of S on G. */
     private void drawPiece(Graphics2D g, Square s) {
+        Piece draw = _board.get(s);
+        if (draw == Piece.BLACK) {
+            g.drawImage(black, cx(s), cy(s), null);
+        } else if (draw == Piece.WHITE) {
+            g.drawImage(white, cx(s), cy(s), null);
+        } else if (draw == Piece.KING) {
+            g.drawImage(king, cx(s), cy(s), null);
+        }
     }
 
     /** Handle a click on S. */
     private void click(Square s) {
+        if (clickpiece == null) {
+            clickpiece = s;
+        } else if (_board.isLegal(Move.mv(clickpiece, s))) {
+            _commands.offer(Move.mv(clickpiece, s).toString());
+            clickpiece = null;
+        }
         repaint();
     }
 
@@ -146,4 +170,16 @@ class BoardWidget extends Pad {
     /** True iff accepting moves from user. */
     private boolean _acceptingMoves;
 
+    /** pieces for GUI. */
+    private BufferedImage black;
+
+    /** pieces for GUI. */
+    private BufferedImage white;
+
+    /** pieces for GUI. */
+    private BufferedImage king;
+
+    /** current clicked piece. */
+    private Square clickpiece;
 }
+
