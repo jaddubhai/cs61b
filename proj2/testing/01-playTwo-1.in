@@ -36,7 +36,5 @@ f5-d
 a4-b
 g6-h
 dump
-auto black
-#*move
-#*remote move/win
-quit
+a5-6
+dump
