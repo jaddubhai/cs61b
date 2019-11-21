@@ -38,7 +38,20 @@ public class MySortingAlgorithms {
     public static class InsertionSort implements SortingAlgorithm {
         @Override
         public void sort(int[] array, int k) {
-            // FIXME
+            for (int i = 0; i < k - 1; i++) {
+                if (array[i] > array[i + 1]) {
+                    int flip = array[i];
+                    array[i] = array[i + 1];
+                    array[i + 1] = flip;
+                    for (int j = i - 1; j > -1; j--) {
+                        if (array[j] > array[j + 1]) {
+                            int flip2 = array[j];
+                            array[j] = array[j + 1];
+                            array[j + 1] = flip2;
+                        }
+                    }
+                }
+            }
         }
 
         @Override
@@ -56,7 +69,21 @@ public class MySortingAlgorithms {
     public static class SelectionSort implements SortingAlgorithm {
         @Override
         public void sort(int[] array, int k) {
-            // FIXME
+            for (int i = 0; i < k - 1; i++) {
+                int min = array[i];
+                int mindex = i;
+                for (int j = i + 1; j < k; j++) {
+                    if (array[j] < min) {
+                        min = array[j];
+                        mindex = j;
+                    }
+                }
+                if (mindex != i) {
+                    int flip = array[i];
+                    array[i] = array[mindex];
+                    array[mindex] = flip;
+                }
+            }
         }
 
         @Override
@@ -73,10 +100,52 @@ public class MySortingAlgorithms {
     public static class MergeSort implements SortingAlgorithm {
         @Override
         public void sort(int[] array, int k) {
-            // FIXME
+            if (k == 0 || k == 1 || array == null) {
+                return;
+            }
+            sort(array, 0, k - 1);
         }
 
-        // may want to add additional methods
+        private void sort(int Arr[], int start, int end) {
+            if(start < end) {
+                int mid = (start + end) / 2;
+                sort(Arr, start, mid);
+                sort(Arr, mid+1, end);
+                merge(Arr, start, mid, end);
+            }
+        }
+
+        void merge(int Arr[], int start, int mid, int end) {
+
+            int temp[] = new int[end - start + 1];
+
+            int i = start, j = mid+1, k = 0;
+
+            while(i <= mid && j <= end) {
+                if(Arr[i] <= Arr[j]) {
+                    temp[k] = Arr[i];
+                    k += 1; i += 1;
+                }
+                else {
+                    temp[k] = Arr[j];
+                    k += 1; j += 1;
+                }
+            }
+
+            while(i <= mid) {
+                temp[k] = Arr[i];
+                k += 1; i += 1;
+            }
+
+            while(j <= end) {
+                temp[k] = Arr[j];
+                k += 1; j += 1;
+            }
+
+            for(i = start; i <= end; i += 1) {
+                Arr[i] = temp[i - start];
+            }
+        }
 
         @Override
         public String toString() {
