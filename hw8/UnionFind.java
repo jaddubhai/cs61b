@@ -24,11 +24,10 @@ public class UnionFind {
     /** Return the representative of the partition currently containing V.
      *  Assumes V is contained in one of the partitions.  */
     public int find(int v) {
-        if (_subsets[v] == v) {
-            return v;
-        } else {
-            return find(_subsets[v]);
+        while (_subsets[v] != v) {
+            v = _subsets[v];
         }
+        return v;
     }
 
     /** Return true iff U and V are in the same partition. */
@@ -38,7 +37,10 @@ public class UnionFind {
 
     /** Union U and V into a single partition, returning its representative. */
     public int union(int u, int v) {
-        if (find(u) == find(v)) {
+        u = find(u);
+        v = find(v);
+
+        if (u == v) {
             return u;
         }
 
