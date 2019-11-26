@@ -22,7 +22,7 @@ public class MST {
         Arrays.sort(copy, EDGE_WEIGHT_COMPARATOR);
 
         UnionFind uni = new UnionFind(V);
-        for (int x = 1, y = 0; y < V - 1; x++) {
+        for (int x = 0, y = 0; y < V - 1; x++) {
             if (!uni.samePartition(copy[x][0], copy[x][1])) {
                 retarr[y] = copy[x];
                 uni.union(copy[x][0], copy[x][1]);
