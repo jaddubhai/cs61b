@@ -12,13 +12,22 @@ public class UnionFind {
     /** A union-find structure consisting of the sets { 1 }, { 2 }, ... { N }.
      */
     public UnionFind(int N) {
-        // FIXME
+        _subsets = new int[N + 1];
+        _size = new int[N + 1];
+        for (int i = 1; i < N + 1; i++) {
+            _size[i] = 1;
+        }
+
     }
 
     /** Return the representative of the partition currently containing V.
      *  Assumes V is contained in one of the partitions.  */
     public int find(int v) {
-        return 0;  // FIXME
+        if (_subsets[v] == 0 || _subsets[v] == v) {
+            return v;
+        } else {
+            return find(_subsets[v]);
+        }
     }
 
     /** Return true iff U and V are in the same partition. */
@@ -28,8 +37,21 @@ public class UnionFind {
 
     /** Union U and V into a single partition, returning its representative. */
     public int union(int u, int v) {
-        return 0;  // FIXME
+        if (find(u) == find(v)) {
+            return u;
+        }
+
+        if (_size[u] < _size[v]) {
+            _subsets[u] = v;
+            _size[v] += _size[u];
+            return _subsets[u];
+        } else {
+            _subsets[v] = u;
+            _size[u] += _size[v];
+            return _subsets[v];
+        }
     }
 
-    // FIXME
+    private int[] _subsets;
+    private int[] _size;
 }

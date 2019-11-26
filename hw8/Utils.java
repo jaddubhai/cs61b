@@ -102,6 +102,7 @@ public class Utils {
 
     /** Return true iff E forms a tree of vertices 1-V. */
     public static boolean isTree(int V, int[][] E) {
+        boolean check = E.length == V - 1;
         return E.length == V - 1 && isConnected(V, E);
     }
 

@@ -1,3 +1,6 @@
+import com.sun.tools.corba.se.idl.Util;
+import com.sun.xml.internal.xsom.impl.scd.Iterators;
+
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -17,7 +20,20 @@ public class MST {
      *  are a subset of those in E (they do not include copies of the
      *  original edges, just the original edges themselves.) */
     public static int[][] mst(int V, int[][] E) {
-        return null;  // FIXME
+        int[][] retarr = new int[V - 1][3];
+        int[][] copy = Arrays.copyOf(E, E.length);
+        Arrays.sort(copy, EDGE_WEIGHT_COMPARATOR);
+
+        UnionFind uni = new UnionFind(V);
+        for (int x = 1, y = 0; y < V - 1; x++) {
+            if (!uni.samePartition(copy[x][0], copy[x][1])) {
+                retarr[y] = copy[x];
+                uni.union(copy[x][0], copy[x][1]);
+                y++;
+            }
+        }
+
+        return retarr;
     }
 
     /** An ordering of edges by weight. */
