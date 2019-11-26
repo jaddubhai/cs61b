@@ -15,6 +15,7 @@ public class UnionFind {
         _subsets = new int[N + 1];
         _size = new int[N + 1];
         for (int i = 1; i < N + 1; i++) {
+            _subsets[i] = i;
             _size[i] = 1;
         }
 
@@ -23,7 +24,7 @@ public class UnionFind {
     /** Return the representative of the partition currently containing V.
      *  Assumes V is contained in one of the partitions.  */
     public int find(int v) {
-        if (_subsets[v] == 0 || _subsets[v] == v) {
+        if (_subsets[v] == v) {
             return v;
         } else {
             return find(_subsets[v]);
@@ -44,11 +45,11 @@ public class UnionFind {
         if (_size[u] < _size[v]) {
             _subsets[u] = v;
             _size[v] += _size[u];
-            return _subsets[u];
+            return v;
         } else {
             _subsets[v] = u;
             _size[u] += _size[v];
-            return _subsets[v];
+            return u;
         }
     }
 
