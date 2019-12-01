@@ -17,7 +17,7 @@ public class Repo implements Serializable {
     private Commit lastcommit;
 
     Repo init() {
-        Commit initcom = new Commit ("initial commit", java.sql.Timestamp.valueOf("1970-01-01 00:00:00.0"));
+        Commit initcom = new Commit("initial commit", java.sql.Timestamp.valueOf("1970-01-01 00:00:00.0"));
         Branch master = new Branch();
         master.sethead(initcom);
         _currbranch = master;
@@ -36,7 +36,7 @@ public class Repo implements Serializable {
         String hashfile = Utils.sha1(Utils.readContentsAsString(file));
         File stage = new File(".gitlet/staging/" + hashfile);
 
-        if(!lastcommit.getfiles().containsKey(filename) ||
+        if (!lastcommit.getfiles().containsKey(filename) ||
                 !lastcommit.getfiles().get(filename).equals(hashfile)) {
             _stagefiles.put(filename, hashfile);
             Utils.writeContents(stage, Utils.readContentsAsString(file));
@@ -59,7 +59,8 @@ public class Repo implements Serializable {
         Commit comm = new Commit(message, time);
         _currbranch.commit(comm);
 
-        for (String filename: _currbranch.gethead().gettrackedfiles().keySet()) {
-            if (_stagefiles.containsKey(filename))
-        }
+//        for (String filename: _currbranch.gethead().gettrackedfiles().keySet()) {
+//            if (_stagefiles.containsKey(filename))
+//        }
+    }
 }
