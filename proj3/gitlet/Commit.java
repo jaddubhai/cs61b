@@ -1,9 +1,10 @@
 package gitlet;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashMap;
 
-public class Commit {
+public class Commit implements Serializable {
 
     /** timestamp of commit. */
     private Timestamp _timestamp;
@@ -27,9 +28,10 @@ public class Commit {
     private HashMap<String, String> _trackedfiles = new HashMap<>();
 
 
-    Commit (String msg, Timestamp time) {
+    Commit (String msg, Timestamp time, HashMap<String, String> files) {
         _logmsg = msg;
         _timestamp = time;
+        _files = files;
         _uid = Utils.sha1(_timestamp.toString(), _logmsg);
     }
 
@@ -50,7 +52,13 @@ public class Commit {
 
     /** get hashid for commit. */
     public String gethash() {
-        return _uid;
+        String files;
+        if (_files == null) {
+            files = "";
+        } else {
+            files = _files.toString();
+        }
+        return Utils.sha1(_logmsg, files, _timestamp.toString());
     }
 
     /** set files. */

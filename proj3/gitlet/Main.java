@@ -47,6 +47,11 @@ public class Main {
                 _repo.add(operand);
             }
 
+            if (command.equals("commit") && operand != null) {
+                _repo = load();
+                _repo.add(operand);
+            }
+
         } else {
             System.out.print("No command with that name exists.");
             System.exit(0);
@@ -73,7 +78,8 @@ public class Main {
 
     /** helper for loading an initialized gitlet directory if it already exists. */
     private static Repo load() {
-        File file = new File(".gitlet");
+        String f = System.getProperty("user.dir");
+        File file = new File(f + "/.gitlet");
         Repo repo = null;
         if (file.exists()) {
             repo = Utils.readObject(file, Repo.class);

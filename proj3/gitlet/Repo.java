@@ -17,11 +17,23 @@ public class Repo implements Serializable {
     private Commit lastcommit;
 
     Repo init() {
-        Commit initcom = new Commit("initial commit", java.sql.Timestamp.valueOf("1970-01-01 00:00:00.0"));
+
+        Commit initcom = new Commit("initial commit", java.sql.Timestamp.valueOf("1970-01-01 00:00:00.0"), new HashMap<>());
         Branch master = new Branch();
         master.sethead(initcom);
+
+        File commits = new File(".gitlet/commits");
+        commits.mkdir();
+        File staging = new File(".gitlet/staging");
+        staging.mkdir();
+
         _currbranch = master;
         _branches.add(master);
+        _stagefiles = new HashMap<String, String>();
+
+        String hash = initcom.gethash();
+        File comm = new File(".gitlet/commits/" + hash);
+        Utils.writeContents(comm, Utils.serialize(initcom));
 
         return this;
     }
@@ -56,11 +68,27 @@ public class Repo implements Serializable {
             System.exit(0);
         }
 
-        Commit comm = new Commit(message, time);
+        Commit comm = new Commit(message, time, _currbranch.gethead().getfiles());
         _currbranch.commit(comm);
 
-//        for (String filename: _currbranch.gethead().gettrackedfiles().keySet()) {
-//            if (_stagefiles.containsKey(filename))
-//        }
+        for (String filename: _currbranch.gethead().gettrackedfiles().keySet()) {
+            if (_stagefiles.containsKey(filename)) {
+                String hash = _currbranch.gethead().gettrackedfiles().get(filename);
+                if (_stagefiles.get(filename).equals(hash)) {
+                    _currbranch.gethead().gettrackedfiles().remove(filename);
+                    _currbranch.gethead().gettrackedfiles().put(filename, _stagefiles.get(filename));
+                }
+            }
+        }
+    }
+
+    public Commit uidToCommit(String uid) {
+        File f = new File(".gitlet/commits/" + uid);
+        if (f.exists()) {
+            return Utils.readObject(f, Commit.class);
+        } else {
+            Utils.message("No commit with that id exists.");
+            throw new GitletException();
+        }
     }
 }
