@@ -1,6 +1,5 @@
 package gitlet;
 
-
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
@@ -41,12 +40,12 @@ public class Main {
                 _repo = init();
             }
             if (command.equals("add") && operand != null) {
-                _repo = load();
+                load();
                 _repo.add(operand);
             }
 
             if (command.equals("commit") && operand != null) {
-                _repo = load();
+                load();
                 _repo.add(operand);
             }
 
@@ -71,12 +70,11 @@ public class Main {
     }
 
     /** helper for loading an initialized gitlet directory if it already exists. */
-    private static Repo load() {
+    private static void load() {
         File file = new File(".gitlet/repo");
-        Repo repo = null;
         if (file.exists()) {
-            repo = Utils.readObject(file, Repo.class);
+            _repo.copy(Utils.readObject(file, Repo.class));
         }
-        return repo;
+        return;
     }
 }

@@ -13,7 +13,7 @@ public class Repo implements Serializable {
     private HashMap<String, Blob> _stagefiles = new HashMap<>();
 
 
-    Repo init() {
+    public Repo init() {
 
         Commit initcom = new Commit("initial commit", java.sql.Timestamp.valueOf("1970-01-01 00:00:00.0"), null);
 
@@ -33,7 +33,12 @@ public class Repo implements Serializable {
         return this;
     }
 
-    void add(String filename) {
+    public void copy(Repo repo) {
+        _stagefiles = repo._stagefiles;
+        _lastcommit = _lastcommit;
+    }
+
+    public void add(String filename) {
         File file = new File(filename);
         if (!file.exists()) {
             System.out.print("File does not exist.");
@@ -59,7 +64,7 @@ public class Repo implements Serializable {
         Utils.writeObject(stage, fileblob);
     }
 
-    void commit(String message, Timestamp time) {
+    public void commit(String message, Timestamp time) {
         if (message.equals("")) {
             System.out.print("Please enter a commit message.");
             System.exit(0);
