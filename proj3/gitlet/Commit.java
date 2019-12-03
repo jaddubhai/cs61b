@@ -2,12 +2,14 @@ package gitlet;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 public class Commit implements Serializable {
 
     /** timestamp of commit. */
-    private Timestamp _timestamp;
+    private Date _timestamp;
 
     /** log message for commit. */
     private String _logmsg;
@@ -15,24 +17,38 @@ public class Commit implements Serializable {
     /** repo/directory that the commit is part of. */
     private Repo _ref;
 
-    /** parent commit. */
-    private Commit _parent;
-
     /** uid for commit. */
     private String _uid;
 
     /** Hashmap containing files. */
-    private HashMap<String, String> _files = new HashMap<>();
+    private HashMap<String, Blob> _files = new HashMap<>();
 
     /** Hashmap containing tracked files. */
     private HashMap<String, String> _trackedfiles = new HashMap<>();
 
+    /** Commit parent id */
+    private String _parenthash ;
 
-    Commit (String msg, Timestamp time, HashMap<String, String> files) {
+    /** String contents of all blobs */
+    private ArrayList<String> _filecontents;
+
+
+    Commit (String msg, Timestamp time, String parent) {
+        _logmsg = msg;
+        _timestamp = time;
+        _parenthash = parent;
+    }
+
+
+    Commit (String msg, Timestamp time, HashMap<String, Blob> files, String parent) {
         _logmsg = msg;
         _timestamp = time;
         _files = files;
-        _uid = Utils.sha1(_timestamp.toString(), _logmsg);
+
+        for (String file : _files.keySet()) {
+            _filecontents.add(_files.get(file).getcontents());
+        }
+        _parenthash = parent;
     }
 
     /** set timestamp for commit. */
@@ -41,7 +57,7 @@ public class Commit implements Serializable {
     }
 
     /** get files. */
-    public HashMap<String, String> getfiles() {
+    public HashMap<String, Blob> getfiles() {
         return _files;
     }
 
@@ -52,17 +68,21 @@ public class Commit implements Serializable {
 
     /** get hashid for commit. */
     public String gethash() {
-        String files;
-        if (_files == null) {
-            files = "";
-        } else {
-            files = _files.toString();
+        if (_logmsg.equals("initial commit")) {
+            ArrayList<Object> shalist = new ArrayList<>();
+            shalist.add(_logmsg);
+            shalist.add("buffer");
+            return Utils.sha1(shalist);
         }
-        return Utils.sha1(_logmsg, files, _timestamp.toString());
+        ArrayList<Object> shalist = new ArrayList<>();
+        shalist.add(_logmsg);
+        shalist.add(_filecontents);
+        shalist.add(_parenthash);
+        return Utils.sha1(shalist);
     }
 
     /** set files. */
-    public void setfiles(HashMap<String, String> _files) {
+    public void setfiles(HashMap<String, Blob> _files) {
         this._files = _files;
     }
 

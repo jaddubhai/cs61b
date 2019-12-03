@@ -8,28 +8,23 @@ import java.util.HashMap;
 
 public class Repo implements Serializable {
 
-    private Branch _currbranch;
+    private String _lastcommit;
 
-    private ArrayList<Branch> _branches = new ArrayList<Branch>();
+    private HashMap<String, Blob> _stagefiles = new HashMap<>();
 
-    private HashMap<String, String> _stagefiles = new HashMap<>();
-
-    private Commit lastcommit;
 
     Repo init() {
 
-        Commit initcom = new Commit("initial commit", java.sql.Timestamp.valueOf("1970-01-01 00:00:00.0"), new HashMap<>());
-        Branch master = new Branch();
-        master.sethead(initcom);
+        Commit initcom = new Commit("initial commit", java.sql.Timestamp.valueOf("1970-01-01 00:00:00.0"), null);
 
+        File repo = new File(".gitlet/repo");
+        repo.mkdir();
         File commits = new File(".gitlet/commits");
         commits.mkdir();
         File staging = new File(".gitlet/staging");
         staging.mkdir();
 
-        _currbranch = master;
-        _branches.add(master);
-        _stagefiles = new HashMap<String, String>();
+        _stagefiles = new HashMap<String, Blob>();
 
         String hash = initcom.gethash();
         File comm = new File(".gitlet/commits/" + hash);
@@ -45,16 +40,23 @@ public class Repo implements Serializable {
             System.exit(0);
         }
 
-        String hashfile = Utils.sha1(Utils.readContentsAsString(file));
-        File stage = new File(".gitlet/staging/" + hashfile);
+        Blob fileblob = new Blob(filename);
+        String hashfile = fileblob.getshacode();
+        Commit lastcommit = Utils.readObject(new File(".gitlet/commits/" + _lastcommit), Commit.class);
 
-        if (!lastcommit.getfiles().containsKey(filename) ||
-                !lastcommit.getfiles().get(filename).equals(hashfile)) {
-            _stagefiles.put(filename, hashfile);
-            Utils.writeContents(stage, Utils.readContentsAsString(file));
-        } else if (stage.exists()) {
-            _stagefiles.remove(filename);
+        for (String name : lastcommit.getfiles().keySet()) {
+            if (hashfile.equals(lastcommit.getfiles().get(name).getshacode())) {
+                if (_stagefiles.containsKey(name)) {
+                    File remove = new File(".gitlet/staging" + lastcommit.getfiles().get(name).getshacode());
+                    remove.delete();
+                }
+            }
+            return;
         }
+
+        File stage = new File(".gitlet/staging/" + hashfile);
+        _stagefiles.put(filename, fileblob);
+        Utils.writeObject(stage, fileblob);
     }
 
     void commit(String message, Timestamp time) {
@@ -68,27 +70,6 @@ public class Repo implements Serializable {
             System.exit(0);
         }
 
-        Commit comm = new Commit(message, time, _currbranch.gethead().getfiles());
-        _currbranch.commit(comm);
 
-        for (String filename: _currbranch.gethead().gettrackedfiles().keySet()) {
-            if (_stagefiles.containsKey(filename)) {
-                String hash = _currbranch.gethead().gettrackedfiles().get(filename);
-                if (_stagefiles.get(filename).equals(hash)) {
-                    _currbranch.gethead().gettrackedfiles().remove(filename);
-                    _currbranch.gethead().gettrackedfiles().put(filename, _stagefiles.get(filename));
-                }
-            }
-        }
-    }
-
-    public Commit uidToCommit(String uid) {
-        File f = new File(".gitlet/commits/" + uid);
-        if (f.exists()) {
-            return Utils.readObject(f, Commit.class);
-        } else {
-            Utils.message("No commit with that id exists.");
-            throw new GitletException();
-        }
     }
 }

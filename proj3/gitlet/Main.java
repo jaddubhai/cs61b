@@ -2,8 +2,6 @@ package gitlet;
 
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,18 +54,14 @@ public class Main {
             System.out.print("No command with that name exists.");
             System.exit(0);
         }
-
-
     }
-
-
 
     /** initializes a new gitlet directory */
     private static Repo init() {
-        File directory = new File(".gitlet");
+        File directory = new File(".gitlet/");
 
         if (!directory.exists()) {
-            directory.mkdir();
+            directory.mkdirs();
             Repo newrep = new Repo();
             return newrep.init();
         } else {
@@ -78,14 +72,11 @@ public class Main {
 
     /** helper for loading an initialized gitlet directory if it already exists. */
     private static Repo load() {
-        String f = System.getProperty("user.dir");
-        File file = new File(f + "/.gitlet");
+        File file = new File(".gitlet/repo");
         Repo repo = null;
         if (file.exists()) {
             repo = Utils.readObject(file, Repo.class);
         }
-
         return repo;
     }
-
 }
