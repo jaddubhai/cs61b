@@ -48,7 +48,6 @@ public class Main {
                 _repo.add(operand);
                 save(_repo);
             } else if (command.equals("commit") && operand != null) {
-                long time = System.currentTimeMillis();
                 String timestamp = ZonedDateTime.now().format
                         (DateTimeFormatter.ofPattern
                                 ("EEE MMM d HH:mm:ss yyyy xxxx"));
@@ -57,6 +56,13 @@ public class Main {
             } else if (command.equals("checkout") && operand != null && args.length == 2) {
                 _repo = load();
                 _repo.checkout1(operand);
+            } else if (command.equals("checkout") && args.length == 3) {
+                _repo = load();
+                String operand2 = args[2];
+                _repo.checkout2(operand, operand2);
+            } else if (command == "log") {
+                _repo = load();
+                _repo.log();
             }
 
         } else {
