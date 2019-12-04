@@ -120,7 +120,6 @@ public class Repo implements Serializable {
             System.exit(0);
         }
         File overwrite = new File(filename);
-//        overwrite.delete();
         Utils.writeContents(overwrite, blb.getcontents());
     }
 
@@ -141,8 +140,7 @@ public class Repo implements Serializable {
             System.exit(0);
         }
         File overwrite = new File(filename);
-        overwrite.delete();
-        Utils.writeObject(overwrite, blb.getcontents());
+        Utils.writeContents(overwrite, blb.getcontents());
     }
 
     public void checkout3(String branchid) {
