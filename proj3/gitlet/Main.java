@@ -1,7 +1,11 @@
 package gitlet;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
@@ -20,7 +24,7 @@ public class Main {
         if (args == null || args.length == 0) {
             System.out.print("Please enter a command.");
             System.exit(0);
-        } else if (args.length > 2) {
+        } else if (args.length > 3) {
             System.out.print("Incorrect operands.");
             System.exit(0);
         }
@@ -39,16 +43,20 @@ public class Main {
             if (command.equals("init")) {
                 _repo = init();
                 save(_repo);
-            }
-            if (command.equals("add") && operand != null) {
+            } else if (command.equals("add") && operand != null) {
                 _repo = load();
                 _repo.add(operand);
                 save(_repo);
-            }
-
-            if (command.equals("commit") && operand != null) {
-                load();
-                _repo.add(operand);
+            } else if (command.equals("commit") && operand != null) {
+                long time = System.currentTimeMillis();
+                String timestamp = ZonedDateTime.now().format
+                        (DateTimeFormatter.ofPattern
+                                ("EEE MMM d HH:mm:ss yyyy xxxx"));
+                _repo = load();
+                _repo.commit(operand, timestamp);
+            } else if (command.equals("checkout") && operand != null && args.length == 2) {
+                _repo = load();
+                _repo.checkout1(operand);
             }
 
         } else {

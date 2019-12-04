@@ -9,10 +9,10 @@ import java.util.HashMap;
 public class Commit implements Serializable {
 
     /** timestamp of commit. */
-    private Date _timestamp;
+    public String _timestamp;
 
     /** log message for commit. */
-    private String _logmsg;
+    public String _logmsg;
 
     /** repo/directory that the commit is part of. */
     private Repo _ref;
@@ -33,14 +33,14 @@ public class Commit implements Serializable {
     private ArrayList<String> _filecontents;
 
 
-    Commit (String msg, Timestamp time, String parent) {
+    Commit (String msg, String time, String parent) {
         _logmsg = msg;
         _timestamp = time;
         _parenthash = parent;
     }
 
 
-    Commit (String msg, Timestamp time, HashMap<String, Blob> files, String parent) {
+    Commit (String msg, String time, HashMap<String, Blob> files, String parent) {
         _logmsg = msg;
         _timestamp = time;
         _files = files;
@@ -52,7 +52,7 @@ public class Commit implements Serializable {
     }
 
     /** set timestamp for commit. */
-    public void settimestamp(Timestamp _timestamp) {
+    public void settimestamp(String _timestamp) {
         this._timestamp = _timestamp;
     }
 
@@ -89,5 +89,15 @@ public class Commit implements Serializable {
     /** set tracked files. */
     public void settrackedfiles(HashMap<String, String> _trackedfiles) {
         this._trackedfiles = _trackedfiles;
+    }
+
+    /** get timestamp. */
+    public String gettimestamp() {
+        return _timestamp;
+    }
+
+    /**get commit msg. */
+    public String getlogmsg(){
+        return _logmsg;
     }
 }

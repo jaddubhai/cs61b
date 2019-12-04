@@ -12,10 +12,15 @@ public class Repo implements Serializable {
 
     private HashMap<String, Blob> _stagefiles = new HashMap<>();
 
+    /** Hashmap of branch names to their head commits. */
+    private HashMap<String, String> _branchmap = new HashMap<>();
+
+    /** Tracks current branch by its name. */
+    private String _currbranch;
 
     public Repo init() {
 
-        Commit initcom = new Commit("initial commit", java.sql.Timestamp.valueOf("1970-01-01 00:00:00.0"), null);
+        Commit initcom = new Commit("initial commit", "Thu Jan 1 00:00:00 1970 -0800", null);
 
         File commits = new File(".gitlet/commits");
         commits.mkdir();
@@ -23,10 +28,13 @@ public class Repo implements Serializable {
         staging.mkdir();
 
         _stagefiles = new HashMap<String, Blob>();
+        _lastcommit = null;
 
         String hash = initcom.gethash();
         File comm = new File(".gitlet/commits/" + hash);
         Utils.writeContents(comm, Utils.serialize(initcom));
+        _branchmap.put("master", hash);
+        _currbranch = "master";
         return this;
     }
 
@@ -61,7 +69,7 @@ public class Repo implements Serializable {
         Utils.writeObject(stage, fileblob);
     }
 
-    public void commit(String message, Timestamp time) {
+    public void commit(String message, String time) {
         if (message.equals("")) {
             System.out.print("Please enter a commit message.");
             System.exit(0);
@@ -100,6 +108,68 @@ public class Repo implements Serializable {
 
         _stagefiles.clear();
         _lastcommit = comm.gethash();
+    }
+
+    public void checkout1(String filename) {
+        Commit lastcommit = Utils.readObject(new File(".gitlet/commits/" + _lastcommit), Commit.class);
+        Blob blb = null;
+        if (lastcommit.getfiles().containsKey(filename)) {
+            blb = lastcommit.getfiles().get(filename);
+        } else {
+            System.out.print("File does not exist in that commit.");
+            System.exit(0);
+        }
+        File overwrite = new File(filename);
+        overwrite.delete();
+        Utils.writeObject(overwrite, blb.getcontents());
+    }
+
+    public void checkout2(String commitid, String filename) {
+        File checkcomm = new File(".gitlet/commits/" + commitid);
+        Commit lastcommit = null;
+        if (checkcomm.exists()) {
+            lastcommit = Utils.readObject(new File(".gitlet/commits/" + checkcomm), Commit.class);
+        } else {
+            System.out.print("No commit with that id exists.");
+            System.exit(0);
+        }
+        Blob blb = null;
+        if (lastcommit.getfiles().containsKey(filename)) {
+            blb = lastcommit.getfiles().get(filename);
+        } else {
+            System.out.print("File does not exist in that commit.");
+            System.exit(0);
+        }
+        File overwrite = new File(filename);
+        overwrite.delete();
+        Utils.writeObject(overwrite, blb.getcontents());
+    }
+
+    public void checkout3(String branchid) {
+        if (_branchmap.containsKey(branchid)) {
+            String headcommit = _branchmap.get(branchid);
+        } else {
+            System.out.print("No such branch exists.");
+            System.exit(0);
+        }
+    }
+
+    public void log() {
+        String counter = _lastcommit;
+        while(counter != null) {
+            Commit lastcommit = Utils.readObject(new File(".gitlet/commits/" + counter), Commit.class);
+            System.out.print("===");
+            System.out.print(lastcommit.gettimestamp());
+            System.out.print(lastcommit.getlogmsg());
+            System.out.println();
+            System.out.print("===");
+        }
+        Commit lastcommit = Utils.readObject(new File(".gitlet/commits/" + counter), Commit.class);
+        System.out.print("===");
+        System.out.print(lastcommit.gettimestamp());
+        System.out.print(lastcommit.getlogmsg());
+        System.out.println();
+        System.out.print("===");
     }
 }
 
