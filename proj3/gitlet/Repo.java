@@ -17,8 +17,6 @@ public class Repo implements Serializable {
 
         Commit initcom = new Commit("initial commit", java.sql.Timestamp.valueOf("1970-01-01 00:00:00.0"), null);
 
-        File repo = new File(".gitlet/repo");
-        repo.mkdir();
         File commits = new File(".gitlet/commits");
         commits.mkdir();
         File staging = new File(".gitlet/staging");
@@ -29,7 +27,6 @@ public class Repo implements Serializable {
         String hash = initcom.gethash();
         File comm = new File(".gitlet/commits/" + hash);
         Utils.writeContents(comm, Utils.serialize(initcom));
-
         return this;
     }
 
@@ -75,6 +72,35 @@ public class Repo implements Serializable {
             System.exit(0);
         }
 
+        Commit lastcommit = Utils.readObject(new File(".gitlet/commits/" + _lastcommit), Commit.class);
+        Commit comm = new Commit(message, time, lastcommit.getfiles(), _lastcommit);
 
+        if (comm.gethash().equals(_lastcommit)) {
+            System.out.print("No changes added to the commit.");
+            System.exit(0);
+        }
+
+        for (String filename : comm.getfiles().keySet()) {
+            if (_stagefiles.containsKey(filename)) {
+                comm.getfiles().remove(filename);
+                comm.getfiles().put(filename, _stagefiles.get(filename));
+            }
+        }
+
+        for (String filename : _stagefiles.keySet()) {
+            if (!comm.getfiles().containsKey(filename)) {
+                comm.getfiles().put(filename, _stagefiles.get(filename));
+                File delstage = new File(".gitlet/staging/" + _stagefiles.get(filename));
+                Utils.restrictedDelete(delstage);
+            }
+        }
+
+        File addcomm = new File(".gitlet/commits/" + comm.gethash());
+        Utils.writeObject(addcomm, comm);
+
+        _stagefiles.clear();
+        _lastcommit = comm.gethash();
     }
 }
+
+

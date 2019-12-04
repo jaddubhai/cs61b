@@ -38,10 +38,12 @@ public class Main {
         if (commandlst.contains(command)) {
             if (command.equals("init")) {
                 _repo = init();
+                save(_repo);
             }
             if (command.equals("add") && operand != null) {
-                load();
+                _repo = load();
                 _repo.add(operand);
+                save(_repo);
             }
 
             if (command.equals("commit") && operand != null) {
@@ -70,11 +72,27 @@ public class Main {
     }
 
     /** helper for loading an initialized gitlet directory if it already exists. */
-    private static void load() {
+    private static Repo load() {
         File file = new File(".gitlet/repo");
+        Repo repo = null;
         if (file.exists()) {
-            _repo.copy(Utils.readObject(file, Repo.class));
+            repo = Utils.readObject(file, Repo.class);
         }
-        return;
+        return repo;
+    }
+
+    /** helper to save repo. */
+    private static void save(Repo repo) {
+        if (repo == null) {
+            return;
+        }
+        try {
+            File f = new File(".gitlet/repo");
+            ObjectOutputStream out =
+                    new ObjectOutputStream(new FileOutputStream(f));
+            out.writeObject(repo);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
