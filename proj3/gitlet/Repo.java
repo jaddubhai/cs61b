@@ -120,8 +120,8 @@ public class Repo implements Serializable {
             System.exit(0);
         }
         File overwrite = new File(filename);
-        overwrite.delete();
-        Utils.writeObject(overwrite, blb.getcontents());
+//        overwrite.delete();
+        Utils.writeContents(overwrite, blb.getcontents());
     }
 
     public void checkout2(String commitid, String filename) {
