@@ -165,6 +165,7 @@ public class Repo implements Serializable {
             System.out.println();
             counter = lastcommit.getparenthash();
         }
+        System.out.println();
     }
 }
 
