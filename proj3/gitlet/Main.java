@@ -24,7 +24,7 @@ public class Main {
         if (args == null || args.length == 0) {
             System.out.print("Please enter a command.");
             System.exit(0);
-        } else if (args.length > 3) {
+        } else if (args.length > 4) {
             System.out.print("Incorrect operands.");
             System.exit(0);
         }
@@ -58,10 +58,9 @@ public class Main {
                 _repo = load();
                 _repo.checkout1(args[2]);
                 save(_repo);
-            } else if (command.equals("checkout") && args.length == 3) {
+            } else if (command.equals("checkout") && args.length == 4) {
                 _repo = load();
-                String operand2 = args[2];
-                _repo.checkout2(operand, operand2);
+                _repo.checkout2(args[1], args[3]);
                 save(_repo);
             } else if (command.equals("log")) {
                 _repo = load();
