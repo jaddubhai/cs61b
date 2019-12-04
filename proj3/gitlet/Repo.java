@@ -160,12 +160,11 @@ public class Repo implements Serializable {
             Commit lastcommit = Utils.readObject(new File(".gitlet/commits/" + counter), Commit.class);
             System.out.println("===");
             System.out.println("commit "+lastcommit.gethash());
-            System.out.println(lastcommit.gettimestamp());
+            System.out.println("Date: " + lastcommit.gettimestamp());
             System.out.println(lastcommit.getlogmsg());
             System.out.println();
             counter = lastcommit.getparenthash();
         }
-        System.out.println();
     }
 }
 
