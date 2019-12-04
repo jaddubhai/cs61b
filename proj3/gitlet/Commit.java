@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class Commit implements Serializable {
 
@@ -69,14 +70,14 @@ public class Commit implements Serializable {
     /** get hashid for commit. */
     public String gethash() {
         if (_logmsg.equals("initial commit")) {
-            ArrayList<Object> shalist = new ArrayList<>();
+            List<Object> shalist = new ArrayList<>();
             shalist.add(_logmsg);
             shalist.add("buffer");
             return Utils.sha1(shalist);
         }
-        ArrayList<Object> shalist = new ArrayList<>();
+        List<Object> shalist = new ArrayList<>();
         shalist.add(_logmsg);
-        shalist.add(_filecontents);
+        shalist.add("buffer");
         shalist.add(_parenthash);
         return Utils.sha1(shalist);
     }

@@ -28,7 +28,7 @@ public class Repo implements Serializable {
         staging.mkdir();
 
         _stagefiles = new HashMap<String, Blob>();
-        _lastcommit = null;
+        _lastcommit = initcom.gethash();
 
         String hash = initcom.gethash();
         File comm = new File(".gitlet/commits/" + hash);
@@ -98,8 +98,8 @@ public class Repo implements Serializable {
         for (String filename : _stagefiles.keySet()) {
             if (!comm.getfiles().containsKey(filename)) {
                 comm.getfiles().put(filename, _stagefiles.get(filename));
-                File delstage = new File(".gitlet/staging/" + _stagefiles.get(filename));
-                Utils.restrictedDelete(delstage);
+                File delstage = new File(".gitlet/staging/" + _stagefiles.get(filename).getshacode());
+                delstage.delete();
             }
         }
 
