@@ -60,8 +60,8 @@ public class Repo implements Serializable {
                     File remove = new File(".gitlet/staging" + lastcommit.getfiles().get(name).getshacode());
                     remove.delete();
                 }
+                return;
             }
-            return;
         }
 
         File stage = new File(".gitlet/staging/" + hashfile);
