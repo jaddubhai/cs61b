@@ -16,7 +16,7 @@ public class Main {
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND> .... */
 
-    private static String[] trycommands = {"init", "add", "checkout", "commit", "rm"};
+    private static String[] trycommands = {"init", "add", "checkout", "commit", "rm", "log"};
 
     private static Repo _repo;
 
@@ -53,16 +53,20 @@ public class Main {
                                 ("EEE MMM d HH:mm:ss yyyy xxxx"));
                 _repo = load();
                 _repo.commit(operand, timestamp);
+                save(_repo);
             } else if (command.equals("checkout") && operand != null && args.length == 2) {
                 _repo = load();
                 _repo.checkout1(operand);
+                save(_repo);
             } else if (command.equals("checkout") && args.length == 3) {
                 _repo = load();
                 String operand2 = args[2];
                 _repo.checkout2(operand, operand2);
-            } else if (command == "log") {
+                save(_repo);
+            } else if (command.equals("log")) {
                 _repo = load();
                 _repo.log();
+                save(_repo);
             }
 
         } else {

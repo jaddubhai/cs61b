@@ -1,9 +1,7 @@
 package gitlet;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -77,7 +75,7 @@ public class Commit implements Serializable {
         }
         List<Object> shalist = new ArrayList<>();
         shalist.add(_logmsg);
-        shalist.add("buffer");
+        shalist.add("yeeet");
         shalist.add(_parenthash);
         return Utils.sha1(shalist);
     }
@@ -98,7 +96,12 @@ public class Commit implements Serializable {
     }
 
     /**get commit msg. */
-    public String getlogmsg(){
+    public String getlogmsg() {
         return _logmsg;
+    }
+
+    /**get parent commit hash. */
+    public String getparenthash() {
+        return _parenthash;
     }
 }

@@ -21,7 +21,7 @@ public class UnitTest {
 
     /** A dummy test to avoid complaint. */
     @Test
-    public void placeholderTest() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    public void placeholderTest() throws IOException {
         Main.main("init");
     }
 
