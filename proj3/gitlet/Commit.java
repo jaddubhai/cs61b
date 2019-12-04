@@ -45,6 +45,9 @@ public class Commit implements Serializable {
         _files = files;
 
         for (String file : _files.keySet()) {
+            if (_filecontents == null) {
+                _filecontents = new ArrayList<>();
+            }
             _filecontents.add(_files.get(file).getcontents());
         }
         _parenthash = parent;

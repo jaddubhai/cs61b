@@ -128,7 +128,7 @@ public class Repo implements Serializable {
         File checkcomm = new File(".gitlet/commits/" + commitid);
         Commit lastcommit = null;
         if (checkcomm.exists()) {
-            lastcommit = Utils.readObject(new File(".gitlet/commits/" + checkcomm), Commit.class);
+            lastcommit = Utils.readObject(checkcomm, Commit.class);
         } else {
             System.out.print("No commit with that id exists.");
             System.exit(0);
