@@ -54,9 +54,9 @@ public class Main {
                 _repo = load();
                 _repo.commit(operand, timestamp);
                 save(_repo);
-            } else if (command.equals("checkout") && operand != null && args.length == 2) {
+            } else if (command.equals("checkout") && operand != null && args.length == 3) {
                 _repo = load();
-                _repo.checkout1(operand);
+                _repo.checkout1(args[2]);
                 save(_repo);
             } else if (command.equals("checkout") && args.length == 3) {
                 _repo = load();
