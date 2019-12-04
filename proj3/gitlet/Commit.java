@@ -5,13 +5,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/** Commit class for Gitlet, the tiny stupid version-control system.
+ *  @author Varun Jadia
+ */
+
 public class Commit implements Serializable {
 
     /** timestamp of commit. */
-    public String _timestamp;
+    private String _timestamp;
 
     /** log message for commit. */
-    public String _logmsg;
+    private String _logmsg;
 
     /** repo/directory that the commit is part of. */
     private Repo _ref;
@@ -25,21 +29,22 @@ public class Commit implements Serializable {
     /** Hashmap containing tracked files. */
     private HashMap<String, String> _trackedfiles = new HashMap<>();
 
-    /** Commit parent id */
-    private String _parenthash ;
+    /** Commit parent id. */
+    private String _parenthash;
 
-    /** String contents of all blobs */
+    /** String contents of all blobs. */
     private ArrayList<String> _filecontents;
 
-
-    Commit (String msg, String time, String parent) {
+    /** commit initializer for initial commit. MSG TIME PARENT*/
+    Commit(String msg, String time, String parent) {
         _logmsg = msg;
         _timestamp = time;
         _parenthash = parent;
     }
 
-
-    Commit (String msg, String time, HashMap<String, Blob> files, String parent) {
+    /**commit initializer for other commits. MSG TIME FILES PARENT*/
+    Commit(String msg, String time,
+           HashMap<String, Blob> files, String parent) {
         _logmsg = msg;
         _timestamp = time;
         _files = files;
@@ -53,22 +58,22 @@ public class Commit implements Serializable {
         _parenthash = parent;
     }
 
-    /** set timestamp for commit. */
-    public void settimestamp(String _timestamp) {
-        this._timestamp = _timestamp;
+    /** set timestamp for commit. TIMESTAMP*/
+    public void settimestamp(String timestamp) {
+        this._timestamp = timestamp;
     }
 
-    /** get files. */
+    /** get files. RETURN*/
     public HashMap<String, Blob> getfiles() {
         return _files;
     }
 
-    /** get tracked files. */
+    /** get tracked files. RETURN*/
     public HashMap<String, String> gettrackedfiles() {
         return _trackedfiles;
     }
 
-    /** get hashid for commit. */
+    /** get hashid for commit. RETURN*/
     public String gethash() {
         if (_logmsg.equals("initial commit")) {
             List<Object> shalist = new ArrayList<>();
@@ -83,27 +88,27 @@ public class Commit implements Serializable {
         return Utils.sha1(shalist);
     }
 
-    /** set files. */
-    public void setfiles(HashMap<String, Blob> _files) {
-        this._files = _files;
+    /** set files. FILES*/
+    public void setfiles(HashMap<String, Blob> files) {
+        this._files = files;
     }
 
-    /** set tracked files. */
-    public void settrackedfiles(HashMap<String, String> _trackedfiles) {
-        this._trackedfiles = _trackedfiles;
+    /** set tracked files. TRACKEDFILES*/
+    public void settrackedfiles(HashMap<String, String> trackedfiles) {
+        this._trackedfiles = trackedfiles;
     }
 
-    /** get timestamp. */
+    /** get timestamp. RETURN. */
     public String gettimestamp() {
         return _timestamp;
     }
 
-    /**get commit msg. */
+    /**get commit msg. RETURN. */
     public String getlogmsg() {
         return _logmsg;
     }
 
-    /**get parent commit hash. */
+    /**get parent commit hash. RETURN. */
     public String getparenthash() {
         return _parenthash;
     }

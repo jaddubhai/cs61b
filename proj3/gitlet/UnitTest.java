@@ -4,8 +4,6 @@ import ucb.junit.textui;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-
 import static org.junit.Assert.*;
 
 /** The suite of all JUnit tests for the gitlet package.
