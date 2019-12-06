@@ -78,7 +78,7 @@ public class Main {
                 _repo.log();
             } else if (command.equals("rm") && args.length == 2) {
                 _repo = load();
-                _repo.rm(operand); 
+                _repo.rm(operand);
             }
         } else {
             System.out.print("No command with that name exists.");

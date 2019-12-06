@@ -56,6 +56,9 @@ public class Repo implements Serializable {
             System.exit(0);
         }
 
+        if (_rmfilenames == null) {
+            _rmfilenames = new ArrayList<>(); 
+        }
         if (_rmfilenames.contains(filename)) {
             _rmfilenames.remove(filename);
         }
