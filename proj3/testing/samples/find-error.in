@@ -1,0 +1,11 @@
+# Can't find something that's not there.
+> init
+<<<
++ wug.txt wug.txt
+> add wug.txt
+<<<
+> commit "added wug"
+<<<
+> find "version 1 of wug.txt"
+Found no commit with that message.
+<<<

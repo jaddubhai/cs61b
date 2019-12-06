@@ -1,0 +1,37 @@
+# Check out but get the id with find.
+> init
+<<<
++ wug.txt wug.txt
+> add wug.txt
+<<<
+> commit "version 1 of wug.txt"
+<<<
+# Each ${HEADER} captures its commit UID.
+D UID "[a-f0-9]+"
+D HEADER "(${UID})"
+D DATE "Date: \w\w\w \w\w\w \d+ \d\d:\d\d:\d\d \d\d\d\d [-+]\d\d\d\d"
+> find "version 1 of wug.txt"
+${HEADER}
+
+<<<*
+# UID of current version
+D UID1 "${1}"
++ wug.txt notwug.txt
+> checkout ${UID1} -- wug.txt
+<<<
+= wug.txt wug.txt
++ wug.txt notwug.txt
+> add wug.txt
+<<<
+> commit "version 1 of wug.txt"
+<<<
+= wug.txt notwug.txt
+# Each ${HEADER} captures its commit UID.
+D UID "[a-f0-9]+"
+D HEADER "(${UID})"
+D DATE "Date: \w\w\w \w\w\w \d+ \d\d:\d\d:\d\d \d\d\d\d [-+]\d\d\d\d"
+> find "version 1 of wug.txt"
+${HEADER}
+${HEADER}
+
+<<<*
