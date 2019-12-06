@@ -18,7 +18,7 @@ public class Main {
      *  <COMMAND> <OPERAND> .... */
 
     private static String[] trycommands =
-        {"init", "add", "checkout", "commit", "rm", "log"};
+        {"init", "add", "checkout", "commit", "rm", "log", "find", "status", "global-log"};
 
     /** repo for gitlet.*/
     private static Repo _repo;
@@ -70,6 +70,15 @@ public class Main {
                 _repo = load();
                 _repo.log();
                 save(_repo);
+            } else if (command.equals("find") && args.length == 2) {
+                _repo = load();
+                _repo.find(operand);
+            } else if (command.equals("global-log")) {
+                _repo = load();
+                _repo.log();
+            } else if (command.equals("rm") && args.length == 2) {
+                _repo = load();
+                _repo.rm(operand); 
             }
         } else {
             System.out.print("No command with that name exists.");
@@ -80,7 +89,6 @@ public class Main {
     /** initializes a new gitlet directory. RETURN */
     private static Repo init() {
         File directory = new File(".gitlet/");
-
         if (!directory.exists()) {
             directory.mkdirs();
             Repo newrep = new Repo();
