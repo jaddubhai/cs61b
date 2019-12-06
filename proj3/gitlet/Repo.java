@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /** Repository/Tree class for Gitlet, the tiny stupid version-control system.
@@ -21,6 +22,9 @@ public class Repo implements Serializable {
 
     /** Tracks current branch by its name. */
     private String _currbranch;
+
+    /** Tracks file to be removed in next commit. */
+    private ArrayList<String> _rmfilenames;
 
     /**initialize a new repo. RETURN*/
     public Repo init() {
@@ -50,6 +54,10 @@ public class Repo implements Serializable {
         if (!file.exists()) {
             System.out.print("File does not exist.");
             System.exit(0);
+        }
+
+        if (_rmfilenames.contains(filename)) {
+            _rmfilenames.remove(filename);
         }
 
         Blob fileblob = new Blob(filename);
@@ -99,6 +107,9 @@ public class Repo implements Serializable {
             if (_stagefiles.containsKey(filename)) {
                 comm.getfiles().remove(filename);
                 comm.getfiles().put(filename, _stagefiles.get(filename));
+            }
+            if (_rmfilenames.contains(filename)) {
+                comm.getfiles().remove(filename);
             }
         }
 
@@ -178,6 +189,86 @@ public class Repo implements Serializable {
             System.out.println();
             counter = lastcommit.getparenthash();
         }
+    }
+
+    /** rm function for gitlet. FILENAME*/
+    public void rm(String filename) {
+        Commit lastcommit = Utils.readObject(
+                new File(".gitlet/commits/" + _lastcommit), Commit.class);
+        if (!_stagefiles.containsKey(filename)
+                && !lastcommit.getfiles().containsKey(filename)) {
+            System.out.print("No reason to remove the file.");
+            System.exit(0);
+        }
+
+        File remove = new File(".gitlet/staging" + filename);
+        _stagefiles.remove(filename);
+        remove.delete();
+
+        if (lastcommit.getfiles().containsKey(filename)) {
+            if (_rmfilenames == null) {
+                _rmfilenames = new ArrayList<>();
+            }
+            _rmfilenames.add(filename);
+            File rm = new File(filename);
+            Utils.restrictedDelete(rm);
+        }
+    }
+    /** global log. */
+    public void globallog() {
+        File commitdir = new File(".gitlet/commits/");
+        for (File file : commitdir.listFiles()) {
+            Commit comm = Utils.readObject(file, Commit.class);
+            System.out.println("===");
+            System.out.println("commit " + comm.gethash());
+            System.out.println("Date: " + comm.gettimestamp());
+            System.out.println(comm.getlogmsg());
+            System.out.println();
+        }
+    }
+
+    /** find function. MSG*/
+    public void find(String msg) {
+        ArrayList<String> vals = new ArrayList<>();
+        File commitdir = new File(".gitlet/commits/");
+        for (File file : commitdir.listFiles()) {
+            Commit comm = Utils.readObject(file, Commit.class);
+            if (comm.getlogmsg().equals(msg)) {
+                System.out.println(comm.gethash());
+                vals.add(comm.gethash());
+            }
+        }
+        if (vals.isEmpty()) {
+            System.out.print("Found no commit with that message.");
+        }
+    }
+
+    /** gitlet status. */
+    public void status() {
+        System.out.println("=== Branches ===");
+        for (String branch : _branchmap.keySet()) {
+            if (branch.equals(_currbranch)) {
+                System.out.println("*"+branch);
+            } else {
+                System.out.println(branch);
+            }
+        }
+        System.out.println();
+
+        System.out.println("=== Staged Files ===");
+        for (String filename : _stagefiles.keySet()) {
+            System.out.println(filename);
+        }
+        System.out.println();
+
+        System.out.println("=== Removed Files ===");
+        for (String filename : _rmfilenames) {
+            System.out.println(filename);
+        }
+        System.out.println();
+        System.out.print("=== Modifications Not Staged For Commit ===");
+        System.out.println();
+        System.out.println("=== Untracked Files ===");
     }
 }
 
