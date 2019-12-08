@@ -38,6 +38,18 @@ public class Commit implements Serializable {
     /** String contents of all blobs. */
     private ArrayList<String> _filecontents;
 
+    /** Return parents of a commit.RETURN*/
+    public ArrayList<String> getparents() {
+        ArrayList<String> arr = new ArrayList<>();
+        if (_parenthash != null) {
+            arr.add(_parenthash);
+        }
+        if (_mergeparenthash != null) {
+            arr.add(_mergeparenthash);
+        }
+        return arr;
+    }
+
     /** commit initializer for initial commit. MSG TIME PARENT*/
     Commit(String msg, String time, String parent) {
         _logmsg = msg;

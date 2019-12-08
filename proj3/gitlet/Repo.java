@@ -2,9 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 /** Repository/Tree class for Gitlet, the tiny stupid version-control system.
  *  @author Varun Jadia
@@ -405,6 +403,8 @@ public class Repo implements Serializable {
             System.out.print("Cannot merge a branch with itself.");
             System.exit(0);
         }
+
+        
     }
 
     /**helper function for finding ancestor given two branch heads. */
@@ -412,51 +412,39 @@ public class Repo implements Serializable {
         Commit commit1 = Utils.readObject(new File(".gitlet/commits/" + branch1), Commit.class);
         Commit commit2 = Utils.readObject(new File(".gitlet/commits/" + branch2), Commit.class);
 
-//        boolean check = true;
-//
-//        for (int i = 0, j = 0, k = 0, l = 0; check;) {
-//            if (commit1.getparenthash() == null || commit2.getparenthash() == null) {
-//                return commit1.gethash();
-//            }
-//            if (!commit1.getparenthash().equals(commit2.getparenthash())) {
-//                i++;
-//                if (i < j && i < k && i < l) {
-//                    check = false;
-//                }
-//            }
-//            if (commit1.getmergeparenthash() != null && commit2.getmergeparenthash() != null) {
-//                if (commit1.getmergeparenthash().equals(commit2.getmergeparenthash())) {
-//                    j++;
-//                }
-//                if (j < i && j < k && j < l) {
-//                    check = false;
-//                }
-//            }
-//            if (commit2.getmergeparenthash() != null) {
-//                if(commit2.getmergeparenthash().equals(commit1.getparenthash())) {
-//                    k++;
-//                }
-//                if (k < i && k < l && k < j) {
-//                    check = false;
-//                }
-//            }
-//            if (commit1.getmergeparenthash() != null) {
-//                if (commit1.getmergeparenthash().equals(commit2.getparenthash())) {
-//                    l++;
-//                }
-//                if (l < i && l < k && l < j) {
-//                    check = false;
-//                }
-//            }
-//
-//        }
+        HashMap<Commit, Integer> commit1parents = BFS(commit1, 0);
+        HashMap<Commit, Integer> commit2parents = BFS(commit2, 0 );
 
-        while (!commit1.getparenthash().equals(commit2.getparenthash())) {
-            commit1 = Utils.readObject(new File(".gitlet/commits/" + commit1.getparenthash()), Commit.class);
-            commit2 = Utils.readObject(new File(".gitlet/commits/" + commit2.getparenthash()), Commit.class);
+        HashMap<Commit, Integer> commonances = new HashMap<>();
+
+        for (Commit comm : commit1parents.keySet()) {
+            if (commit2parents.containsKey(comm)) {
+                commonances.put(comm, commit1parents.get(comm));
+            }
         }
-        return commit1.getparenthash();
+
+        Map.Entry<Commit, Integer> min = Collections.min(commonances.entrySet(),
+                Comparator.comparing(Map.Entry::getValue));
+
+        return min.getKey().getparenthash();
     }
+
+    /**helper function to find all ancestors of a given commit. */
+    public HashMap<Commit, Integer> BFS(Commit commit, Integer distance) {
+        HashMap<Commit, Integer> ancestors = new HashMap<>();
+
+        if (commit == null) {
+            return ancestors;
+        }
+        if (commit.getparents() != null) {
+            for (String comm : commit.getparents()) {
+                Commit commit1 = Utils.readObject(new File(".gitlet/commits/" + comm), Commit.class);
+                ancestors.putAll(BFS(commit1, distance + 1));
+            }
+        }
+        return ancestors;
+    }
+
 }
 
 
