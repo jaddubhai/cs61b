@@ -32,6 +32,9 @@ public class Commit implements Serializable {
     /** Commit parent id. */
     private String _parenthash;
 
+    /** Commit mergeparent id. */
+    private String _mergeparenthash;
+
     /** String contents of all blobs. */
     private ArrayList<String> _filecontents;
 
@@ -111,5 +114,15 @@ public class Commit implements Serializable {
     /**get parent commit hash. RETURN. */
     public String getparenthash() {
         return _parenthash;
+    }
+
+    /**get mergeparent hash. RETURN. */
+    public String getmergeparenthash() {
+        return _mergeparenthash;
+    }
+
+    /** set mergeparent hash. RETURN. */
+    public void set_mergeparenthash(String set) {
+        _mergeparenthash = set;
     }
 }

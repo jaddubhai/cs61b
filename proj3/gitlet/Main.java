@@ -66,6 +66,10 @@ public class Main {
                 _repo = load();
                 _repo.checkout2(args[1], args[3]);
                 save(_repo);
+            } else if (command.equals("checkout") && operand != null) {
+                _repo = load();
+                _repo.checkout3(operand);
+                save(_repo);
             } else if (command.equals("log")) {
                 _repo = load();
                 _repo.log();
