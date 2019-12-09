@@ -2,6 +2,8 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /** Repository/Tree class for Gitlet, the tiny stupid version-control system.
@@ -27,6 +29,12 @@ public class Repo implements Serializable {
 
     /**Tracks all commit ids. */
     private HashSet<String> _commitids;
+
+    /**Boolean mask for merges. */
+    private Boolean _merge;
+
+    /**mergeparent SHAcode. */
+    private String _lastmerge;
 
     /**initialize a new repo. RETURN*/
     public Repo init() {
@@ -94,22 +102,25 @@ public class Repo implements Serializable {
             System.out.print("Please enter a commit message.");
             System.exit(0);
         }
-
         if (_stagefiles == null) {
             System.out.print("No changes added to the commit.");
             System.exit(0);
         }
-
         Commit lastcommit = Utils.readObject(
                 new File(".gitlet/commits/" + _lastcommit), Commit.class);
-        Commit comm = new Commit(message, time,
-                lastcommit.getfiles(), _lastcommit);
 
+        Commit comm;
+        if (_merge) {
+            comm = new Commit(message, time,
+                    lastcommit.getfiles(), _lastcommit, _lastmerge);
+        } else {
+            comm = new Commit(message, time,
+                    lastcommit.getfiles(), _lastcommit);
+        }
         if (comm.gethash().equals(_lastcommit)) {
             System.out.print("No changes added to the commit.");
             System.exit(0);
         }
-
         for (String filename : comm.getfiles().keySet()) {
             if (_stagefiles.containsKey(filename)) {
                 comm.getfiles().remove(filename);
@@ -119,7 +130,6 @@ public class Repo implements Serializable {
                 comm.getfiles().remove(filename);
             }
         }
-
         for (String filename : _stagefiles.keySet()) {
             if (!comm.getfiles().containsKey(filename)) {
                 comm.getfiles().put(filename, _stagefiles.get(filename));
@@ -137,6 +147,8 @@ public class Repo implements Serializable {
         _lastcommit = comm.gethash();
         _branchmap.put(_currbranch, commhash);
         _commitids.add(commhash);
+        _lastmerge = null;
+        _merge = false; 
     }
 
     /**java gitlet.Main checkout -- [file name]. FILENAME*/
@@ -393,22 +405,170 @@ public class Repo implements Serializable {
             System.out.print("You have uncommitted changes.");
             System.exit(0);
         }
-
         if (!_branchmap.containsKey(branchname)) {
             System.out.print("A branch with that name does not exist.");
             System.exit(0);
         }
-
         if (branchname.equals(_currbranch)) {
             System.out.print("Cannot merge a branch with itself.");
             System.exit(0);
         }
+        Commit split = ancestor(_currbranch, branchname);
+        Commit currcommit = Utils.readObject(new File(".gitlet/commits/" + _lastcommit), Commit.class);
+        Commit givencommit = Utils.readObject(new File(".gitlet/commits/" + _branchmap.get(branchname)), Commit.class);
 
-        
+        if (split.gethash().equals(givencommit.gethash())) {
+            System.out.print("Given branch is an ancestor of the current branch.");
+            System.exit(0);
+        }
+        if (split.gethash().equals(currcommit.gethash())) {
+            System.out.print("Current branch fast forwared.");
+            System.exit(0);
+        }
+        for (String filename : givencommit.getfiles().keySet()) {
+            Blob blb = givencommit.getfiles().get(filename);
+            Blob blb2 = split.getfiles().get(filename);
+            if (!blb.getshacode().equals(blb2.getshacode())) {
+                checkout2(givencommit.gethash(), filename);
+                add(filename);
+            }
+            if (!currcommit.getfiles().containsKey(filename) && !split.getfiles().containsKey(filename)) {
+                checkout1(filename);
+                add(filename);
+            }
+        }
+        for (String filename: split.getfiles().keySet()) {
+            if (!currcommit.getfiles().containsKey(filename) && !givencommit.getfiles().containsKey(filename)) {
+                File file = new File(filename);
+                if (file.exists()) {
+                    if (_rmfilenames.contains(filename)) {
+                        _rmfilenames.remove(filename);
+                    }
+                }
+            }
+            if (currcommit.getfiles().containsKey(filename) && !givencommit.getfiles().containsKey(filename)) {
+                Blob blb3 = split.getfiles().get(filename);
+                Blob blb4 = currcommit.getfiles().get(filename);
+                if (blb3.getshacode().equals(blb4.getshacode())) {
+                    rm(filename);
+                }
+            }
+        }
+        Boolean mergeconflict = mergeconflict(split, currcommit, givencommit);
+        String message = "Merged " + branchname + "into " + _currbranch;
+        String timestamp = ZonedDateTime.now().format
+                (DateTimeFormatter.ofPattern
+                        ("EEE MMM d HH:mm:ss yyyy xxxx"));
+        _merge = true;
+        _lastmerge = givencommit.gethash();
+        commit(message, timestamp);
+        if (mergeconflict) {
+            System.out.print("Encountered a merge conflict.");
+        }
+    }
+
+    /**helper function for detecting merge conflicts.*/
+    public boolean mergeconflict(Commit split, Commit currcommit, Commit givencommit) {
+        for (String filename : split.getfiles().keySet()) {
+            if (currcommit.getfiles().containsKey(filename)) {
+                if (givencommit.getfiles().containsKey(filename)) {
+                    Blob blb1 = currcommit.getfiles().get(filename);
+                    Blob blb2 = givencommit.getfiles().get(filename);
+                    if (!blb1.getshacode().equals(blb2.getshacode())) {
+                        String one = "<<<<<<< HEAD\n";
+                        String blb1con = blb1.getcontents();
+                        String two = "=======\n";
+                        String blb2con = blb2.getcontents();
+                        String three = ">>>>>>>";
+                        String total = one + blb1con + two + blb2con + three;
+                        File file = new File(filename);
+                        Utils.writeContents(file, total);
+                        return true;
+                    }
+                } else {
+                    Blob blb1 = split.getfiles().get(filename);
+                    Blob blb2 = currcommit.getfiles().get(filename);
+                    if (!blb1.getshacode().equals(blb2.getshacode())) {
+                        blb1 = currcommit.getfiles().get(filename);
+                        blb2 = null;
+                        String one = "<<<<<<< HEAD\n";
+                        String blb1con = blb1.getcontents();
+                        String two = "=======\n";
+                        String blb2con = "";
+                        String three = ">>>>>>>";
+                        String total = one + blb1con + two + blb2con + three;
+                        File file = new File(filename);
+                        Utils.writeContents(file, total);
+                        return true;
+                    }
+                }
+            } else {
+                if (givencommit.getfiles().containsKey(filename)) {
+                    Blob blb1 = split.getfiles().get(filename);
+                    Blob blb2 = givencommit.getfiles().get(filename);
+                    if (!blb1.getshacode().equals(blb2.getshacode())) {
+                        blb1 = null;
+                        blb2 = givencommit.getfiles().get(filename);
+                        String one = "<<<<<<< HEAD\n";
+                        String blb1con = "";
+                        String two = "=======\n";
+                        String blb2con = blb2.getcontents();
+                        String three = ">>>>>>>";
+                        String total = one + blb1con + two + blb2con + three;
+                        File file = new File(filename);
+                        Utils.writeContents(file, total);
+                        return true;
+                    }
+                }
+            }
+        }
+        for (String filename : currcommit.getfiles().keySet()) {
+            if (!split.getfiles().containsKey(filename)) {
+                if (givencommit.getfiles().containsKey(filename)) {
+                    Blob blb3 = currcommit.getfiles().get(filename);
+                    Blob blb4 = givencommit.getfiles().get(filename);
+                    if (!blb3.getshacode().equals(blb4.getshacode())) {
+                        blb3 = currcommit.getfiles().get(filename);
+                        blb4 = givencommit.getfiles().get(filename);
+                        String one = "<<<<<<< HEAD\n";
+                        String blb1con = blb3.getcontents();
+                        String two = "=======\n";
+                        String blb2con = blb4.getcontents();
+                        String three = ">>>>>>>";
+                        String total = one + blb1con + two + blb2con + three;
+                        File file = new File(filename);
+                        Utils.writeContents(file, total);
+                        return true;
+                    }
+                }
+            }
+        }
+        for (String filename : givencommit.getfiles().keySet()) {
+            if (!split.getfiles().containsKey(filename)) {
+                if (currcommit.getfiles().containsKey(filename)) {
+                    Blob blb3 = currcommit.getfiles().get(filename);
+                    Blob blb4 = givencommit.getfiles().get(filename);
+                    if (!blb3.getshacode().equals(blb4.getshacode())) {
+                        blb3 = currcommit.getfiles().get(filename);
+                        blb4 = givencommit.getfiles().get(filename);
+                        String one = "<<<<<<< HEAD\n";
+                        String blb1con = blb3.getcontents();
+                        String two = "=======\n";
+                        String blb2con = blb4.getcontents();
+                        String three = ">>>>>>>";
+                        String total = one + blb1con + two + blb2con + three;
+                        File file = new File(filename);
+                        Utils.writeContents(file, total);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**helper function for finding ancestor given two branch heads. */
-    public String ancestor(String branch1, String branch2) {
+    private Commit ancestor(String branch1, String branch2) {
         Commit commit1 = Utils.readObject(new File(".gitlet/commits/" + branch1), Commit.class);
         Commit commit2 = Utils.readObject(new File(".gitlet/commits/" + branch2), Commit.class);
 
@@ -426,11 +586,11 @@ public class Repo implements Serializable {
         Map.Entry<Commit, Integer> min = Collections.min(commonances.entrySet(),
                 Comparator.comparing(Map.Entry::getValue));
 
-        return min.getKey().getparenthash();
+        return min.getKey();
     }
 
     /**helper function to find all ancestors of a given commit. */
-    public HashMap<Commit, Integer> BFS(Commit commit, Integer distance) {
+    private HashMap<Commit, Integer> BFS(Commit commit, Integer distance) {
         HashMap<Commit, Integer> ancestors = new HashMap<>();
 
         if (commit == null) {

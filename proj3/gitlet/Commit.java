@@ -73,6 +73,23 @@ public class Commit implements Serializable {
         _parenthash = parent;
     }
 
+    /** commit initializer for merges. */
+    Commit(String msg, String time,
+           HashMap<String, Blob> files, String parent, String mergeparent) {
+        _logmsg = msg;
+        _timestamp = time;
+        _files = files;
+
+        for (String file : _files.keySet()) {
+            if (_filecontents == null) {
+                _filecontents = new ArrayList<>();
+            }
+            _filecontents.add(_files.get(file).getcontents());
+        }
+        _parenthash = parent;
+        _mergeparenthash = mergeparent;
+    }
+
     /** set timestamp for commit. TIMESTAMP*/
     public void settimestamp(String timestamp) {
         this._timestamp = timestamp;
