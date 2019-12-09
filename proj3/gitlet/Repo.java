@@ -110,7 +110,7 @@ public class Repo implements Serializable {
                 new File(".gitlet/commits/" + _lastcommit), Commit.class);
 
         Commit comm;
-        if (_merge) {
+        if (_merge != null) {
             comm = new Commit(message, time,
                     lastcommit.getfiles(), _lastcommit, _lastmerge);
         } else {
