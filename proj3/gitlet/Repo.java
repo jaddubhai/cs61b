@@ -148,7 +148,7 @@ public class Repo implements Serializable {
         _branchmap.put(_currbranch, commhash);
         _commitids.add(commhash);
         _lastmerge = null;
-        _merge = false; 
+        _merge = false;
     }
 
     /**java gitlet.Main checkout -- [file name]. FILENAME*/
@@ -245,6 +245,11 @@ public class Repo implements Serializable {
                     new File(".gitlet/commits/" + counter), Commit.class);
             System.out.println("===");
             System.out.println("commit " + lastcommit.gethash());
+            if (lastcommit.getmergeparenthash() != null) {
+                String currhash = lastcommit.gethash().substring(0, 8);
+                String mergehash = lastcommit.gethash().substring(0, 8);
+                System.out.print("Merge: " + currhash + mergehash);
+            }
             System.out.println("Date: " + lastcommit.gettimestamp());
             System.out.println(lastcommit.getlogmsg());
             System.out.println();
@@ -422,7 +427,7 @@ public class Repo implements Serializable {
             System.exit(0);
         }
         if (split.gethash().equals(currcommit.gethash())) {
-            System.out.print("Current branch fast forwared.");
+            System.out.print("Current branch fast forwarded.");
             System.exit(0);
         }
         for (String filename : givencommit.getfiles().keySet()) {
