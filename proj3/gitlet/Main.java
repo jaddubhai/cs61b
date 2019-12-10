@@ -18,7 +18,8 @@ public class Main {
      *  <COMMAND> <OPERAND> .... */
 
     private static String[] trycommands =
-        {"init", "add", "checkout", "commit", "rm", "log", "find", "status", "global-log", "merge", "branch"};
+        {"init", "add", "checkout", "commit", "rm", "log",
+                "find", "status", "global-log", "merge", "branch", "rm-branch"};
 
     /** repo for gitlet.*/
     private static Repo _repo;
@@ -97,6 +98,10 @@ public class Main {
             } else if (command.equals("branch")) {
                 _repo = load();
                 _repo.branch(operand);
+                save(_repo);
+            } else if (command.equals("rm-branch")) {
+                _repo = load();
+                _repo.rmbranch(operand);
                 save(_repo);
             }
         } else {
