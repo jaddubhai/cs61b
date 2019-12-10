@@ -416,7 +416,7 @@ public class Repo implements Serializable {
 
     /**merge function for gitlet.BRANCHNAME.*/
     public void merge(String branchname) {
-        if (!_stagefiles.isEmpty() && !_rmfilenames.isEmpty()) {
+        if (!_stagefiles.isEmpty() || !_rmfilenames.isEmpty()) {
             System.out.print("You have uncommitted changes.");
             System.exit(0);
         }
