@@ -37,6 +37,7 @@ I  prelude1.inc
 * g.txt
 > merge C1
 <<<
+> status
 = f.txt wug.txt
 = h.txt wug.txt
 * g.txt
