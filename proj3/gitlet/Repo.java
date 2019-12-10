@@ -428,7 +428,7 @@ public class Repo implements Serializable {
             System.out.print("Cannot merge a branch with itself.");
             System.exit(0);
         }
-        Commit split = ancestor(_currbranch, branchname);
+        Commit split = ancestor(_lastcommit, _branchmap.get(branchname));
         Commit currcommit = Utils.readObject(new
                 File(".gitlet/commits/" + _lastcommit), Commit.class);
         Commit givencommit = Utils.readObject(new
@@ -590,38 +590,38 @@ public class Repo implements Serializable {
         Commit commit2 = Utils.readObject(new
                 File(".gitlet/commits/" + branch2), Commit.class);
 
-        HashMap<Commit, Integer> commit1parents = bfs(commit1, 0);
-        HashMap<Commit, Integer> commit2parents = bfs(commit2, 0);
+        HashMap<String, Integer> commit1parents = bfs(commit1, 0);
+        HashMap<String, Integer> commit2parents = bfs(commit2, 0);
 
-        HashMap<Commit, Integer> commonances = new HashMap<>();
+        HashMap<String, Integer> commonances = new HashMap<>();
 
-        for (Commit comm : commit1parents.keySet()) {
+        for (String comm : commit1parents.keySet()) {
             if (commit2parents.containsKey(comm)) {
                 commonances.put(comm, commit1parents.get(comm));
             }
         }
 
-        Map.Entry<Commit, Integer> min = Collections.min(commonances.entrySet(),
+        Map.Entry<String, Integer> min = Collections.min(commonances.entrySet(),
                 Comparator.comparing(Map.Entry::getValue));
-
-        return min.getKey();
+        Commit retcomm = Utils.readObject(new
+                File(".gitlet/commits/" + min.getKey()), Commit.class);
+        return retcomm;
     }
 
     /**helper function to find all ancestors of a given commit.
      * DISTANCE.COMMIT.RETURN. */
-    private HashMap<Commit, Integer> bfs(Commit commit, Integer distance) {
-        HashMap<Commit, Integer> ancestors = new HashMap<>();
+    private HashMap<String, Integer> bfs(Commit commit, Integer distance) {
+        HashMap<String, Integer> ancestors = new HashMap<>();
 
         if (commit == null) {
             return ancestors;
         }
+        ancestors.put(commit.gethash(), distance);
         if (commit.getparents() != null) {
             for (String comm : commit.getparents()) {
                 Commit commit1 = Utils.readObject(new
                         File(".gitlet/commits/" + comm), Commit.class);
-                if (!ancestors.containsKey(commit1)) {
-                    ancestors.putAll(bfs(commit1, distance + 1));
-                }
+                ancestors.putAll(bfs(commit1, distance + 1));
             }
         }
         return ancestors;
