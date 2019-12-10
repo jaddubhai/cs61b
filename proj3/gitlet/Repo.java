@@ -443,12 +443,14 @@ public class Repo implements Serializable {
             System.exit(0);
         }
         for (String filename : givencommit.getfiles().keySet()) {
-            Blob blb = givencommit.getfiles().get(filename);
-            Blob blb2 = split.getfiles().get(filename);
-            if (blb != null && blb2 != null) {
-                if (!blb.getshacode().equals(blb2.getshacode())) {
-                    checkout2(givencommit.gethash(), filename);
-                    add(filename);
+            if (split.getfiles().containsKey(filename)) {
+                Blob blb = givencommit.getfiles().get(filename);
+                Blob blb2 = split.getfiles().get(filename);
+                if (blb != null && blb2 != null) {
+                    if (!blb.getshacode().equals(blb2.getshacode())) {
+                        checkout2(givencommit.gethash(), filename);
+                        add(filename);
+                    }
                 }
             }
             if (!currcommit.getfiles().containsKey(filename)
