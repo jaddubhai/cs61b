@@ -445,7 +445,7 @@ public class Repo implements Serializable {
         for (String filename : givencommit.getfiles().keySet()) {
             Blob blb = givencommit.getfiles().get(filename);
             Blob blb2 = split.getfiles().get(filename);
-            if (!blb.getshacode().equals(blb2.getshacode())) {
+            if (blb != null && blb2 != null && !blb.getshacode().equals(blb2.getshacode())) {
                 checkout2(givencommit.gethash(), filename);
                 add(filename);
             }
