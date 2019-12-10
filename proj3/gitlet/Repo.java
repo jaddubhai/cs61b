@@ -455,7 +455,7 @@ public class Repo implements Serializable {
             }
             if (!currcommit.getfiles().containsKey(filename)
                     && !split.getfiles().containsKey(filename)) {
-                checkout1(filename);
+                checkout2(givencommit.gethash(), filename);
                 add(filename);
             }
         }
