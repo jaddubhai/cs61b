@@ -18,7 +18,7 @@ public class Main {
      *  <COMMAND> <OPERAND> .... */
 
     private static String[] trycommands =
-        {"init", "add", "checkout", "commit", "rm", "log", "find", "status", "global-log", "merge"};
+        {"init", "add", "checkout", "commit", "rm", "log", "find", "status", "global-log", "merge", "branch"};
 
     /** repo for gitlet.*/
     private static Repo _repo;
@@ -62,11 +62,11 @@ public class Main {
                 _repo = load();
                 _repo.checkout1(args[2]);
                 save(_repo);
-            } else if (command.equals("checkout") && args.length == 4) {
+            } else if (command.equals("checkout") && args.length == 4 && args[2].equals("--")) {
                 _repo = load();
                 _repo.checkout2(args[1], args[3]);
                 save(_repo);
-            } else if (command.equals("checkout") && operand != null) {
+            } else if (command.equals("checkout") && operand != null && args.length == 2 ) {
                 _repo = load();
                 _repo.checkout3(operand);
                 save(_repo);
@@ -89,6 +89,14 @@ public class Main {
             } else if (command.equals("merge") && args.length == 2) {
                 _repo = load();
                 _repo.merge(operand);
+                save(_repo);
+            } else if (command.equals("status")) {
+                _repo = load();
+                _repo.status();
+                save(_repo);
+            } else if (command.equals("branch")) {
+                _repo = load();
+                _repo.branch(operand);
                 save(_repo);
             }
         } else {
@@ -118,6 +126,9 @@ public class Main {
         Repo repo = null;
         if (file.exists()) {
             repo = Utils.readObject(file, Repo.class);
+        } else {
+            System.out.print("Not in an initialized Gitlet directory.");
+            System.exit(0);
         }
         return repo;
     }

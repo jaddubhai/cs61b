@@ -31,7 +31,7 @@ public class Repo implements Serializable {
     private HashSet<String> _commitids;
 
     /**Boolean mask for merges. */
-    private Boolean _merge;
+    private Boolean _merge = false;
 
     /**mergeparent SHAcode. */
     private String _lastmerge;
@@ -102,7 +102,7 @@ public class Repo implements Serializable {
             System.out.print("Please enter a commit message.");
             System.exit(0);
         }
-        if (_stagefiles == null) {
+        if (_stagefiles.isEmpty() && _rmfilenames.isEmpty()) {
             System.out.print("No changes added to the commit.");
             System.exit(0);
         }
@@ -110,7 +110,7 @@ public class Repo implements Serializable {
                 new File(".gitlet/commits/" + _lastcommit), Commit.class);
 
         Commit comm;
-        if (_merge != null) {
+        if (_merge == true) {
             comm = new Commit(message, time,
                     lastcommit.getfiles(), _lastcommit, _lastmerge);
         } else {
@@ -121,15 +121,15 @@ public class Repo implements Serializable {
             System.out.print("No changes added to the commit.");
             System.exit(0);
         }
+
+
         for (String filename : comm.getfiles().keySet()) {
             if (_stagefiles.containsKey(filename)) {
                 comm.getfiles().remove(filename);
                 comm.getfiles().put(filename, _stagefiles.get(filename));
             }
-            if (_rmfilenames.contains(filename)) {
-                comm.getfiles().remove(filename);
-            }
         }
+        comm.getfiles().keySet().removeAll(_rmfilenames);
         for (String filename : _stagefiles.keySet()) {
             if (!comm.getfiles().containsKey(filename)) {
                 comm.getfiles().put(filename, _stagefiles.get(filename));
@@ -148,6 +148,7 @@ public class Repo implements Serializable {
         _branchmap.put(_currbranch, commhash);
         _commitids.add(commhash);
         _lastmerge = null;
+        _rmfilenames.clear();
         _merge = false;
     }
 
@@ -333,6 +334,7 @@ public class Repo implements Serializable {
         }
         System.out.println();
         System.out.print("=== Modifications Not Staged For Commit ===");
+        System.out.println();
         System.out.println();
         System.out.println("=== Untracked Files ===");
     }
@@ -604,7 +606,9 @@ public class Repo implements Serializable {
         if (commit.getparents() != null) {
             for (String comm : commit.getparents()) {
                 Commit commit1 = Utils.readObject(new File(".gitlet/commits/" + comm), Commit.class);
-                ancestors.putAll(BFS(commit1, distance + 1));
+                if (!ancestors.containsKey(commit1)) {
+                    ancestors.putAll(BFS(commit1, distance + 1));
+                }
             }
         }
         return ancestors;
