@@ -486,7 +486,7 @@ public class Repo implements Serializable {
     public void mergehelper(Commit split, Commit currcommit,
                             Commit givencommit, String branchname) {
         Boolean mergeconflict = mergeconflict(split, currcommit, givencommit);
-        String message = "Merged " + branchname + "into " + _currbranch;
+        String message = "Merged " + branchname + " into " + _currbranch;
         String timestamp = ZonedDateTime.now().format
                 (DateTimeFormatter.ofPattern
                         ("EEE MMM d HH:mm:ss yyyy xxxx"));
