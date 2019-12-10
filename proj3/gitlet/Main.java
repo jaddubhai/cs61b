@@ -63,11 +63,13 @@ public class Main {
                 _repo = load();
                 _repo.checkout1(args[2]);
                 save(_repo);
-            } else if (command.equals("checkout") && args.length == 4 && args[2].equals("--")) {
+            } else if (command.equals("checkout") && args.length == 4
+                    && args[2].equals("--")) {
                 _repo = load();
                 _repo.checkout2(args[1], args[3]);
                 save(_repo);
-            } else if (command.equals("checkout") && operand != null && args.length == 2 ) {
+            } else if (command.equals("checkout")
+                    && operand != null && args.length == 2) {
                 _repo = load();
                 _repo.checkout3(operand);
                 save(_repo);

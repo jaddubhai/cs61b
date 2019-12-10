@@ -38,7 +38,7 @@ public class Commit implements Serializable {
     /** String contents of all blobs. */
     private ArrayList<String> _filecontents;
 
-    /** Return parents of a commit.RETURN*/
+    /** Return parents of a commit.RETURN.*/
     public ArrayList<String> getparents() {
         ArrayList<String> arr = new ArrayList<>();
         if (_parenthash != null) {
@@ -73,7 +73,7 @@ public class Commit implements Serializable {
         _parenthash = parent;
     }
 
-    /** commit initializer for merges. */
+    /** commit initializer for merges.MSG.TIME.FILES.PARENT.MERGEPARENT. */
     Commit(String msg, String time,
            HashMap<String, Blob> files, String parent, String mergeparent) {
         _logmsg = msg;
@@ -150,8 +150,8 @@ public class Commit implements Serializable {
         return _mergeparenthash;
     }
 
-    /** set mergeparent hash. RETURN. */
-    public void set_mergeparenthash(String set) {
+    /** set mergeparent hash. RETURN.SET. */
+    public void setmergeparenthash(String set) {
         _mergeparenthash = set;
     }
 }

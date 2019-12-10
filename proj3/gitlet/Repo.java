@@ -4,7 +4,12 @@ import java.io.File;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 /** Repository/Tree class for Gitlet, the tiny stupid version-control system.
  *  @author Varun Jadia
@@ -110,7 +115,7 @@ public class Repo implements Serializable {
                 new File(".gitlet/commits/" + _lastcommit), Commit.class);
 
         Commit comm;
-        if (_merge == true) {
+        if (_merge) {
             comm = new Commit(message, time,
                     lastcommit.getfiles(), _lastcommit, _lastmerge);
         } else {
@@ -202,7 +207,8 @@ public class Repo implements Serializable {
                 new File(".gitlet/commits/" + _lastcommit), Commit.class);
 
         Commit lastcommit = Utils.readObject(
-                new File(".gitlet/commits/" + _branchmap.get(branchname)), Commit.class);
+                new File(".gitlet/commits/"
+                        + _branchmap.get(branchname)), Commit.class);
 
         HashMap<String, Blob> commfiles = lastcommit.getfiles();
         HashMap<String, Blob> currheadfiles = currhead.getfiles();
@@ -210,7 +216,8 @@ public class Repo implements Serializable {
         for (String file : commfiles.keySet()) {
             File plstage = new File(file);
             if (!currheadfiles.containsKey(file) && plstage.exists()) {
-                System.out.print("There is an untracked file in the way; delete it or add it first.");
+                System.out.print("There is an untracked "
+                        + "file in the way; delete it or add it first.");
                 System.exit(0);
             }
         }
@@ -232,7 +239,8 @@ public class Repo implements Serializable {
         _lastcommit = _branchmap.get(_currbranch);
 
         for (String filename : _stagefiles.keySet()) {
-            File delstage = new File(".gitlet/staging/" + _stagefiles.get(filename).getshacode());
+            File delstage = new File(".gitlet/staging/"
+                    + _stagefiles.get(filename).getshacode());
             delstage.delete();
         }
         _stagefiles.clear();
@@ -339,7 +347,7 @@ public class Repo implements Serializable {
         System.out.println("=== Untracked Files ===");
     }
 
-    /** creates a new branch on the commit tree.BRANCHNAME */
+    /** creates a new branch on the commit tree.BRANCHNAME. */
     public void branch(String branchname) {
         if (_branchmap.containsKey(branchname)) {
             System.out.print("A branch with that name already exists.");
@@ -348,7 +356,7 @@ public class Repo implements Serializable {
         _branchmap.put(branchname, _lastcommit);
     }
 
-    /** rm-branch.BRANCHNAME*/
+    /** rm-branch.BRANCHNAME.*/
     public void rmbranch(String branchname) {
         if (!_branchmap.containsKey(branchname)) {
             System.out.print("A branch with that name does not exist.");
@@ -361,7 +369,7 @@ public class Repo implements Serializable {
         _branchmap.remove(branchname);
     }
 
-    /** reset.COMMITID*/
+    /** reset.COMMITID.*/
     public void reset(String commitid) {
         if (!_commitids.contains(commitid)) {
             System.out.print("No commit with that id exists.");
@@ -406,7 +414,7 @@ public class Repo implements Serializable {
         _stagefiles.clear();
     }
 
-    /**merge function for gitlet.BRANCHNAME*/
+    /**merge function for gitlet.BRANCHNAME.*/
     public void merge(String branchname) {
         if (!_stagefiles.isEmpty() && !_rmfilenames.isEmpty()) {
             System.out.print("You have uncommitted changes.");
@@ -421,11 +429,13 @@ public class Repo implements Serializable {
             System.exit(0);
         }
         Commit split = ancestor(_currbranch, branchname);
-        Commit currcommit = Utils.readObject(new File(".gitlet/commits/" + _lastcommit), Commit.class);
-        Commit givencommit = Utils.readObject(new File(".gitlet/commits/" + _branchmap.get(branchname)), Commit.class);
-
+        Commit currcommit = Utils.readObject(new
+                File(".gitlet/commits/" + _lastcommit), Commit.class);
+        Commit givencommit = Utils.readObject(new
+                File(".gitlet/commits/" + _branchmap.get(branchname)), Commit.class);
         if (split.gethash().equals(givencommit.gethash())) {
-            System.out.print("Given branch is an ancestor of the current branch.");
+            System.out.print("Given branch"
+                    + " is an ancestor of the current branch.");
             System.exit(0);
         }
         if (split.gethash().equals(currcommit.gethash())) {
@@ -439,13 +449,15 @@ public class Repo implements Serializable {
                 checkout2(givencommit.gethash(), filename);
                 add(filename);
             }
-            if (!currcommit.getfiles().containsKey(filename) && !split.getfiles().containsKey(filename)) {
+            if (!currcommit.getfiles().containsKey(filename)
+                    && !split.getfiles().containsKey(filename)) {
                 checkout1(filename);
                 add(filename);
             }
         }
         for (String filename: split.getfiles().keySet()) {
-            if (!currcommit.getfiles().containsKey(filename) && !givencommit.getfiles().containsKey(filename)) {
+            if (!currcommit.getfiles().containsKey(filename)
+                    && !givencommit.getfiles().containsKey(filename)) {
                 File file = new File(filename);
                 if (file.exists()) {
                     if (_rmfilenames.contains(filename)) {
@@ -453,7 +465,8 @@ public class Repo implements Serializable {
                     }
                 }
             }
-            if (currcommit.getfiles().containsKey(filename) && !givencommit.getfiles().containsKey(filename)) {
+            if (currcommit.getfiles().containsKey(filename)
+                    && !givencommit.getfiles().containsKey(filename)) {
                 Blob blb3 = split.getfiles().get(filename);
                 Blob blb4 = currcommit.getfiles().get(filename);
                 if (blb3.getshacode().equals(blb4.getshacode())) {
@@ -461,6 +474,13 @@ public class Repo implements Serializable {
                 }
             }
         }
+        mergehelper(split, currcommit, givencommit, branchname);
+    }
+
+    /**helper function for merge.
+     * SPLIT. CURRCOMMIT. GIVENCOMMIT. BRANCHNAME.*/
+    public void mergehelper(Commit split, Commit currcommit,
+                            Commit givencommit, String branchname) {
         Boolean mergeconflict = mergeconflict(split, currcommit, givencommit);
         String message = "Merged " + branchname + "into " + _currbranch;
         String timestamp = ZonedDateTime.now().format
@@ -474,22 +494,17 @@ public class Repo implements Serializable {
         }
     }
 
-    /**helper function for detecting merge conflicts.*/
-    public boolean mergeconflict(Commit split, Commit currcommit, Commit givencommit) {
+    /**helper function for detecting merge conflicts.
+     * GIVENCOMMIT.CURRCOMMIT.SPLIT.RETURN.*/
+    public boolean mergeconflict(Commit split,
+                                 Commit currcommit, Commit givencommit) {
         for (String filename : split.getfiles().keySet()) {
             if (currcommit.getfiles().containsKey(filename)) {
                 if (givencommit.getfiles().containsKey(filename)) {
                     Blob blb1 = currcommit.getfiles().get(filename);
                     Blob blb2 = givencommit.getfiles().get(filename);
                     if (!blb1.getshacode().equals(blb2.getshacode())) {
-                        String one = "<<<<<<< HEAD\n";
-                        String blb1con = blb1.getcontents();
-                        String two = "=======\n";
-                        String blb2con = blb2.getcontents();
-                        String three = ">>>>>>>";
-                        String total = one + blb1con + two + blb2con + three;
-                        File file = new File(filename);
-                        Utils.writeContents(file, total);
+                        replacecon(filename, blb1, blb2);
                         return true;
                     }
                 } else {
@@ -498,14 +513,7 @@ public class Repo implements Serializable {
                     if (!blb1.getshacode().equals(blb2.getshacode())) {
                         blb1 = currcommit.getfiles().get(filename);
                         blb2 = null;
-                        String one = "<<<<<<< HEAD\n";
-                        String blb1con = blb1.getcontents();
-                        String two = "=======\n";
-                        String blb2con = "";
-                        String three = ">>>>>>>";
-                        String total = one + blb1con + two + blb2con + three;
-                        File file = new File(filename);
-                        Utils.writeContents(file, total);
+                        replacecon(filename, blb1, blb2);
                         return true;
                     }
                 }
@@ -515,15 +523,7 @@ public class Repo implements Serializable {
                     Blob blb2 = givencommit.getfiles().get(filename);
                     if (!blb1.getshacode().equals(blb2.getshacode())) {
                         blb1 = null;
-                        blb2 = givencommit.getfiles().get(filename);
-                        String one = "<<<<<<< HEAD\n";
-                        String blb1con = "";
-                        String two = "=======\n";
-                        String blb2con = blb2.getcontents();
-                        String three = ">>>>>>>";
-                        String total = one + blb1con + two + blb2con + three;
-                        File file = new File(filename);
-                        Utils.writeContents(file, total);
+                        replacecon(filename, blb1, blb2);
                         return true;
                     }
                 }
@@ -535,16 +535,7 @@ public class Repo implements Serializable {
                     Blob blb3 = currcommit.getfiles().get(filename);
                     Blob blb4 = givencommit.getfiles().get(filename);
                     if (!blb3.getshacode().equals(blb4.getshacode())) {
-                        blb3 = currcommit.getfiles().get(filename);
-                        blb4 = givencommit.getfiles().get(filename);
-                        String one = "<<<<<<< HEAD\n";
-                        String blb1con = blb3.getcontents();
-                        String two = "=======\n";
-                        String blb2con = blb4.getcontents();
-                        String three = ">>>>>>>";
-                        String total = one + blb1con + two + blb2con + three;
-                        File file = new File(filename);
-                        Utils.writeContents(file, total);
+                        replacecon(filename, blb3, blb4);
                         return true;
                     }
                 }
@@ -556,16 +547,7 @@ public class Repo implements Serializable {
                     Blob blb3 = currcommit.getfiles().get(filename);
                     Blob blb4 = givencommit.getfiles().get(filename);
                     if (!blb3.getshacode().equals(blb4.getshacode())) {
-                        blb3 = currcommit.getfiles().get(filename);
-                        blb4 = givencommit.getfiles().get(filename);
-                        String one = "<<<<<<< HEAD\n";
-                        String blb1con = blb3.getcontents();
-                        String two = "=======\n";
-                        String blb2con = blb4.getcontents();
-                        String three = ">>>>>>>";
-                        String total = one + blb1con + two + blb2con + three;
-                        File file = new File(filename);
-                        Utils.writeContents(file, total);
+                        replacecon(filename, blb3, blb4);
                         return true;
                     }
                 }
@@ -574,13 +556,42 @@ public class Repo implements Serializable {
         return false;
     }
 
-    /**helper function for finding ancestor given two branch heads. */
-    private Commit ancestor(String branch1, String branch2) {
-        Commit commit1 = Utils.readObject(new File(".gitlet/commits/" + branch1), Commit.class);
-        Commit commit2 = Utils.readObject(new File(".gitlet/commits/" + branch2), Commit.class);
+    /** helper function to replace contents.
+     * BLB1.BLB2.FILENAME.*/
+    private void replacecon(String filename, Blob blb1, Blob blb2) {
+        String one = "<<<<<<< HEAD\n";
+        String two = "=======\n";
+        String three = ">>>>>>>";
+        String blb1con;
 
-        HashMap<Commit, Integer> commit1parents = BFS(commit1, 0);
-        HashMap<Commit, Integer> commit2parents = BFS(commit2, 0 );
+        if (blb1 == null) {
+            blb1con = "";
+        } else {
+            blb1con = blb1.getcontents();
+        }
+
+        String blb2con;
+        if (blb2 == null) {
+            blb2con = "";
+        } else {
+            blb2con = blb2.getcontents();
+        }
+
+        String total = one + blb1con + two + blb2con + three;
+        File file = new File(filename);
+        Utils.writeContents(file, total);
+    }
+
+    /**helper function for finding ancestor given two branch heads.
+     * BRANCH1.BRANCH2.RETURN */
+    private Commit ancestor(String branch1, String branch2) {
+        Commit commit1 = Utils.readObject(new
+                File(".gitlet/commits/" + branch1), Commit.class);
+        Commit commit2 = Utils.readObject(new
+                File(".gitlet/commits/" + branch2), Commit.class);
+
+        HashMap<Commit, Integer> commit1parents = bfs(commit1, 0);
+        HashMap<Commit, Integer> commit2parents = bfs(commit2, 0);
 
         HashMap<Commit, Integer> commonances = new HashMap<>();
 
@@ -596,8 +607,9 @@ public class Repo implements Serializable {
         return min.getKey();
     }
 
-    /**helper function to find all ancestors of a given commit. */
-    private HashMap<Commit, Integer> BFS(Commit commit, Integer distance) {
+    /**helper function to find all ancestors of a given commit.
+     * DISTANCE.COMMIT.RETURN. */
+    private HashMap<Commit, Integer> bfs(Commit commit, Integer distance) {
         HashMap<Commit, Integer> ancestors = new HashMap<>();
 
         if (commit == null) {
@@ -605,9 +617,10 @@ public class Repo implements Serializable {
         }
         if (commit.getparents() != null) {
             for (String comm : commit.getparents()) {
-                Commit commit1 = Utils.readObject(new File(".gitlet/commits/" + comm), Commit.class);
+                Commit commit1 = Utils.readObject(new
+                        File(".gitlet/commits/" + comm), Commit.class);
                 if (!ancestors.containsKey(commit1)) {
-                    ancestors.putAll(BFS(commit1, distance + 1));
+                    ancestors.putAll(bfs(commit1, distance + 1));
                 }
             }
         }
