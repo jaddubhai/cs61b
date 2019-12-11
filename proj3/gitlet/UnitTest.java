@@ -22,6 +22,11 @@ public class UnitTest {
     public void placeholderTest() throws IOException {
         return;
     }
+    
+    @Test
+    public void dummy() {
+        return;
+    }
 
 }
 
