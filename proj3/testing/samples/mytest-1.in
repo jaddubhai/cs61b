@@ -6,5 +6,5 @@
 <<<
 > rm sumimasen.txt
 <<<
-# checks if sumimasen is deleted
-* sumimasen.txt
+# checks if sumimasen is still present
+= sumimasen.txt wug.txt
