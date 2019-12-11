@@ -118,9 +118,6 @@ public class Main {
         Repo repo = null;
         if (file.exists()) {
             repo = Utils.readObject(file, Repo.class);
-        } else {
-            System.out.print("Not in an initialized Gitlet directory.");
-            System.exit(0);
         }
         return repo;
     }
