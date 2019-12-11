@@ -21,4 +21,3 @@ Given branch is an ancestor of the current branch.
 > merge master
 Current branch fast-forwarded.
 <<<
-* f.txt

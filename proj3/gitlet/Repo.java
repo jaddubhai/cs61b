@@ -620,9 +620,10 @@ public class Repo implements Serializable {
             blb2con = blb2.getcontents();
         }
 
-        String total = one + blb1con + two + blb2con + three;
+        String total = one + blb1con + two + blb2con + three + "\n";
         File file = new File(filename);
         Utils.writeContents(file, total);
+        add(filename);
     }
 
     /**helper function for finding ancestor given two branch heads.
