@@ -1,32 +1,32 @@
- 1. # Test the find command when it finds commits that are no longer
- 2. # on any branch.
- 3. I setup2.inc
- 4. > rm f.txt
- 5. <<<
- 6. > commit "Remove one file"
- 7. <<<
- 8. > log
- 9. ===
-10. ${COMMIT_HEAD}
-11. Remove one file
-12.
-13. ===
-14. ${COMMIT_HEAD}
-15. Two files
-16.
-17. ===
-18. ${COMMIT_HEAD}
-19. initial commit
-20.
-21. <<<*
-22. # UID of initial version
-23. D UID1 "${3}"
-24. # UID of second version
-25. D UID2 "${2}"
-26. # UID of third version
-27. D UID3 "${1}"
-28. > reset ${2}
-29. <<<
-30. > find "Remove one file"
-31. ${UID3}
-32. <<<
+# Test the find command when it finds commits that are no longer
+# on any branch.
+I setup2.inc
+> rm f.txt
+<<<
+> commit "Remove one file"
+<<<
+> log
+===
+${COMMIT_HEAD}
+Remove one file
+
+===
+${COMMIT_HEAD}
+Two files
+
+===
+${COMMIT_HEAD}
+initial commit
+
+<<<*
+# UID of initial version
+D UID1 "${3}"
+# UID of second version
+D UID2 "${2}"
+# UID of third version
+D UID3 "${1}"
+> reset ${2}
+<<<
+> find "Remove one file"
+${UID3}
+<<<
