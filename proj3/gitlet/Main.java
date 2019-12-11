@@ -28,7 +28,7 @@ public class Main {
         try {
             switch (command) {
             case "init":
-                init();
+                _repo = init();
                 break;
             case "add":
                 _repo.add(args[1]);
@@ -114,7 +114,7 @@ public class Main {
     /** helper for loading an initialized
      * gitlet directory if it already exists. RETURN*/
     private static Repo load() {
-        File file = new File(".gitlet/repo");
+        File file = new File(".gitlet" + File.separator + "repo");
         Repo repo = null;
         if (file.exists()) {
             repo = Utils.readObject(file, Repo.class);
