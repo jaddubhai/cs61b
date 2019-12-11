@@ -433,6 +433,7 @@ public class Repo implements Serializable {
                 File(".gitlet/commits/" + _lastcommit), Commit.class);
         Commit givencommit = Utils.readObject(new
                 File(".gitlet/commits/" + _branchmap.get(branchname)), Commit.class);
+
         if (split.gethash().equals(givencommit.gethash())) {
             System.out.print("Given branch"
                     + " is an ancestor of the current branch.");
@@ -441,6 +442,14 @@ public class Repo implements Serializable {
         if (split.gethash().equals(currcommit.gethash())) {
             System.out.print("Current branch fast forwarded.");
             System.exit(0);
+        }
+        for (String file : givencommit.getfiles().keySet()) {
+            File plstage = new File(file);
+            if (!currcommit.getfiles().containsKey(file) && plstage.exists()) {
+                System.out.print("There is an untracked file "
+                        + "in the way; delete it or add it first.");
+                System.exit(0);
+            }
         }
         for (String filename : givencommit.getfiles().keySet()) {
             if (split.getfiles().containsKey(filename)) {
