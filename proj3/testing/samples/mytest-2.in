@@ -3,6 +3,6 @@
 <<<
 > branch other
 <<<
-> rm branch
+> rm-branch other
 <<<
 I blank-status.inc

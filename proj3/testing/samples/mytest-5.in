@@ -7,10 +7,11 @@
 > commit "added a file"
 <<<
 + morefiles.txt notwug.txt
-> add morefiles.txt notwug.txt
+> add morefiles.txt
 <<<
 > commit "added another version"
 <<<
++ morefiles.txt wug.txt
 > checkout -- morefiles.txt
 <<<
 = morefiles.txt notwug.txt
