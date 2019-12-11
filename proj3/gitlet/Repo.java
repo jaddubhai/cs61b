@@ -419,6 +419,7 @@ public class Repo implements Serializable {
 
     /**merge function for gitlet.BRANCHNAME.*/
     public void merge(String branchname) {
+        mergerrors(branchname);
         Commit split = ancestor(_lastcommit, _branchmap.get(branchname));
         Commit currcommit = readcommit(_lastcommit);
         Commit givencommit = readcommit(_branchmap.get(branchname));

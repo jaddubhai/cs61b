@@ -94,6 +94,9 @@ public class Main {
             _repo.checkout3(args[1]);
         } else if (args.length == 4 && args[2].equals("--")) {
             _repo.checkout2(args[1], args[3]);
+        } else {
+            System.out.print("Incorrect operands.");
+            System.exit(0);
         }
     }
 
