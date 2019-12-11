@@ -2,7 +2,7 @@
 > init
 <<<
 + morefiles.txt wug.txt
-> add.txt
+> add morefiles.txt
 <<<
 > commit "added a file"
 <<<
