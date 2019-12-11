@@ -1,0 +1,7 @@
+# last test
+# hell yeah
+> init
+<<<
+> add filenotther.txt
+File does not exist.
+<<<

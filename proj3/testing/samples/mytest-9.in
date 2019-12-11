@@ -1,0 +1,19 @@
+> init
+<<<
++ file.txt wug.txt
+> add file.txt
+<<<
+> commit "added file"
+<<<
+> branch b1
+<<<
+> rm file.txt
+<<<
+> commit "removed file"
+<<<
+> checkout b1
+<<<
+> merge master
+Current branch fast-forwarded.
+<<<
+* file.txt

@@ -1,0 +1,36 @@
+> init
+<<<
++ some.txt notwug.txt
+> status
+=== Branches ===
+\*master
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+
+=== Untracked Files ===
+some.txt
+
+<<<
+> add some.txt
+<<<
+> commit "file added"
+<<<
+- some.txt
+> status
+=== Branches ===
+\*master
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+some.txt (deleted)
+
+=== Untracked Files ===
+
+<<<

@@ -1,0 +1,17 @@
+> init
+<<<
++ file.txt wug.txt
+> add file.txt
+<<<
+> commit "added file"
+<<<
+> branch b1
+<<<
+> rm file.txt
+<<<
+> commit "removed file"
+<<<
+> merge b1
+Given branch is an ancestor of the current branch.
+<<<
+* file.txt
