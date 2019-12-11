@@ -4,12 +4,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 /** Repository/Tree class for Gitlet, the tiny stupid version-control system.
  *  @author Varun Jadia
@@ -321,7 +316,14 @@ public class Repo implements Serializable {
     /** gitlet status. */
     public void status() {
         System.out.println("=== Branches ===");
-        for (String branch : _branchmap.keySet()) {
+        List<String> branches = new ArrayList<>(_branchmap.keySet());
+        Collections.sort(branches);
+        List<String> stagefiles = new ArrayList<>(_stagefiles.keySet());
+        Collections.sort(stagefiles);
+        List<String> rmfiles = new ArrayList<>(_rmfilenames);
+        Collections.sort(rmfiles);
+        
+        for (String branch : branches) {
             if (branch.equals(_currbranch)) {
                 System.out.println("*" + branch);
             } else {
@@ -331,13 +333,13 @@ public class Repo implements Serializable {
         System.out.println();
 
         System.out.println("=== Staged Files ===");
-        for (String filename : _stagefiles.keySet()) {
+        for (String filename : stagefiles) {
             System.out.println(filename);
         }
         System.out.println();
 
         System.out.println("=== Removed Files ===");
-        for (String filename : _rmfilenames) {
+        for (String filename : rmfiles) {
             System.out.println(filename);
         }
         System.out.println();
