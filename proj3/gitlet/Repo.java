@@ -250,8 +250,8 @@ public class Repo implements Serializable {
             System.out.println("===");
             System.out.println("commit " + lastcommit.gethash());
             if (lastcommit.getmergeparenthash() != null) {
-                String currhash = lastcommit.gethash().substring(0, 8);
-                String mergehash = lastcommit.gethash().substring(0, 8);
+                String currhash = lastcommit.gethash().substring(0, 7);
+                String mergehash = lastcommit.gethash().substring(0, 7);
                 System.out.println("Merge: " + currhash + " " + mergehash);
             }
             System.out.println("Date: " + lastcommit.gettimestamp());
