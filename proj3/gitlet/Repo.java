@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /** Repository/Tree class for Gitlet, the tiny stupid version-control system.
  *  @author Varun Jadia
@@ -328,9 +329,10 @@ public class Repo implements Serializable {
     public void status() {
         System.out.println("=== Branches ===");
         List<String> branches = new ArrayList<>(_branchmap.keySet());
-        Collections.sort(branches);
         List<String> stagefiles = new ArrayList<>();
         List<String> rmfiles = new ArrayList<>();
+        HashMap<String, String> modinotstage = modinotstage();
+        List<String> untracked = untracked();
 
         if (_stagefiles != null) {
             stagefiles = new ArrayList<>(_stagefiles.keySet());
@@ -340,6 +342,9 @@ public class Repo implements Serializable {
             rmfiles = new ArrayList<>(_rmfilenames);
             Collections.sort(rmfiles);
         }
+        Collections.sort(branches);
+        Collections.sort(untracked);
+        TreeMap<String, String> sortedmodi = new TreeMap<>(modinotstage);
 
         for (String branch : branches) {
             if (branch.equals(_currbranch)) {
@@ -361,10 +366,74 @@ public class Repo implements Serializable {
             System.out.println(filename);
         }
         System.out.println();
-        System.out.print("=== Modifications Not Staged For Commit ===");
-        System.out.println();
+        System.out.println("=== Modifications Not Staged For Commit ===");
+        if (!sortedmodi.isEmpty()) {
+            for (Map.Entry<String, String> filename : sortedmodi.entrySet()) {
+                System.out.println(
+                        filename.getKey()
+                                + " " + "(" + filename.getValue() + ")");
+            }
+        }
         System.out.println();
         System.out.println("=== Untracked Files ===");
+        if (!untracked.isEmpty()) {
+            for (String filename : untracked) {
+                System.out.println(filename);
+            }
+        }
+    }
+
+    /** helper for status function.RETURN.*/
+    public HashMap<String, String> modinotstage() {
+        HashMap<String, String> retfiles = new HashMap<>();
+        Commit lastcomm = readcommit(_lastcommit);
+        for (String filename : lastcomm.getfiles().keySet()) {
+            File f = new File(filename);
+            if (f.exists()) {
+                Blob blb = new Blob(filename);
+                if (!blb.getshacode().equals(
+                        lastcomm.getfiles().get(filename).getshacode())) {
+                    retfiles.put(filename, "modified");
+                }
+            } else if (!f.exists() && !_rmfilenames.contains(filename)) {
+                retfiles.put(filename, "deleted");
+            }
+        }
+
+        for (String filename2 : _stagefiles.keySet()) {
+            File f2 = new File(filename2);
+            if (f2.exists()) {
+                Blob blb2 = new Blob(filename2);
+                if (!blb2.getshacode().equals(
+                        _stagefiles.get(filename2).getshacode())) {
+                    retfiles.put(filename2, "modified");
+                } else if (!f2.exists()) {
+                    retfiles.put(filename2, "deleted");
+                }
+            }
+        }
+        return  retfiles;
+    }
+
+    /** another helper for status function.RETURN.*/
+    public ArrayList<String> untracked() {
+        ArrayList<String> retarr = new ArrayList<>();
+        Commit lastcomm = readcommit(_lastcommit);
+        List<String> plainfiles = Utils.plainFilenamesIn(
+                new File(System.getProperty("user.dir")));
+        for (String filename : plainfiles) {
+            if (!filename.equals(".gitignore")
+                    && !filename.equals("Makefile")
+                    && !filename.equals("proj3.iml")) {
+                if (!_stagefiles.containsKey(filename)
+                        && !lastcomm.getfiles().containsKey(filename)) {
+                    retarr.add(filename);
+                } else if (_rmfilenames.contains(filename)) {
+                    retarr.add(filename);
+                }
+            }
+        }
+        return retarr;
     }
 
     /** creates a new branch on the commit tree.BRANCHNAME. */
@@ -487,9 +556,7 @@ public class Repo implements Serializable {
                     && !givencommit.getfiles().containsKey(filename)) {
                 File file = new File(filename);
                 if (file.exists()) {
-                    if (_rmfilenames.contains(filename)) {
-                        _rmfilenames.remove(filename);
-                    }
+                    _rmfilenames.remove(filename);
                 }
             }
             if (currcommit.getfiles().containsKey(filename)
