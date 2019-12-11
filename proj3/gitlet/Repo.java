@@ -4,7 +4,13 @@ import java.io.File;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /** Repository/Tree class for Gitlet, the tiny stupid version-control system.
  *  @author Varun Jadia
@@ -77,8 +83,7 @@ public class Repo implements Serializable {
 
         Blob fileblob = new Blob(filename);
         String hashfile = fileblob.getshacode();
-        Commit lastcommit = Utils.readObject(
-                new File(".gitlet/commits/" + _lastcommit), Commit.class);
+        Commit lastcommit = readcommit(_lastcommit);
 
         for (String name : lastcommit.getfiles().keySet()) {
             if (hashfile.equals(lastcommit.getfiles().get(name).getshacode())) {
@@ -106,8 +111,7 @@ public class Repo implements Serializable {
             System.out.print("No changes added to the commit.");
             System.exit(0);
         }
-        Commit lastcommit = Utils.readObject(
-                new File(".gitlet/commits/" + _lastcommit), Commit.class);
+        Commit lastcommit = readcommit(_lastcommit);
 
         Commit comm;
         if (_merge) {
@@ -121,7 +125,6 @@ public class Repo implements Serializable {
             System.out.print("No changes added to the commit.");
             System.exit(0);
         }
-
 
         for (String filename : comm.getfiles().keySet()) {
             if (_stagefiles.containsKey(filename)) {
@@ -154,8 +157,7 @@ public class Repo implements Serializable {
 
     /**java gitlet.Main checkout -- [file name]. FILENAME*/
     public void checkout1(String filename) {
-        Commit lastcommit = Utils.readObject(
-                new File(".gitlet/commits/" + _lastcommit), Commit.class);
+        Commit lastcommit = readcommit(_lastcommit);
         Blob blb = null;
         if (lastcommit.getfiles().containsKey(filename)) {
             blb = lastcommit.getfiles().get(filename);
@@ -198,12 +200,8 @@ public class Repo implements Serializable {
             System.out.print("No need to checkout to the current branch.");
             System.exit(0);
         }
-        Commit currhead = Utils.readObject(
-                new File(".gitlet/commits/" + _lastcommit), Commit.class);
-
-        Commit lastcommit = Utils.readObject(
-                new File(".gitlet/commits/"
-                        + _branchmap.get(branchname)), Commit.class);
+        Commit currhead = readcommit(_lastcommit);
+        Commit lastcommit = readcommit(_branchmap.get(branchname));
 
         HashMap<String, Blob> commfiles = lastcommit.getfiles();
         HashMap<String, Blob> currheadfiles = currhead.getfiles();
@@ -245,8 +243,7 @@ public class Repo implements Serializable {
     public void log() {
         String counter = _lastcommit;
         while (counter != null) {
-            Commit lastcommit = Utils.readObject(
-                    new File(".gitlet/commits/" + counter), Commit.class);
+            Commit lastcommit = readcommit(counter);
             System.out.println("===");
             System.out.println("commit " + lastcommit.gethash());
             if (lastcommit.getmergeparenthash() != null) {
@@ -263,15 +260,14 @@ public class Repo implements Serializable {
 
     /** rm function for gitlet. FILENAME*/
     public void rm(String filename) {
-        Commit lastcommit = Utils.readObject(
-                new File(".gitlet/commits/" + _lastcommit), Commit.class);
+        Commit lastcommit = readcommit(_lastcommit);
         if (!_stagefiles.containsKey(filename)
                 && !lastcommit.getfiles().containsKey(filename)) {
             System.out.print("No reason to remove the file.");
             System.exit(0);
         }
 
-        File remove = new File(".gitlet/staging" + filename);
+        File remove = new File(".gitlet/staging/" + filename);
         _stagefiles.remove(filename);
         remove.delete();
 
@@ -380,9 +376,7 @@ public class Repo implements Serializable {
         File commfile = new File(".gitlet/commits/" + commitid);
         Commit comm = Utils.readObject(commfile, Commit.class);
 
-        Commit currhead = Utils.readObject(
-                new File(".gitlet/commits/" + _lastcommit), Commit.class);
-
+        Commit currhead = readcommit(_lastcommit);
         HashMap<String, Blob> commfiles = comm.getfiles();
         HashMap<String, Blob> currheadfiles = currhead.getfiles();
 
@@ -416,26 +410,18 @@ public class Repo implements Serializable {
         _stagefiles.clear();
     }
 
+    /**helper function to read a commit file.
+     * COMMITHASH.RETURN.*/
+    public Commit readcommit(String commithash) {
+        return Utils.readObject(
+                new File(".gitlet/commits/" + commithash), Commit.class);
+    }
+
     /**merge function for gitlet.BRANCHNAME.*/
     public void merge(String branchname) {
-        if (!_stagefiles.isEmpty() || !_rmfilenames.isEmpty()) {
-            System.out.print("You have uncommitted changes.");
-            System.exit(0);
-        }
-        if (!_branchmap.containsKey(branchname)) {
-            System.out.print("A branch with that name does not exist.");
-            System.exit(0);
-        }
-        if (branchname.equals(_currbranch)) {
-            System.out.print("Cannot merge a branch with itself.");
-            System.exit(0);
-        }
         Commit split = ancestor(_lastcommit, _branchmap.get(branchname));
-        Commit currcommit = Utils.readObject(new
-                File(".gitlet/commits/" + _lastcommit), Commit.class);
-        Commit givencommit = Utils.readObject(new
-                File(".gitlet/commits/" + _branchmap.get(branchname)), Commit.class);
-
+        Commit currcommit = readcommit(_lastcommit);
+        Commit givencommit = readcommit(_branchmap.get(branchname));
         if (split.gethash().equals(givencommit.gethash())) {
             System.out.print("Given branch"
                     + " is an ancestor of the current branch.");
@@ -492,12 +478,28 @@ public class Repo implements Serializable {
         mergehelper(split, currcommit, givencommit, branchname);
     }
 
+    /** helper function to find merge errors.
+     * BRANCHNAME */
+    public void mergerrors(String branchname) {
+        if (!_stagefiles.isEmpty() || !_rmfilenames.isEmpty()) {
+            System.out.print("You have uncommitted changes.");
+            System.exit(0);
+        }
+        if (!_branchmap.containsKey(branchname)) {
+            System.out.print("A branch with that name does not exist.");
+            System.exit(0);
+        }
+        if (branchname.equals(_currbranch)) {
+            System.out.print("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
+    }
     /**helper function for merge.
      * SPLIT. CURRCOMMIT. GIVENCOMMIT. BRANCHNAME.*/
     public void mergehelper(Commit split, Commit currcommit,
                             Commit givencommit, String branchname) {
         Boolean mergeconflict = mergeconflict(split, currcommit, givencommit);
-        String message = "Merged " + branchname + " into " + _currbranch +".";
+        String message = "Merged " + branchname + " into " + _currbranch + ".";
         String timestamp = ZonedDateTime.now().format
                 (DateTimeFormatter.ofPattern
                         ("EEE MMM d HH:mm:ss yyyy xxxx"));
