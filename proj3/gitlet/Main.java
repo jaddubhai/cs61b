@@ -88,10 +88,10 @@ public class Main {
 
     /**checkout helper for main.ARGS.*/
     private static void checkouthelper(String... args) {
-        if (args.length == 2) {
-            _repo.checkout1(args[1]);
-        } else if (args.length == 3) {
-            _repo.checkout3(args[2]);
+        if (args.length == 3 && args[1].equals("--")) {
+            _repo.checkout1(args[2]);
+        } else if (args.length == 2) {
+            _repo.checkout3(args[1]);
         } else if (args.length == 4 && args[2].equals("--")) {
             _repo.checkout2(args[1], args[3]);
         }
