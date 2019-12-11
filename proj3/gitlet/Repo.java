@@ -31,7 +31,7 @@ public class Repo implements Serializable {
     private String _currbranch;
 
     /** Tracks file to be removed in next commit. */
-    private ArrayList<String> _rmfilenames;
+    private ArrayList<String> _rmfilenames = new ArrayList<>();
 
     /**Tracks all commit ids. */
     private HashSet<String> _commitids;
@@ -54,6 +54,7 @@ public class Repo implements Serializable {
         staging.mkdir();
 
         _stagefiles = new HashMap<String, Blob>();
+        _rmfilenames = new ArrayList<>();
         _commitids = new HashSet<>();
         _lastcommit = initcom.gethash();
 
@@ -107,7 +108,7 @@ public class Repo implements Serializable {
             System.out.print("Please enter a commit message.");
             System.exit(0);
         }
-        if (_stagefiles.isEmpty() && _rmfilenames.isEmpty()) {
+        if (_stagefiles.isEmpty() && _rmfilenames.isEmpty() || _rmfilenames == null) {
             System.out.print("No changes added to the commit.");
             System.exit(0);
         }
@@ -314,10 +315,17 @@ public class Repo implements Serializable {
         System.out.println("=== Branches ===");
         List<String> branches = new ArrayList<>(_branchmap.keySet());
         Collections.sort(branches);
-        List<String> stagefiles = new ArrayList<>(_stagefiles.keySet());
-        Collections.sort(stagefiles);
-        List<String> rmfiles = new ArrayList<>(_rmfilenames);
-        Collections.sort(rmfiles);
+        List<String> stagefiles = new ArrayList<>();
+        List<String> rmfiles = new ArrayList<>();
+
+        if (_stagefiles != null) {
+            stagefiles = new ArrayList<>(_stagefiles.keySet());
+            Collections.sort(stagefiles);
+        }
+        if (_rmfilenames != null) {
+            rmfiles = new ArrayList<>(_rmfilenames);
+            Collections.sort(rmfiles);
+        }
 
         for (String branch : branches) {
             if (branch.equals(_currbranch)) {
@@ -399,7 +407,7 @@ public class Repo implements Serializable {
         }
 
         for (String filename : commfiles.keySet()) {
-            checkout1(filename);
+            checkout2(commitid, filename);
         }
 
         for (String filename : _stagefiles.keySet()) {
@@ -408,6 +416,7 @@ public class Repo implements Serializable {
             delstage.delete();
         }
         _stagefiles.clear();
+        _lastcommit = commitid;
     }
 
     /**helper function to read a commit file.
