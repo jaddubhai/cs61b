@@ -108,7 +108,8 @@ public class Repo implements Serializable {
             System.out.print("Please enter a commit message.");
             System.exit(0);
         }
-        if (_stagefiles.isEmpty() && _rmfilenames.isEmpty() || _rmfilenames == null) {
+        if (_stagefiles.isEmpty() && _rmfilenames.isEmpty()
+                || _rmfilenames == null) {
             System.out.print("No changes added to the commit.");
             System.exit(0);
         }
@@ -173,6 +174,19 @@ public class Repo implements Serializable {
     /** java gitlet.Main
      * checkout [commit id] -- [file name]. COMMITID FILENAME*/
     public void checkout2(String commitid, String filename) {
+        int hashlength = _lastcommit.length();
+        if (commitid.length() < hashlength) {
+            int commlen = commitid.length();
+            File dir = new File(".gitlet/commits/");
+            for (File commfile : dir.listFiles()) {
+                Commit comm = Utils.readObject(commfile, Commit.class);
+                String commid = comm.gethash();
+                if (commid.substring(0, commlen).equals(commitid)) {
+                    commitid = commid;
+                }
+            }
+        }
+
         File checkcomm = new File(".gitlet/commits/" + commitid);
         Commit lastcommit = null;
         if (checkcomm.exists()) {
@@ -242,7 +256,7 @@ public class Repo implements Serializable {
 
     /**prints commit logs. */
     public void log() {
-        String counter = _lastcommit;
+        String counter = _branchmap.get(_currbranch);
         while (counter != null) {
             Commit lastcommit = readcommit(counter);
             System.out.println("===");
@@ -416,7 +430,8 @@ public class Repo implements Serializable {
             delstage.delete();
         }
         _stagefiles.clear();
-        _lastcommit = commitid;
+        _branchmap.put(_currbranch, commitid);
+        _lastcommit = _branchmap.get(_currbranch);
     }
 
     /**helper function to read a commit file.
@@ -439,6 +454,7 @@ public class Repo implements Serializable {
         }
         if (split.gethash().equals(currcommit.gethash())) {
             System.out.print("Current branch fast forwarded.");
+            reset(givencommit.gethash());
             System.exit(0);
         }
         for (String file : givencommit.getfiles().keySet()) {
@@ -539,7 +555,7 @@ public class Repo implements Serializable {
                     Blob blb2 = currcommit.getfiles().get(filename);
                     if (!blb1.getshacode().equals(blb2.getshacode())) {
                         blb1 = currcommit.getfiles().get(filename);
-                        blb2 = null;
+                        blb2 = givencommit.getfiles().get(filename);
                         replacecon(filename, blb1, blb2);
                         return true;
                     }
@@ -549,7 +565,7 @@ public class Repo implements Serializable {
                     Blob blb1 = split.getfiles().get(filename);
                     Blob blb2 = givencommit.getfiles().get(filename);
                     if (!blb1.getshacode().equals(blb2.getshacode())) {
-                        blb1 = null;
+                        blb1 = currcommit.getfiles().get(filename);
                         replacecon(filename, blb1, blb2);
                         return true;
                     }
