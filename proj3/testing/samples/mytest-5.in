@@ -1,0 +1,16 @@
+# random tests for checkout
+> init
+<<<
++ morefiles.txt wug.txt
+> add.txt
+<<<
+> commit "added a file"
+<<<
++ morefiles.txt notwug.txt
+> add morefiles.txt notwug.txt
+<<<
+> commit "added another version"
+<<<
+> checkout -- morefiles.txt
+<<<
+= morefilex.txt notwug.txt

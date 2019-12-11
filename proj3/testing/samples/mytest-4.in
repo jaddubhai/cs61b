@@ -1,0 +1,11 @@
+# some test for find
+> init
+<<<
++ findsome.txt wug.txt
+> add findsome.txt
+<<<
+> commit "added findsome"
+<<<
+> find "reeeeeeeeeee"
+Found no commit with that message.
+<<<

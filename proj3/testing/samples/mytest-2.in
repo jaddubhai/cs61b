@@ -1,0 +1,7 @@
+# Some test for rm-branch
+> init
+<<<
+> branch other
+<<<
+> rm branch
+I blank-status.inc

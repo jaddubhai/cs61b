@@ -1,0 +1,11 @@
+# random test for add
+> init
+<<<
++ somefile.txt wug.txt
+> add somefile.txt
+<<<
+> commit "added somefile"
+<<<
+> reset "initial commit"
+<<<
+I blank-status.inc

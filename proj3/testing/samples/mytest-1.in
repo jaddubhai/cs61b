@@ -1,0 +1,10 @@
+# small test for rm
+> init
+<<<
++ sumimasen.txt wug.txt
+> add sumimasen.txt
+<<<
+> rm sumimasen.txt
+<<<
+# checks if sumimasen is deleted
+* sumimasen.txt
